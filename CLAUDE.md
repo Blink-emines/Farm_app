@@ -53,4 +53,13 @@ Secrets live in `backend/.env` (gitignored). `.env.example` documents the keys.
 
 ## Commands
 
-_(filled in as layers are built)_
+Run from `backend/` (first time: `python3 -m venv .venv`, then copy
+`.env.example` to `backend/.env` and set a secret key).
+
+| What                          | Command                                          |
+|-------------------------------|--------------------------------------------------|
+| Install libraries             | `.venv/bin/pip install -r requirements.txt`      |
+| Build/update database tables  | `.venv/bin/python manage.py migrate`             |
+| Run tests                     | `.venv/bin/python manage.py test`                |
+| Create an admin login         | `.venv/bin/python manage.py createsuperuser`     |
+| Start the server (admin at http://127.0.0.1:8000/admin/) | `.venv/bin/python manage.py runserver` |
