@@ -1,0 +1,43 @@
+# Secrets — never commit real values
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Django / databases (contain user data)
+*.sqlite3
+*.sqlite3-journal
+/backend/staticfiles/
+
+# Node (web + mobile)
+node_modules/
+dist/
+coverage/
+.expo/
+web-build/
+
+# Mobile build output + signing keys (secrets!)
+*.apk
+*.aab
+*.ipa
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Logs
+*.log
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
