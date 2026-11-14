@@ -1,0 +1,6 @@
+# Cache: commit only the default point (33.96, -5.27) so it works offline.
+cache/*
+!cache/.gitkeep
+!cache/*_33.96_-5.27_*.json
+__pycache__/
+.pytest_cache/

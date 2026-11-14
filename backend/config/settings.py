@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
 import os
+import sys
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -20,6 +21,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Read backend/.env (gitignored) into environment variables.
 load_dotenv(BASE_DIR / '.env')
+
+# data/ and engine/ live at the repository root, next to backend/.
+sys.path.insert(0, str(BASE_DIR.parent))
 
 
 # Quick-start development settings - unsuitable for production
@@ -46,6 +50,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'farms',
+    'rotation',
 ]
 
 REST_FRAMEWORK = {

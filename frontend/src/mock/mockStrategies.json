@@ -1,0 +1,2530 @@
+{
+ "schema_version": "1.0",
+ "generated_at": "2026-11-14T13:59:57Z",
+ "location": {
+  "latitude": 33.96,
+  "longitude": -5.27
+ },
+ "features_summary": {
+  "climate_period": {
+   "start_year": 2005,
+   "end_year": 2024
+  },
+  "soil_status": "cache",
+  "data_gaps": [
+   "climate_coarse_grid",
+   "root_zone_wetness_model",
+   "soil_model_estimate"
+  ]
+ },
+ "priorities": {
+  "save_water": 3,
+  "improve_soil": 3,
+  "extra_income": 2,
+  "reduce_erosion": 1,
+  "forage": 0
+ },
+ "strategies": [
+  {
+   "id": "wheat_faba_bean",
+   "name": {
+    "code": "strategy_name_template",
+    "params": {
+     "crops": "wheat > faba_bean"
+    },
+    "default_text": "Rotation: wheat > faba_bean"
+   },
+   "is_current": false,
+   "seasons": [
+    {
+     "crop_id": "wheat",
+     "sow_month": 11,
+     "harvest_month": 6
+    },
+    {
+     "crop_id": "faba_bean",
+     "sow_month": 11,
+     "harvest_month": 5
+    }
+   ],
+   "calendar": [
+    {
+     "year": 1,
+     "months": [
+      {
+       "month": 1,
+       "crop_id": "faba_bean",
+       "status": "growing",
+       "stress_reasons": []
+      },
+      {
+       "month": 2,
+       "crop_id": "faba_bean",
+       "status": "growing",
+       "stress_reasons": []
+      },
+      {
+       "month": 3,
+       "crop_id": "faba_bean",
+       "status": "stress",
+       "stress_reasons": [
+        {
+         "code": "stress_water_deficit",
+         "params": {
+          "crop": "faba_bean",
+          "need_mm": 110,
+          "rain_mm": 98
+         },
+         "default_text": "Rain (98 mm) is below the estimated water need of faba_bean (110 mm)."
+        }
+       ]
+      },
+      {
+       "month": 4,
+       "crop_id": "faba_bean",
+       "status": "stress",
+       "stress_reasons": [
+        {
+         "code": "stress_water_deficit",
+         "params": {
+          "crop": "faba_bean",
+          "need_mm": 141,
+          "rain_mm": 65
+         },
+         "default_text": "Rain (65 mm) is below the estimated water need of faba_bean (141 mm)."
+        }
+       ]
+      },
+      {
+       "month": 5,
+       "crop_id": "faba_bean",
+       "status": "stress",
+       "stress_reasons": [
+        {
+         "code": "stress_water_deficit",
+         "params": {
+          "crop": "faba_bean",
+          "need_mm": 191,
+          "rain_mm": 35
+         },
+         "default_text": "Rain (35 mm) is below the estimated water need of faba_bean (191 mm)."
+        },
+        {
+         "code": "stress_heat_generic",
+         "params": {
+          "crop": "faba_bean",
+          "heat_days": 3.3,
+          "threshold_c": 35,
+          "level": 1
+         },
+         "default_text": "Average days above 35 C this month (3.3) reach the generic warning level of 1; generic level, not crop-specific (faba_bean)."
+        }
+       ]
+      },
+      {
+       "month": 6,
+       "crop_id": null,
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 7,
+       "crop_id": null,
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 8,
+       "crop_id": null,
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 9,
+       "crop_id": null,
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 10,
+       "crop_id": null,
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 11,
+       "crop_id": "wheat",
+       "status": "growing",
+       "stress_reasons": []
+      },
+      {
+       "month": 12,
+       "crop_id": "wheat",
+       "status": "growing",
+       "stress_reasons": []
+      }
+     ]
+    },
+    {
+     "year": 2,
+     "months": [
+      {
+       "month": 1,
+       "crop_id": "wheat",
+       "status": "growing",
+       "stress_reasons": []
+      },
+      {
+       "month": 2,
+       "crop_id": "wheat",
+       "status": "growing",
+       "stress_reasons": []
+      },
+      {
+       "month": 3,
+       "crop_id": "wheat",
+       "status": "stress",
+       "stress_reasons": [
+        {
+         "code": "stress_water_deficit",
+         "params": {
+          "crop": "wheat",
+          "need_mm": 110,
+          "rain_mm": 98
+         },
+         "default_text": "Rain (98 mm) is below the estimated water need of wheat (110 mm)."
+        }
+       ]
+      },
+      {
+       "month": 4,
+       "crop_id": "wheat",
+       "status": "stress",
+       "stress_reasons": [
+        {
+         "code": "stress_water_deficit",
+         "params": {
+          "crop": "wheat",
+          "need_mm": 141,
+          "rain_mm": 65
+         },
+         "default_text": "Rain (65 mm) is below the estimated water need of wheat (141 mm)."
+        }
+       ]
+      },
+      {
+       "month": 5,
+       "crop_id": "wheat",
+       "status": "stress",
+       "stress_reasons": [
+        {
+         "code": "stress_water_deficit",
+         "params": {
+          "crop": "wheat",
+          "need_mm": 191,
+          "rain_mm": 35
+         },
+         "default_text": "Rain (35 mm) is below the estimated water need of wheat (191 mm)."
+        },
+        {
+         "code": "stress_heat_generic",
+         "params": {
+          "crop": "wheat",
+          "heat_days": 3.3,
+          "threshold_c": 35,
+          "level": 1
+         },
+         "default_text": "Average days above 35 C this month (3.3) reach the generic warning level of 1; generic level, not crop-specific (wheat)."
+        }
+       ]
+      },
+      {
+       "month": 6,
+       "crop_id": "wheat",
+       "status": "stress",
+       "stress_reasons": [
+        {
+         "code": "stress_water_deficit",
+         "params": {
+          "crop": "wheat",
+          "need_mm": 229,
+          "rain_mm": 10
+         },
+         "default_text": "Rain (10 mm) is below the estimated water need of wheat (229 mm)."
+        },
+        {
+         "code": "stress_heat_generic",
+         "params": {
+          "crop": "wheat",
+          "heat_days": 9.7,
+          "threshold_c": 35,
+          "level": 1
+         },
+         "default_text": "Average days above 35 C this month (9.7) reach the generic warning level of 1; generic level, not crop-specific (wheat)."
+        }
+       ]
+      },
+      {
+       "month": 7,
+       "crop_id": null,
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 8,
+       "crop_id": null,
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 9,
+       "crop_id": null,
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 10,
+       "crop_id": null,
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 11,
+       "crop_id": "faba_bean",
+       "status": "growing",
+       "stress_reasons": []
+      },
+      {
+       "month": 12,
+       "crop_id": "faba_bean",
+       "status": "growing",
+       "stress_reasons": []
+      }
+     ]
+    }
+   ],
+   "why": [
+    {
+     "rule_id": "n_credit_legume_after_cereal",
+     "effect": "bonus",
+     "points": 5.0,
+     "priority": "improve_soil",
+     "message": {
+      "code": "n_credit_applied",
+      "params": {
+       "from_crop": "wheat",
+       "to_crop": "faba_bean"
+      },
+      "default_text": "faba_bean after wheat: the legume leaves nitrogen for the next crop."
+     }
+    },
+    {
+     "rule_id": "family_break",
+     "effect": "bonus",
+     "points": 2.5,
+     "priority": "improve_soil",
+     "message": {
+      "code": "family_change",
+      "params": {
+       "from_crop": "faba_bean",
+       "to_crop": "wheat"
+      },
+      "default_text": "wheat after faba_bean: different crop families help break pest and disease cycles."
+     }
+    },
+    {
+     "rule_id": "family_break",
+     "effect": "bonus",
+     "points": 2.5,
+     "priority": "improve_soil",
+     "message": {
+      "code": "family_change",
+      "params": {
+       "from_crop": "wheat",
+       "to_crop": "faba_bean"
+      },
+      "default_text": "faba_bean after wheat: different crop families help break pest and disease cycles."
+     }
+    },
+    {
+     "rule_id": "deep_root_structure",
+     "effect": "bonus",
+     "points": 2.5,
+     "priority": "improve_soil",
+     "message": {
+      "code": "deep_root_present",
+      "params": {
+       "crops": "wheat",
+       "years": 1
+      },
+      "default_text": "Deep-rooting crops (wheat) in 1 season(s) help soil structure and water infiltration."
+     }
+    },
+    {
+     "rule_id": "bare_months_penalty",
+     "effect": "penalty",
+     "points": -9.0,
+     "priority": "reduce_erosion",
+     "message": {
+      "code": "bare_months",
+      "params": {
+       "count": 9,
+       "months": "6,7,8,9,10"
+      },
+      "default_text": "9 bare-field month(s) per rotation (months 6,7,8,9,10) leave the soil exposed to erosion."
+     }
+    },
+    {
+     "rule_id": "water_demand_match",
+     "effect": "bonus",
+     "points": 20.0,
+     "priority": "save_water",
+     "message": {
+      "code": "water_ok_months",
+      "params": {
+       "count": 8
+      },
+      "default_text": "8 growing month(s) where rainfall covers the crop's estimated water need."
+     }
+    },
+    {
+     "rule_id": "water_demand_match",
+     "effect": "penalty",
+     "points": -17.5,
+     "priority": "save_water",
+     "message": {
+      "code": "water_stress_months",
+      "params": {
+       "count": 7
+      },
+      "default_text": "7 growing month(s) where rainfall is below the crop's estimated water need."
+     }
+    },
+    {
+     "rule_id": "income_flag",
+     "effect": "bonus",
+     "points": 5.0,
+     "priority": "extra_income",
+     "message": {
+      "code": "income_flag_points",
+      "params": {
+       "levels": "wheat:medium,faba_bean:medium"
+      },
+      "default_text": "Income potential from qualitative crop flags only (wheat:medium,faba_bean:medium); there is no price data."
+     }
+    },
+    {
+     "rule_id": "forage_flag",
+     "effect": "neutral",
+     "points": 0.0,
+     "priority": "forage",
+     "message": {
+      "code": "forage_flag_points",
+      "params": {
+       "levels": "wheat:low,faba_bean:low"
+      },
+      "default_text": "Forage value from qualitative crop flags only (wheat:low,faba_bean:low); there is no price data."
+     }
+    }
+   ],
+   "evidence": [
+    {
+     "feature": "crops.faba_bean.legume",
+     "value": "yes",
+     "unit": "yes/no",
+     "source": "botanical taxonomy"
+    },
+    {
+     "feature": "crops.wheat.family",
+     "value": "poaceae",
+     "unit": "taxon",
+     "source": "botanical taxonomy"
+    },
+    {
+     "feature": "crops.faba_bean.family",
+     "value": "fabaceae",
+     "unit": "taxon",
+     "source": "botanical taxonomy"
+    },
+    {
+     "feature": "crops.wheat.rooting_zr_min_m",
+     "value": 1.0,
+     "unit": "m",
+     "source": "FAO-56 Table 22, Spring Wheat 1.0-1.5 m (Winter Wheat row is 1.5-1.8 m; deep either way)"
+    },
+    {
+     "feature": "climate.monthly.precipitation",
+     "value": [
+      94.99,
+      86.29,
+      98.03,
+      64.92,
+      35.36,
+      9.62,
+      3.3,
+      7.7,
+      26.8,
+      66.57,
+      100.7,
+      84.7
+     ],
+     "unit": "mm/month",
+     "source": "NASA POWER"
+    },
+    {
+     "feature": "climate.monthly.et0",
+     "value": [
+      51.35,
+      63.29,
+      95.48,
+      123.02,
+      165.74,
+      199.23,
+      245.94,
+      237.67,
+      165.89,
+      122.86,
+      69.62,
+      51.83
+     ],
+     "unit": "mm/month",
+     "source": "NASA POWER"
+    },
+    {
+     "feature": "crops.faba_bean.kc_mid",
+     "value": 1.15,
+     "unit": "FAO-56 Kc (-)",
+     "source": "FAO-56 Table 12, Faba bean (footnote 2)"
+    },
+    {
+     "feature": "crops.wheat.kc_mid",
+     "value": 1.15,
+     "unit": "FAO-56 Kc (-)",
+     "source": "FAO-56 Table 12, Wheat"
+    },
+    {
+     "feature": "crops.wheat.income_flag",
+     "value": "medium",
+     "unit": "qualitative",
+     "source": "qualitative, approved by user 2026-11-14, no price data"
+    },
+    {
+     "feature": "crops.faba_bean.income_flag",
+     "value": "medium",
+     "unit": "qualitative",
+     "source": "qualitative, approved by user 2026-11-14, no price data"
+    },
+    {
+     "feature": "crops.wheat.forage_flag",
+     "value": "low",
+     "unit": "qualitative",
+     "source": "qualitative, approved by user 2026-11-14, no price data"
+    },
+    {
+     "feature": "crops.faba_bean.forage_flag",
+     "value": "low",
+     "unit": "qualitative",
+     "source": "qualitative, approved by user 2026-11-14, no price data"
+    },
+    {
+     "feature": "climate.monthly.frost_days",
+     "value": [
+      0.5,
+      0.6,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.05
+     ],
+     "unit": "days/month",
+     "months": [
+      5,
+      6
+     ],
+     "source": "NASA POWER"
+    },
+    {
+     "feature": "climate.monthly.heat_days.35",
+     "value": [
+      0.0,
+      0.0,
+      0.0,
+      0.2,
+      3.3,
+      9.65,
+      23.75,
+      26.4,
+      9.15,
+      1.6,
+      0.0,
+      0.0
+     ],
+     "unit": "days/month",
+     "months": [
+      5,
+      6
+     ],
+     "source": "NASA POWER"
+    }
+   ],
+   "benefits": [
+    {
+     "code": "benefit_n_credit_legume_after_cereal",
+     "params": {},
+     "default_text": "Nitrogen credit from a legume after a cereal."
+    },
+    {
+     "code": "benefit_family_break",
+     "params": {},
+     "default_text": "Crop family changes between seasons, which breaks pest and disease cycles."
+    },
+    {
+     "code": "benefit_deep_root_structure",
+     "params": {},
+     "default_text": "Deep roots improve soil structure and infiltration."
+    },
+    {
+     "code": "benefit_water_demand_match",
+     "params": {},
+     "default_text": "Crop water need is mostly met by rainfall in its growing months."
+    },
+    {
+     "code": "benefit_income_flag",
+     "params": {},
+     "default_text": "Qualitatively favourable for income (low confidence, no price data)."
+    }
+   ],
+   "information_gaps": [
+    {
+     "code": "gap_local_prices",
+     "params": {},
+     "default_text": "Local prices are not available, so income and forage are compared only from qualitative crop flags."
+    },
+    {
+     "code": "gap_water_stress_indicative",
+     "params": {},
+     "default_text": "Water stress is estimated from NASA model data (ET0 at the high end of typical Saiss values); treat it as indicative."
+    },
+    {
+     "code": "gap_frost_heat_tolerance_unknown",
+     "params": {
+      "crops": "faba_bean,wheat"
+     },
+     "default_text": "Crop frost and heat tolerance unknown, needs local data: faba_bean,wheat."
+    },
+    {
+     "code": "gap_frost_underestimated",
+     "params": {},
+     "default_text": "NASA frost days are likely underestimated for the Saiss (coarse grid); check frost risk locally."
+    },
+    {
+     "code": "gap_default_months",
+     "params": {
+      "crops": "faba_bean,wheat"
+     },
+     "default_text": "Sowing and harvest months for faba_bean,wheat are defaults, to confirm locally."
+    }
+   ],
+   "risks_for_local_review": [
+    {
+     "code": "risk_local_review",
+     "params": {},
+     "default_text": "Check this option with a local agronomist or extension officer before acting; it is an option to discuss, not an order."
+    },
+    {
+     "code": "risk_water_stress_months",
+     "params": {
+      "months": "3,4,5,6"
+     },
+     "default_text": "Rainfall is below the estimated crop water need in months 3,4,5,6; check soil moisture and irrigation access locally."
+    },
+    {
+     "code": "risk_frost_heat_generic",
+     "params": {
+      "months": "5,6"
+     },
+     "default_text": "Frost or heat warning (generic level, not crop-specific) in growing months 5,6; check the crop's real tolerance locally."
+    },
+    {
+     "code": "risk_frost_heat_unassessed",
+     "params": {},
+     "default_text": "Crop frost and heat tolerance is unknown, so frost and heat risk is only flagged at generic levels."
+    }
+   ],
+   "confidence": "low",
+   "score": {
+    "total": 88.99,
+    "by_priority": {
+     "save_water": 85.71,
+     "improve_soil": 100.0,
+     "extra_income": 100.0,
+     "reduce_erosion": 43.75,
+     "forage": 0.0
+    }
+   },
+   "rank": 1
+  },
+  {
+   "id": "barley_lentil",
+   "name": {
+    "code": "strategy_name_template",
+    "params": {
+     "crops": "barley > lentil"
+    },
+    "default_text": "Rotation: barley > lentil"
+   },
+   "is_current": false,
+   "seasons": [
+    {
+     "crop_id": "barley",
+     "sow_month": 11,
+     "harvest_month": 5
+    },
+    {
+     "crop_id": "lentil",
+     "sow_month": 11,
+     "harvest_month": 5
+    }
+   ],
+   "calendar": [
+    {
+     "year": 1,
+     "months": [
+      {
+       "month": 1,
+       "crop_id": "lentil",
+       "status": "growing",
+       "stress_reasons": []
+      },
+      {
+       "month": 2,
+       "crop_id": "lentil",
+       "status": "growing",
+       "stress_reasons": []
+      },
+      {
+       "month": 3,
+       "crop_id": "lentil",
+       "status": "stress",
+       "stress_reasons": [
+        {
+         "code": "stress_water_deficit",
+         "params": {
+          "crop": "lentil",
+          "need_mm": 105,
+          "rain_mm": 98
+         },
+         "default_text": "Rain (98 mm) is below the estimated water need of lentil (105 mm)."
+        }
+       ]
+      },
+      {
+       "month": 4,
+       "crop_id": "lentil",
+       "status": "stress",
+       "stress_reasons": [
+        {
+         "code": "stress_water_deficit",
+         "params": {
+          "crop": "lentil",
+          "need_mm": 135,
+          "rain_mm": 65
+         },
+         "default_text": "Rain (65 mm) is below the estimated water need of lentil (135 mm)."
+        }
+       ]
+      },
+      {
+       "month": 5,
+       "crop_id": "lentil",
+       "status": "stress",
+       "stress_reasons": [
+        {
+         "code": "stress_water_deficit",
+         "params": {
+          "crop": "lentil",
+          "need_mm": 182,
+          "rain_mm": 35
+         },
+         "default_text": "Rain (35 mm) is below the estimated water need of lentil (182 mm)."
+        },
+        {
+         "code": "stress_heat_generic",
+         "params": {
+          "crop": "lentil",
+          "heat_days": 3.3,
+          "threshold_c": 35,
+          "level": 1
+         },
+         "default_text": "Average days above 35 C this month (3.3) reach the generic warning level of 1; generic level, not crop-specific (lentil)."
+        }
+       ]
+      },
+      {
+       "month": 6,
+       "crop_id": null,
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 7,
+       "crop_id": null,
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 8,
+       "crop_id": null,
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 9,
+       "crop_id": null,
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 10,
+       "crop_id": null,
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 11,
+       "crop_id": "barley",
+       "status": "growing",
+       "stress_reasons": []
+      },
+      {
+       "month": 12,
+       "crop_id": "barley",
+       "status": "growing",
+       "stress_reasons": []
+      }
+     ]
+    },
+    {
+     "year": 2,
+     "months": [
+      {
+       "month": 1,
+       "crop_id": "barley",
+       "status": "growing",
+       "stress_reasons": []
+      },
+      {
+       "month": 2,
+       "crop_id": "barley",
+       "status": "growing",
+       "stress_reasons": []
+      },
+      {
+       "month": 3,
+       "crop_id": "barley",
+       "status": "stress",
+       "stress_reasons": [
+        {
+         "code": "stress_water_deficit",
+         "params": {
+          "crop": "barley",
+          "need_mm": 110,
+          "rain_mm": 98
+         },
+         "default_text": "Rain (98 mm) is below the estimated water need of barley (110 mm)."
+        }
+       ]
+      },
+      {
+       "month": 4,
+       "crop_id": "barley",
+       "status": "stress",
+       "stress_reasons": [
+        {
+         "code": "stress_water_deficit",
+         "params": {
+          "crop": "barley",
+          "need_mm": 141,
+          "rain_mm": 65
+         },
+         "default_text": "Rain (65 mm) is below the estimated water need of barley (141 mm)."
+        }
+       ]
+      },
+      {
+       "month": 5,
+       "crop_id": "barley",
+       "status": "stress",
+       "stress_reasons": [
+        {
+         "code": "stress_water_deficit",
+         "params": {
+          "crop": "barley",
+          "need_mm": 191,
+          "rain_mm": 35
+         },
+         "default_text": "Rain (35 mm) is below the estimated water need of barley (191 mm)."
+        },
+        {
+         "code": "stress_heat_generic",
+         "params": {
+          "crop": "barley",
+          "heat_days": 3.3,
+          "threshold_c": 35,
+          "level": 1
+         },
+         "default_text": "Average days above 35 C this month (3.3) reach the generic warning level of 1; generic level, not crop-specific (barley)."
+        }
+       ]
+      },
+      {
+       "month": 6,
+       "crop_id": null,
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 7,
+       "crop_id": null,
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 8,
+       "crop_id": null,
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 9,
+       "crop_id": null,
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 10,
+       "crop_id": null,
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 11,
+       "crop_id": "lentil",
+       "status": "growing",
+       "stress_reasons": []
+      },
+      {
+       "month": 12,
+       "crop_id": "lentil",
+       "status": "growing",
+       "stress_reasons": []
+      }
+     ]
+    }
+   ],
+   "why": [
+    {
+     "rule_id": "n_credit_legume_after_cereal",
+     "effect": "bonus",
+     "points": 5.0,
+     "priority": "improve_soil",
+     "message": {
+      "code": "n_credit_applied",
+      "params": {
+       "from_crop": "barley",
+       "to_crop": "lentil"
+      },
+      "default_text": "lentil after barley: the legume leaves nitrogen for the next crop."
+     }
+    },
+    {
+     "rule_id": "family_break",
+     "effect": "bonus",
+     "points": 2.5,
+     "priority": "improve_soil",
+     "message": {
+      "code": "family_change",
+      "params": {
+       "from_crop": "lentil",
+       "to_crop": "barley"
+      },
+      "default_text": "barley after lentil: different crop families help break pest and disease cycles."
+     }
+    },
+    {
+     "rule_id": "family_break",
+     "effect": "bonus",
+     "points": 2.5,
+     "priority": "improve_soil",
+     "message": {
+      "code": "family_change",
+      "params": {
+       "from_crop": "barley",
+       "to_crop": "lentil"
+      },
+      "default_text": "lentil after barley: different crop families help break pest and disease cycles."
+     }
+    },
+    {
+     "rule_id": "deep_root_structure",
+     "effect": "bonus",
+     "points": 2.5,
+     "priority": "improve_soil",
+     "message": {
+      "code": "deep_root_present",
+      "params": {
+       "crops": "barley",
+       "years": 1
+      },
+      "default_text": "Deep-rooting crops (barley) in 1 season(s) help soil structure and water infiltration."
+     }
+    },
+    {
+     "rule_id": "bare_months_penalty",
+     "effect": "penalty",
+     "points": -10.0,
+     "priority": "reduce_erosion",
+     "message": {
+      "code": "bare_months",
+      "params": {
+       "count": 10,
+       "months": "6,7,8,9,10"
+      },
+      "default_text": "10 bare-field month(s) per rotation (months 6,7,8,9,10) leave the soil exposed to erosion."
+     }
+    },
+    {
+     "rule_id": "water_demand_match",
+     "effect": "bonus",
+     "points": 20.0,
+     "priority": "save_water",
+     "message": {
+      "code": "water_ok_months",
+      "params": {
+       "count": 8
+      },
+      "default_text": "8 growing month(s) where rainfall covers the crop's estimated water need."
+     }
+    },
+    {
+     "rule_id": "water_demand_match",
+     "effect": "penalty",
+     "points": -15.0,
+     "priority": "save_water",
+     "message": {
+      "code": "water_stress_months",
+      "params": {
+       "count": 6
+      },
+      "default_text": "6 growing month(s) where rainfall is below the crop's estimated water need."
+     }
+    },
+    {
+     "rule_id": "income_flag",
+     "effect": "bonus",
+     "points": 2.5,
+     "priority": "extra_income",
+     "message": {
+      "code": "income_flag_points",
+      "params": {
+       "levels": "barley:low,lentil:medium"
+      },
+      "default_text": "Income potential from qualitative crop flags only (barley:low,lentil:medium); there is no price data."
+     }
+    },
+    {
+     "rule_id": "forage_flag",
+     "effect": "bonus",
+     "points": 2.5,
+     "priority": "forage",
+     "message": {
+      "code": "forage_flag_points",
+      "params": {
+       "levels": "barley:medium,lentil:low"
+      },
+      "default_text": "Forage value from qualitative crop flags only (barley:medium,lentil:low); there is no price data."
+     }
+    }
+   ],
+   "evidence": [
+    {
+     "feature": "crops.lentil.legume",
+     "value": "yes",
+     "unit": "yes/no",
+     "source": "botanical taxonomy"
+    },
+    {
+     "feature": "crops.barley.family",
+     "value": "poaceae",
+     "unit": "taxon",
+     "source": "botanical taxonomy"
+    },
+    {
+     "feature": "crops.lentil.family",
+     "value": "fabaceae",
+     "unit": "taxon",
+     "source": "botanical taxonomy"
+    },
+    {
+     "feature": "crops.barley.rooting_zr_min_m",
+     "value": 1.0,
+     "unit": "m",
+     "source": "FAO-56 Table 22, Barley 1.0-1.5 m"
+    },
+    {
+     "feature": "climate.monthly.precipitation",
+     "value": [
+      94.99,
+      86.29,
+      98.03,
+      64.92,
+      35.36,
+      9.62,
+      3.3,
+      7.7,
+      26.8,
+      66.57,
+      100.7,
+      84.7
+     ],
+     "unit": "mm/month",
+     "source": "NASA POWER"
+    },
+    {
+     "feature": "climate.monthly.et0",
+     "value": [
+      51.35,
+      63.29,
+      95.48,
+      123.02,
+      165.74,
+      199.23,
+      245.94,
+      237.67,
+      165.89,
+      122.86,
+      69.62,
+      51.83
+     ],
+     "unit": "mm/month",
+     "source": "NASA POWER"
+    },
+    {
+     "feature": "crops.barley.kc_mid",
+     "value": 1.15,
+     "unit": "FAO-56 Kc (-)",
+     "source": "FAO-56 Table 12, Barley"
+    },
+    {
+     "feature": "crops.lentil.kc_mid",
+     "value": 1.1,
+     "unit": "FAO-56 Kc (-)",
+     "source": "FAO-56 Table 12, Lentil"
+    },
+    {
+     "feature": "crops.barley.income_flag",
+     "value": "low",
+     "unit": "qualitative",
+     "source": "qualitative, approved by user 2026-11-14, no price data"
+    },
+    {
+     "feature": "crops.lentil.income_flag",
+     "value": "medium",
+     "unit": "qualitative",
+     "source": "qualitative, approved by user 2026-11-14, no price data"
+    },
+    {
+     "feature": "crops.barley.forage_flag",
+     "value": "medium",
+     "unit": "qualitative",
+     "source": "qualitative, approved by user 2026-11-14, no price data"
+    },
+    {
+     "feature": "crops.lentil.forage_flag",
+     "value": "low",
+     "unit": "qualitative",
+     "source": "qualitative, approved by user 2026-11-14, no price data"
+    },
+    {
+     "feature": "climate.monthly.frost_days",
+     "value": [
+      0.5,
+      0.6,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.05
+     ],
+     "unit": "days/month",
+     "months": [
+      5
+     ],
+     "source": "NASA POWER"
+    },
+    {
+     "feature": "climate.monthly.heat_days.35",
+     "value": [
+      0.0,
+      0.0,
+      0.0,
+      0.2,
+      3.3,
+      9.65,
+      23.75,
+      26.4,
+      9.15,
+      1.6,
+      0.0,
+      0.0
+     ],
+     "unit": "days/month",
+     "months": [
+      5
+     ],
+     "source": "NASA POWER"
+    }
+   ],
+   "benefits": [
+    {
+     "code": "benefit_n_credit_legume_after_cereal",
+     "params": {},
+     "default_text": "Nitrogen credit from a legume after a cereal."
+    },
+    {
+     "code": "benefit_family_break",
+     "params": {},
+     "default_text": "Crop family changes between seasons, which breaks pest and disease cycles."
+    },
+    {
+     "code": "benefit_deep_root_structure",
+     "params": {},
+     "default_text": "Deep roots improve soil structure and infiltration."
+    },
+    {
+     "code": "benefit_water_demand_match",
+     "params": {},
+     "default_text": "Crop water need is mostly met by rainfall in its growing months."
+    },
+    {
+     "code": "benefit_income_flag",
+     "params": {},
+     "default_text": "Qualitatively favourable for income (low confidence, no price data)."
+    },
+    {
+     "code": "benefit_forage_flag",
+     "params": {},
+     "default_text": "Qualitatively favourable for forage (low confidence, no price data)."
+    }
+   ],
+   "information_gaps": [
+    {
+     "code": "gap_local_prices",
+     "params": {},
+     "default_text": "Local prices are not available, so income and forage are compared only from qualitative crop flags."
+    },
+    {
+     "code": "gap_water_stress_indicative",
+     "params": {},
+     "default_text": "Water stress is estimated from NASA model data (ET0 at the high end of typical Saiss values); treat it as indicative."
+    },
+    {
+     "code": "gap_frost_heat_tolerance_unknown",
+     "params": {
+      "crops": "barley,lentil"
+     },
+     "default_text": "Crop frost and heat tolerance unknown, needs local data: barley,lentil."
+    },
+    {
+     "code": "gap_frost_underestimated",
+     "params": {},
+     "default_text": "NASA frost days are likely underestimated for the Saiss (coarse grid); check frost risk locally."
+    },
+    {
+     "code": "gap_default_months",
+     "params": {
+      "crops": "barley,lentil"
+     },
+     "default_text": "Sowing and harvest months for barley,lentil are defaults, to confirm locally."
+    }
+   ],
+   "risks_for_local_review": [
+    {
+     "code": "risk_local_review",
+     "params": {},
+     "default_text": "Check this option with a local agronomist or extension officer before acting; it is an option to discuss, not an order."
+    },
+    {
+     "code": "risk_water_stress_months",
+     "params": {
+      "months": "3,4,5"
+     },
+     "default_text": "Rainfall is below the estimated crop water need in months 3,4,5; check soil moisture and irrigation access locally."
+    },
+    {
+     "code": "risk_frost_heat_generic",
+     "params": {
+      "months": "5"
+     },
+     "default_text": "Frost or heat warning (generic level, not crop-specific) in growing months 5; check the crop's real tolerance locally."
+    },
+    {
+     "code": "risk_frost_heat_unassessed",
+     "params": {},
+     "default_text": "Crop frost and heat tolerance is unknown, so frost and heat risk is only flagged at generic levels."
+    }
+   ],
+   "confidence": "low",
+   "score": {
+    "total": 70.83,
+    "by_priority": {
+     "save_water": 100.0,
+     "improve_soil": 100.0,
+     "extra_income": 0.0,
+     "reduce_erosion": 37.5,
+     "forage": 25.0
+    }
+   },
+   "rank": 2
+  },
+  {
+   "id": "wheat_chickpea",
+   "name": {
+    "code": "strategy_name_template",
+    "params": {
+     "crops": "wheat > chickpea"
+    },
+    "default_text": "Rotation: wheat > chickpea"
+   },
+   "is_current": false,
+   "seasons": [
+    {
+     "crop_id": "wheat",
+     "sow_month": 11,
+     "harvest_month": 6
+    },
+    {
+     "crop_id": "chickpea",
+     "sow_month": 3,
+     "harvest_month": 7
+    }
+   ],
+   "calendar": [
+    {
+     "year": 1,
+     "months": [
+      {
+       "month": 1,
+       "crop_id": null,
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 2,
+       "crop_id": null,
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 3,
+       "crop_id": "chickpea",
+       "status": "growing",
+       "stress_reasons": []
+      },
+      {
+       "month": 4,
+       "crop_id": "chickpea",
+       "status": "stress",
+       "stress_reasons": [
+        {
+         "code": "stress_water_deficit",
+         "params": {
+          "crop": "chickpea",
+          "need_mm": 123,
+          "rain_mm": 65
+         },
+         "default_text": "Rain (65 mm) is below the estimated water need of chickpea (123 mm)."
+        }
+       ]
+      },
+      {
+       "month": 5,
+       "crop_id": "chickpea",
+       "status": "stress",
+       "stress_reasons": [
+        {
+         "code": "stress_water_deficit",
+         "params": {
+          "crop": "chickpea",
+          "need_mm": 166,
+          "rain_mm": 35
+         },
+         "default_text": "Rain (35 mm) is below the estimated water need of chickpea (166 mm)."
+        },
+        {
+         "code": "stress_heat_generic",
+         "params": {
+          "crop": "chickpea",
+          "heat_days": 3.3,
+          "threshold_c": 35,
+          "level": 1
+         },
+         "default_text": "Average days above 35 C this month (3.3) reach the generic warning level of 1; generic level, not crop-specific (chickpea)."
+        }
+       ]
+      },
+      {
+       "month": 6,
+       "crop_id": "chickpea",
+       "status": "stress",
+       "stress_reasons": [
+        {
+         "code": "stress_water_deficit",
+         "params": {
+          "crop": "chickpea",
+          "need_mm": 199,
+          "rain_mm": 10
+         },
+         "default_text": "Rain (10 mm) is below the estimated water need of chickpea (199 mm)."
+        },
+        {
+         "code": "stress_heat_generic",
+         "params": {
+          "crop": "chickpea",
+          "heat_days": 9.7,
+          "threshold_c": 35,
+          "level": 1
+         },
+         "default_text": "Average days above 35 C this month (9.7) reach the generic warning level of 1; generic level, not crop-specific (chickpea)."
+        }
+       ]
+      },
+      {
+       "month": 7,
+       "crop_id": "chickpea",
+       "status": "stress",
+       "stress_reasons": [
+        {
+         "code": "stress_water_deficit",
+         "params": {
+          "crop": "chickpea",
+          "need_mm": 246,
+          "rain_mm": 3
+         },
+         "default_text": "Rain (3 mm) is below the estimated water need of chickpea (246 mm)."
+        },
+        {
+         "code": "stress_heat_generic",
+         "params": {
+          "crop": "chickpea",
+          "heat_days": 23.8,
+          "threshold_c": 35,
+          "level": 1
+         },
+         "default_text": "Average days above 35 C this month (23.8) reach the generic warning level of 1; generic level, not crop-specific (chickpea)."
+        }
+       ]
+      },
+      {
+       "month": 8,
+       "crop_id": null,
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 9,
+       "crop_id": null,
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 10,
+       "crop_id": null,
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 11,
+       "crop_id": "wheat",
+       "status": "growing",
+       "stress_reasons": []
+      },
+      {
+       "month": 12,
+       "crop_id": "wheat",
+       "status": "growing",
+       "stress_reasons": []
+      }
+     ]
+    },
+    {
+     "year": 2,
+     "months": [
+      {
+       "month": 1,
+       "crop_id": "wheat",
+       "status": "growing",
+       "stress_reasons": []
+      },
+      {
+       "month": 2,
+       "crop_id": "wheat",
+       "status": "growing",
+       "stress_reasons": []
+      },
+      {
+       "month": 3,
+       "crop_id": "wheat",
+       "status": "stress",
+       "stress_reasons": [
+        {
+         "code": "stress_water_deficit",
+         "params": {
+          "crop": "wheat",
+          "need_mm": 110,
+          "rain_mm": 98
+         },
+         "default_text": "Rain (98 mm) is below the estimated water need of wheat (110 mm)."
+        }
+       ]
+      },
+      {
+       "month": 4,
+       "crop_id": "wheat",
+       "status": "stress",
+       "stress_reasons": [
+        {
+         "code": "stress_water_deficit",
+         "params": {
+          "crop": "wheat",
+          "need_mm": 141,
+          "rain_mm": 65
+         },
+         "default_text": "Rain (65 mm) is below the estimated water need of wheat (141 mm)."
+        }
+       ]
+      },
+      {
+       "month": 5,
+       "crop_id": "wheat",
+       "status": "stress",
+       "stress_reasons": [
+        {
+         "code": "stress_water_deficit",
+         "params": {
+          "crop": "wheat",
+          "need_mm": 191,
+          "rain_mm": 35
+         },
+         "default_text": "Rain (35 mm) is below the estimated water need of wheat (191 mm)."
+        },
+        {
+         "code": "stress_heat_generic",
+         "params": {
+          "crop": "wheat",
+          "heat_days": 3.3,
+          "threshold_c": 35,
+          "level": 1
+         },
+         "default_text": "Average days above 35 C this month (3.3) reach the generic warning level of 1; generic level, not crop-specific (wheat)."
+        }
+       ]
+      },
+      {
+       "month": 6,
+       "crop_id": "wheat",
+       "status": "stress",
+       "stress_reasons": [
+        {
+         "code": "stress_water_deficit",
+         "params": {
+          "crop": "wheat",
+          "need_mm": 229,
+          "rain_mm": 10
+         },
+         "default_text": "Rain (10 mm) is below the estimated water need of wheat (229 mm)."
+        },
+        {
+         "code": "stress_heat_generic",
+         "params": {
+          "crop": "wheat",
+          "heat_days": 9.7,
+          "threshold_c": 35,
+          "level": 1
+         },
+         "default_text": "Average days above 35 C this month (9.7) reach the generic warning level of 1; generic level, not crop-specific (wheat)."
+        }
+       ]
+      },
+      {
+       "month": 7,
+       "crop_id": null,
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 8,
+       "crop_id": null,
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 9,
+       "crop_id": null,
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 10,
+       "crop_id": null,
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 11,
+       "crop_id": null,
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 12,
+       "crop_id": null,
+       "status": "bare",
+       "stress_reasons": []
+      }
+     ]
+    }
+   ],
+   "why": [
+    {
+     "rule_id": "n_credit_legume_after_cereal",
+     "effect": "bonus",
+     "points": 5.0,
+     "priority": "improve_soil",
+     "message": {
+      "code": "n_credit_applied",
+      "params": {
+       "from_crop": "wheat",
+       "to_crop": "chickpea"
+      },
+      "default_text": "chickpea after wheat: the legume leaves nitrogen for the next crop."
+     }
+    },
+    {
+     "rule_id": "family_break",
+     "effect": "bonus",
+     "points": 2.5,
+     "priority": "improve_soil",
+     "message": {
+      "code": "family_change",
+      "params": {
+       "from_crop": "chickpea",
+       "to_crop": "wheat"
+      },
+      "default_text": "wheat after chickpea: different crop families help break pest and disease cycles."
+     }
+    },
+    {
+     "rule_id": "family_break",
+     "effect": "bonus",
+     "points": 2.5,
+     "priority": "improve_soil",
+     "message": {
+      "code": "family_change",
+      "params": {
+       "from_crop": "wheat",
+       "to_crop": "chickpea"
+      },
+      "default_text": "chickpea after wheat: different crop families help break pest and disease cycles."
+     }
+    },
+    {
+     "rule_id": "deep_root_structure",
+     "effect": "bonus",
+     "points": 2.5,
+     "priority": "improve_soil",
+     "message": {
+      "code": "deep_root_present",
+      "params": {
+       "crops": "wheat",
+       "years": 1
+      },
+      "default_text": "Deep-rooting crops (wheat) in 1 season(s) help soil structure and water infiltration."
+     }
+    },
+    {
+     "rule_id": "bare_months_penalty",
+     "effect": "penalty",
+     "points": -11.0,
+     "priority": "reduce_erosion",
+     "message": {
+      "code": "bare_months",
+      "params": {
+       "count": 11,
+       "months": "1,2,7,8,9,10,11,12"
+      },
+      "default_text": "11 bare-field month(s) per rotation (months 1,2,7,8,9,10,11,12) leave the soil exposed to erosion."
+     }
+    },
+    {
+     "rule_id": "water_demand_match",
+     "effect": "bonus",
+     "points": 12.5,
+     "priority": "save_water",
+     "message": {
+      "code": "water_ok_months",
+      "params": {
+       "count": 5
+      },
+      "default_text": "5 growing month(s) where rainfall covers the crop's estimated water need."
+     }
+    },
+    {
+     "rule_id": "water_demand_match",
+     "effect": "penalty",
+     "points": -20.0,
+     "priority": "save_water",
+     "message": {
+      "code": "water_stress_months",
+      "params": {
+       "count": 8
+      },
+      "default_text": "8 growing month(s) where rainfall is below the crop's estimated water need."
+     }
+    },
+    {
+     "rule_id": "income_flag",
+     "effect": "bonus",
+     "points": 5.0,
+     "priority": "extra_income",
+     "message": {
+      "code": "income_flag_points",
+      "params": {
+       "levels": "wheat:medium,chickpea:medium"
+      },
+      "default_text": "Income potential from qualitative crop flags only (wheat:medium,chickpea:medium); there is no price data."
+     }
+    },
+    {
+     "rule_id": "forage_flag",
+     "effect": "neutral",
+     "points": 0.0,
+     "priority": "forage",
+     "message": {
+      "code": "forage_flag_points",
+      "params": {
+       "levels": "wheat:low,chickpea:low"
+      },
+      "default_text": "Forage value from qualitative crop flags only (wheat:low,chickpea:low); there is no price data."
+     }
+    }
+   ],
+   "evidence": [
+    {
+     "feature": "crops.chickpea.legume",
+     "value": "yes",
+     "unit": "yes/no",
+     "source": "botanical taxonomy"
+    },
+    {
+     "feature": "crops.wheat.family",
+     "value": "poaceae",
+     "unit": "taxon",
+     "source": "botanical taxonomy"
+    },
+    {
+     "feature": "crops.chickpea.family",
+     "value": "fabaceae",
+     "unit": "taxon",
+     "source": "botanical taxonomy"
+    },
+    {
+     "feature": "crops.wheat.rooting_zr_min_m",
+     "value": 1.0,
+     "unit": "m",
+     "source": "FAO-56 Table 22, Spring Wheat 1.0-1.5 m (Winter Wheat row is 1.5-1.8 m; deep either way)"
+    },
+    {
+     "feature": "climate.monthly.precipitation",
+     "value": [
+      94.99,
+      86.29,
+      98.03,
+      64.92,
+      35.36,
+      9.62,
+      3.3,
+      7.7,
+      26.8,
+      66.57,
+      100.7,
+      84.7
+     ],
+     "unit": "mm/month",
+     "source": "NASA POWER"
+    },
+    {
+     "feature": "climate.monthly.et0",
+     "value": [
+      51.35,
+      63.29,
+      95.48,
+      123.02,
+      165.74,
+      199.23,
+      245.94,
+      237.67,
+      165.89,
+      122.86,
+      69.62,
+      51.83
+     ],
+     "unit": "mm/month",
+     "source": "NASA POWER"
+    },
+    {
+     "feature": "crops.chickpea.kc_mid",
+     "value": 1.0,
+     "unit": "FAO-56 Kc (-)",
+     "source": "FAO-56 Table 12, Chick pea"
+    },
+    {
+     "feature": "crops.wheat.kc_mid",
+     "value": 1.15,
+     "unit": "FAO-56 Kc (-)",
+     "source": "FAO-56 Table 12, Wheat"
+    },
+    {
+     "feature": "crops.wheat.income_flag",
+     "value": "medium",
+     "unit": "qualitative",
+     "source": "qualitative, approved by user 2026-11-14, no price data"
+    },
+    {
+     "feature": "crops.chickpea.income_flag",
+     "value": "medium",
+     "unit": "qualitative",
+     "source": "qualitative, approved by user 2026-11-14, no price data"
+    },
+    {
+     "feature": "crops.wheat.forage_flag",
+     "value": "low",
+     "unit": "qualitative",
+     "source": "qualitative, approved by user 2026-11-14, no price data"
+    },
+    {
+     "feature": "crops.chickpea.forage_flag",
+     "value": "low",
+     "unit": "qualitative",
+     "source": "qualitative, approved by user 2026-11-14, no price data"
+    },
+    {
+     "feature": "climate.monthly.frost_days",
+     "value": [
+      0.5,
+      0.6,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.05
+     ],
+     "unit": "days/month",
+     "months": [
+      5,
+      6,
+      7
+     ],
+     "source": "NASA POWER"
+    },
+    {
+     "feature": "climate.monthly.heat_days.35",
+     "value": [
+      0.0,
+      0.0,
+      0.0,
+      0.2,
+      3.3,
+      9.65,
+      23.75,
+      26.4,
+      9.15,
+      1.6,
+      0.0,
+      0.0
+     ],
+     "unit": "days/month",
+     "months": [
+      5,
+      6,
+      7
+     ],
+     "source": "NASA POWER"
+    }
+   ],
+   "benefits": [
+    {
+     "code": "benefit_n_credit_legume_after_cereal",
+     "params": {},
+     "default_text": "Nitrogen credit from a legume after a cereal."
+    },
+    {
+     "code": "benefit_family_break",
+     "params": {},
+     "default_text": "Crop family changes between seasons, which breaks pest and disease cycles."
+    },
+    {
+     "code": "benefit_deep_root_structure",
+     "params": {},
+     "default_text": "Deep roots improve soil structure and infiltration."
+    },
+    {
+     "code": "benefit_water_demand_match",
+     "params": {},
+     "default_text": "Crop water need is mostly met by rainfall in its growing months."
+    },
+    {
+     "code": "benefit_income_flag",
+     "params": {},
+     "default_text": "Qualitatively favourable for income (low confidence, no price data)."
+    }
+   ],
+   "information_gaps": [
+    {
+     "code": "gap_local_prices",
+     "params": {},
+     "default_text": "Local prices are not available, so income and forage are compared only from qualitative crop flags."
+    },
+    {
+     "code": "gap_water_stress_indicative",
+     "params": {},
+     "default_text": "Water stress is estimated from NASA model data (ET0 at the high end of typical Saiss values); treat it as indicative."
+    },
+    {
+     "code": "gap_frost_heat_tolerance_unknown",
+     "params": {
+      "crops": "chickpea,wheat"
+     },
+     "default_text": "Crop frost and heat tolerance unknown, needs local data: chickpea,wheat."
+    },
+    {
+     "code": "gap_frost_underestimated",
+     "params": {},
+     "default_text": "NASA frost days are likely underestimated for the Saiss (coarse grid); check frost risk locally."
+    },
+    {
+     "code": "gap_default_months",
+     "params": {
+      "crops": "chickpea,wheat"
+     },
+     "default_text": "Sowing and harvest months for chickpea,wheat are defaults, to confirm locally."
+    }
+   ],
+   "risks_for_local_review": [
+    {
+     "code": "risk_local_review",
+     "params": {},
+     "default_text": "Check this option with a local agronomist or extension officer before acting; it is an option to discuss, not an order."
+    },
+    {
+     "code": "risk_water_stress_months",
+     "params": {
+      "months": "3,4,5,6,7"
+     },
+     "default_text": "Rainfall is below the estimated crop water need in months 3,4,5,6,7; check soil moisture and irrigation access locally."
+    },
+    {
+     "code": "risk_frost_heat_generic",
+     "params": {
+      "months": "5,6,7"
+     },
+     "default_text": "Frost or heat warning (generic level, not crop-specific) in growing months 5,6,7; check the crop's real tolerance locally."
+    },
+    {
+     "code": "risk_frost_heat_unassessed",
+     "params": {},
+     "default_text": "Crop frost and heat tolerance is unknown, so frost and heat risk is only flagged at generic levels."
+    }
+   ],
+   "confidence": "low",
+   "score": {
+    "total": 68.55,
+    "by_priority": {
+     "save_water": 28.57,
+     "improve_soil": 100.0,
+     "extra_income": 100.0,
+     "reduce_erosion": 31.25,
+     "forage": 0.0
+    }
+   },
+   "rank": 3
+  },
+  {
+   "id": "current_rotation",
+   "name": {
+    "code": "strategy_name_current",
+    "params": {
+     "crops": "wheat > fallow"
+    },
+    "default_text": "Your current rotation: wheat > fallow"
+   },
+   "is_current": true,
+   "seasons": [
+    {
+     "crop_id": "wheat",
+     "sow_month": 11,
+     "harvest_month": 6
+    },
+    {
+     "crop_id": "fallow",
+     "sow_month": 7,
+     "harvest_month": 6
+    }
+   ],
+   "calendar": [
+    {
+     "year": 1,
+     "months": [
+      {
+       "month": 1,
+       "crop_id": "fallow",
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 2,
+       "crop_id": "fallow",
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 3,
+       "crop_id": "fallow",
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 4,
+       "crop_id": "fallow",
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 5,
+       "crop_id": "fallow",
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 6,
+       "crop_id": "fallow",
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 7,
+       "crop_id": null,
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 8,
+       "crop_id": null,
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 9,
+       "crop_id": null,
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 10,
+       "crop_id": null,
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 11,
+       "crop_id": "wheat",
+       "status": "growing",
+       "stress_reasons": []
+      },
+      {
+       "month": 12,
+       "crop_id": "wheat",
+       "status": "growing",
+       "stress_reasons": []
+      }
+     ]
+    },
+    {
+     "year": 2,
+     "months": [
+      {
+       "month": 1,
+       "crop_id": "wheat",
+       "status": "growing",
+       "stress_reasons": []
+      },
+      {
+       "month": 2,
+       "crop_id": "wheat",
+       "status": "growing",
+       "stress_reasons": []
+      },
+      {
+       "month": 3,
+       "crop_id": "wheat",
+       "status": "stress",
+       "stress_reasons": [
+        {
+         "code": "stress_water_deficit",
+         "params": {
+          "crop": "wheat",
+          "need_mm": 110,
+          "rain_mm": 98
+         },
+         "default_text": "Rain (98 mm) is below the estimated water need of wheat (110 mm)."
+        }
+       ]
+      },
+      {
+       "month": 4,
+       "crop_id": "wheat",
+       "status": "stress",
+       "stress_reasons": [
+        {
+         "code": "stress_water_deficit",
+         "params": {
+          "crop": "wheat",
+          "need_mm": 141,
+          "rain_mm": 65
+         },
+         "default_text": "Rain (65 mm) is below the estimated water need of wheat (141 mm)."
+        }
+       ]
+      },
+      {
+       "month": 5,
+       "crop_id": "wheat",
+       "status": "stress",
+       "stress_reasons": [
+        {
+         "code": "stress_water_deficit",
+         "params": {
+          "crop": "wheat",
+          "need_mm": 191,
+          "rain_mm": 35
+         },
+         "default_text": "Rain (35 mm) is below the estimated water need of wheat (191 mm)."
+        },
+        {
+         "code": "stress_heat_generic",
+         "params": {
+          "crop": "wheat",
+          "heat_days": 3.3,
+          "threshold_c": 35,
+          "level": 1
+         },
+         "default_text": "Average days above 35 C this month (3.3) reach the generic warning level of 1; generic level, not crop-specific (wheat)."
+        }
+       ]
+      },
+      {
+       "month": 6,
+       "crop_id": "wheat",
+       "status": "stress",
+       "stress_reasons": [
+        {
+         "code": "stress_water_deficit",
+         "params": {
+          "crop": "wheat",
+          "need_mm": 229,
+          "rain_mm": 10
+         },
+         "default_text": "Rain (10 mm) is below the estimated water need of wheat (229 mm)."
+        },
+        {
+         "code": "stress_heat_generic",
+         "params": {
+          "crop": "wheat",
+          "heat_days": 9.7,
+          "threshold_c": 35,
+          "level": 1
+         },
+         "default_text": "Average days above 35 C this month (9.7) reach the generic warning level of 1; generic level, not crop-specific (wheat)."
+        }
+       ]
+      },
+      {
+       "month": 7,
+       "crop_id": "fallow",
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 8,
+       "crop_id": "fallow",
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 9,
+       "crop_id": "fallow",
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 10,
+       "crop_id": "fallow",
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 11,
+       "crop_id": "fallow",
+       "status": "bare",
+       "stress_reasons": []
+      },
+      {
+       "month": 12,
+       "crop_id": "fallow",
+       "status": "bare",
+       "stress_reasons": []
+      }
+     ]
+    }
+   ],
+   "why": [
+    {
+     "rule_id": "deep_root_structure",
+     "effect": "bonus",
+     "points": 2.5,
+     "priority": "improve_soil",
+     "message": {
+      "code": "deep_root_present",
+      "params": {
+       "crops": "wheat",
+       "years": 1
+      },
+      "default_text": "Deep-rooting crops (wheat) in 1 season(s) help soil structure and water infiltration."
+     }
+    },
+    {
+     "rule_id": "bare_months_penalty",
+     "effect": "penalty",
+     "points": -16.0,
+     "priority": "reduce_erosion",
+     "message": {
+      "code": "bare_months",
+      "params": {
+       "count": 16,
+       "months": "1,2,3,4,5,6,7,8,9,10,11,12"
+      },
+      "default_text": "16 bare-field month(s) per rotation (months 1,2,3,4,5,6,7,8,9,10,11,12) leave the soil exposed to erosion."
+     }
+    },
+    {
+     "rule_id": "water_demand_match",
+     "effect": "bonus",
+     "points": 10.0,
+     "priority": "save_water",
+     "message": {
+      "code": "water_ok_months",
+      "params": {
+       "count": 4
+      },
+      "default_text": "4 growing month(s) where rainfall covers the crop's estimated water need."
+     }
+    },
+    {
+     "rule_id": "water_demand_match",
+     "effect": "penalty",
+     "points": -10.0,
+     "priority": "save_water",
+     "message": {
+      "code": "water_stress_months",
+      "params": {
+       "count": 4
+      },
+      "default_text": "4 growing month(s) where rainfall is below the crop's estimated water need."
+     }
+    },
+    {
+     "rule_id": "income_flag",
+     "effect": "bonus",
+     "points": 2.5,
+     "priority": "extra_income",
+     "message": {
+      "code": "income_flag_points",
+      "params": {
+       "levels": "wheat:medium,fallow:low"
+      },
+      "default_text": "Income potential from qualitative crop flags only (wheat:medium,fallow:low); there is no price data."
+     }
+    },
+    {
+     "rule_id": "forage_flag",
+     "effect": "neutral",
+     "points": 0.0,
+     "priority": "forage",
+     "message": {
+      "code": "forage_flag_points",
+      "params": {
+       "levels": "wheat:low,fallow:low"
+      },
+      "default_text": "Forage value from qualitative crop flags only (wheat:low,fallow:low); there is no price data."
+     }
+    }
+   ],
+   "evidence": [
+    {
+     "feature": "crops.wheat.rooting_zr_min_m",
+     "value": 1.0,
+     "unit": "m",
+     "source": "FAO-56 Table 22, Spring Wheat 1.0-1.5 m (Winter Wheat row is 1.5-1.8 m; deep either way)"
+    },
+    {
+     "feature": "climate.monthly.precipitation",
+     "value": [
+      94.99,
+      86.29,
+      98.03,
+      64.92,
+      35.36,
+      9.62,
+      3.3,
+      7.7,
+      26.8,
+      66.57,
+      100.7,
+      84.7
+     ],
+     "unit": "mm/month",
+     "source": "NASA POWER"
+    },
+    {
+     "feature": "climate.monthly.et0",
+     "value": [
+      51.35,
+      63.29,
+      95.48,
+      123.02,
+      165.74,
+      199.23,
+      245.94,
+      237.67,
+      165.89,
+      122.86,
+      69.62,
+      51.83
+     ],
+     "unit": "mm/month",
+     "source": "NASA POWER"
+    },
+    {
+     "feature": "crops.wheat.kc_mid",
+     "value": 1.15,
+     "unit": "FAO-56 Kc (-)",
+     "source": "FAO-56 Table 12, Wheat"
+    },
+    {
+     "feature": "crops.wheat.income_flag",
+     "value": "medium",
+     "unit": "qualitative",
+     "source": "qualitative, approved by user 2026-11-14, no price data"
+    },
+    {
+     "feature": "crops.fallow.income_flag",
+     "value": "low",
+     "unit": "qualitative",
+     "source": "qualitative, approved by user 2026-11-14, no price data"
+    },
+    {
+     "feature": "crops.wheat.forage_flag",
+     "value": "low",
+     "unit": "qualitative",
+     "source": "qualitative, approved by user 2026-11-14, no price data"
+    },
+    {
+     "feature": "crops.fallow.forage_flag",
+     "value": "low",
+     "unit": "qualitative",
+     "source": "qualitative, approved by user 2026-11-14, no price data"
+    },
+    {
+     "feature": "climate.monthly.frost_days",
+     "value": [
+      0.5,
+      0.6,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.05
+     ],
+     "unit": "days/month",
+     "months": [
+      5,
+      6
+     ],
+     "source": "NASA POWER"
+    },
+    {
+     "feature": "climate.monthly.heat_days.35",
+     "value": [
+      0.0,
+      0.0,
+      0.0,
+      0.2,
+      3.3,
+      9.65,
+      23.75,
+      26.4,
+      9.15,
+      1.6,
+      0.0,
+      0.0
+     ],
+     "unit": "days/month",
+     "months": [
+      5,
+      6
+     ],
+     "source": "NASA POWER"
+    }
+   ],
+   "benefits": [
+    {
+     "code": "benefit_deep_root_structure",
+     "params": {},
+     "default_text": "Deep roots improve soil structure and infiltration."
+    },
+    {
+     "code": "benefit_water_demand_match",
+     "params": {},
+     "default_text": "Crop water need is mostly met by rainfall in its growing months."
+    },
+    {
+     "code": "benefit_income_flag",
+     "params": {},
+     "default_text": "Qualitatively favourable for income (low confidence, no price data)."
+    }
+   ],
+   "information_gaps": [
+    {
+     "code": "gap_local_prices",
+     "params": {},
+     "default_text": "Local prices are not available, so income and forage are compared only from qualitative crop flags."
+    },
+    {
+     "code": "gap_water_stress_indicative",
+     "params": {},
+     "default_text": "Water stress is estimated from NASA model data (ET0 at the high end of typical Saiss values); treat it as indicative."
+    },
+    {
+     "code": "gap_frost_heat_tolerance_unknown",
+     "params": {
+      "crops": "wheat"
+     },
+     "default_text": "Crop frost and heat tolerance unknown, needs local data: wheat."
+    },
+    {
+     "code": "gap_frost_underestimated",
+     "params": {},
+     "default_text": "NASA frost days are likely underestimated for the Saiss (coarse grid); check frost risk locally."
+    },
+    {
+     "code": "gap_default_months",
+     "params": {
+      "crops": "wheat"
+     },
+     "default_text": "Sowing and harvest months for wheat are defaults, to confirm locally."
+    }
+   ],
+   "risks_for_local_review": [
+    {
+     "code": "risk_local_review",
+     "params": {},
+     "default_text": "Check this option with a local agronomist or extension officer before acting; it is an option to discuss, not an order."
+    },
+    {
+     "code": "risk_water_stress_months",
+     "params": {
+      "months": "3,4,5,6"
+     },
+     "default_text": "Rainfall is below the estimated crop water need in months 3,4,5,6; check soil moisture and irrigation access locally."
+    },
+    {
+     "code": "risk_frost_heat_generic",
+     "params": {
+      "months": "5,6"
+     },
+     "default_text": "Frost or heat warning (generic level, not crop-specific) in growing months 5,6; check the crop's real tolerance locally."
+    },
+    {
+     "code": "risk_frost_heat_unassessed",
+     "params": {},
+     "default_text": "Crop frost and heat tolerance is unknown, so frost and heat risk is only flagged at generic levels."
+    }
+   ],
+   "confidence": "low",
+   "score": {
+    "total": 23.81,
+    "by_priority": {
+     "save_water": 71.43,
+     "improve_soil": 0.0,
+     "extra_income": 0.0,
+     "reduce_erosion": 0.0,
+     "forage": 0.0
+    }
+   },
+   "rank": 4
+  }
+ ],
+ "notes": [
+  {
+   "code": "note_relative_scores",
+   "params": {},
+   "default_text": "Scores are relative comparisons among the options shown, not yield or income predictions."
+  },
+  {
+   "code": "note_local_expert",
+   "params": {},
+   "default_text": "Discuss any option with a local expert before acting."
+  },
+  {
+   "code": "note_normalisation",
+   "params": {},
+   "default_text": "Each goal score is scaled 0-100 against all candidate rotations the engine evaluated."
+  },
+  {
+   "code": "note_soil_not_scored",
+   "params": {},
+   "default_text": "Soil data is shown for context but is not used by any scoring rule yet."
+  }
+ ]
+}

@@ -1,0 +1,244 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://farm-app.local/contracts/strategy.schema.json",
+  "title": "StrategyResponse",
+  "description": "Ranked rotation strategies for one point. Produced by engine/ (agronomy-engine) via engine.scorer.score(); returned by POST /api/strategies. The request body of that endpoint is $defs/StrategyRequest. All user-facing text is a message object (code + params) so the UI can show it in French or Arabic; default_text is English and is for logs and tests only.",
+  "$ref": "#/$defs/StrategyResponse",
+  "$defs": {
+    "cropId": {
+      "enum": [
+        "wheat", "barley", "chickpea", "lentil", "faba_bean", "alfalfa",
+        "vetch_oat_cover", "sunflower", "potato", "olive_intercrop", "fallow"
+      ],
+      "description": "The 10 MVP crops plus fallow (field left unsown for a season), needed to describe current practice."
+    },
+    "month": { "type": "integer", "minimum": 1, "maximum": 12 },
+    "priorityKey": { "enum": ["save_water", "improve_soil", "extra_income", "reduce_erosion", "forage"] },
+    "priorities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["save_water", "improve_soil", "extra_income", "reduce_erosion", "forage"],
+      "description": "How much the farmer cares about each goal, 0 (not at all) to 5 (very much). The engine normalises them; all zero means equal weights.",
+      "properties": {
+        "save_water": { "type": "integer", "minimum": 0, "maximum": 5 },
+        "improve_soil": { "type": "integer", "minimum": 0, "maximum": 5 },
+        "extra_income": { "type": "integer", "minimum": 0, "maximum": 5 },
+        "reduce_erosion": { "type": "integer", "minimum": 0, "maximum": 5 },
+        "forage": { "type": "integer", "minimum": 0, "maximum": 5 }
+      }
+    },
+    "message": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "params", "default_text"],
+      "properties": {
+        "code": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$", "description": "Translation key; the UI holds FR and AR text for every code." },
+        "params": {
+          "type": "object",
+          "additionalProperties": { "type": ["string", "number", "null"] },
+          "description": "Values inserted into the translated text, e.g. {\"crop\": \"chickpea\", \"months\": 4}."
+        },
+        "default_text": { "type": "string", "minLength": 1 }
+      }
+    },
+    "seasonInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["crop_id"],
+      "description": "One growing season of the farmer's current rotation. Months are optional; the engine fills typical Saïss months from engine/crops.yaml.",
+      "properties": {
+        "crop_id": { "$ref": "#/$defs/cropId" },
+        "sow_month": { "$ref": "#/$defs/month" },
+        "harvest_month": { "$ref": "#/$defs/month" }
+      }
+    },
+    "season": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["crop_id", "sow_month", "harvest_month"],
+      "properties": {
+        "crop_id": { "$ref": "#/$defs/cropId" },
+        "sow_month": { "$ref": "#/$defs/month" },
+        "harvest_month": { "$ref": "#/$defs/month" }
+      }
+    },
+    "StrategyRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["latitude", "longitude", "current_rotation", "priorities"],
+      "properties": {
+        "latitude": { "type": "number", "minimum": -90, "maximum": 90 },
+        "longitude": { "type": "number", "minimum": -180, "maximum": 180 },
+        "current_rotation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["seasons"],
+          "properties": {
+            "seasons": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 6,
+              "items": { "$ref": "#/$defs/seasonInput" },
+              "description": "Seasons in order, one per year; the sequence repeats."
+            }
+          }
+        },
+        "priorities": { "$ref": "#/$defs/priorities" }
+      }
+    },
+    "calendarMonth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["month", "crop_id", "status", "stress_reasons"],
+      "properties": {
+        "month": { "$ref": "#/$defs/month" },
+        "crop_id": { "oneOf": [{ "$ref": "#/$defs/cropId" }, { "type": "null" }], "description": "Crop in the field that month; null = bare field." },
+        "status": { "enum": ["growing", "stress", "bare"], "description": "stress = a crop is growing but water, frost or heat is a likely problem that month." },
+        "stress_reasons": { "type": "array", "items": { "$ref": "#/$defs/message" } }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["feature", "value", "unit", "source"],
+      "properties": {
+        "feature": { "type": "string", "description": "Path into features.json, e.g. \"climate.monthly.water_balance\", or into crops.yaml, e.g. \"crops.chickpea.kc_mid\"." },
+        "value": {
+          "oneOf": [
+            { "type": ["number", "string", "null"] },
+            { "type": "array", "items": { "type": ["number", "null"] } }
+          ]
+        },
+        "unit": { "type": "string" },
+        "months": { "type": "array", "items": { "$ref": "#/$defs/month" } },
+        "source": { "type": "string", "description": "Dataset or reference, e.g. \"NASA POWER\", \"ISRIC SoilGrids\", \"FAO-56 Table 12\"." }
+      }
+    },
+    "strategy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id", "name", "is_current", "rank", "score", "seasons", "calendar", "why",
+        "evidence", "benefits", "information_gaps", "risks_for_local_review", "confidence"
+      ],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+        "name": { "$ref": "#/$defs/message" },
+        "is_current": { "type": "boolean", "description": "true for the farmer's own rotation, scored by the same rules." },
+        "rank": { "type": "integer", "minimum": 1, "description": "1 = best total score among the returned strategies." },
+        "score": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["total", "by_priority"],
+          "description": "Relative scores 0-100 for comparing these strategies only. Not a yield or income prediction.",
+          "properties": {
+            "total": { "type": "number", "minimum": 0, "maximum": 100 },
+            "by_priority": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["save_water", "improve_soil", "extra_income", "reduce_erosion", "forage"],
+              "properties": {
+                "save_water": { "type": "number", "minimum": 0, "maximum": 100 },
+                "improve_soil": { "type": "number", "minimum": 0, "maximum": 100 },
+                "extra_income": { "type": "number", "minimum": 0, "maximum": 100 },
+                "reduce_erosion": { "type": "number", "minimum": 0, "maximum": 100 },
+                "forage": { "type": "number", "minimum": 0, "maximum": 100 }
+              }
+            }
+          }
+        },
+        "seasons": { "type": "array", "minItems": 1, "maxItems": 6, "items": { "$ref": "#/$defs/season" } },
+        "calendar": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 6,
+          "description": "One 12-month row per year of the rotation.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["year", "months"],
+            "properties": {
+              "year": { "type": "integer", "minimum": 1 },
+              "months": { "type": "array", "minItems": 12, "maxItems": 12, "items": { "$ref": "#/$defs/calendarMonth" } }
+            }
+          }
+        },
+        "why": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Every rule that changed the score. The score must be fully explained by these entries.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["rule_id", "effect", "points", "priority", "message"],
+            "properties": {
+              "rule_id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$", "description": "Name of the rule function in engine/." },
+              "effect": { "enum": ["bonus", "penalty", "neutral"] },
+              "points": { "type": "number" },
+              "priority": { "$ref": "#/$defs/priorityKey", "description": "Which farmer goal these points count toward." },
+              "message": { "$ref": "#/$defs/message" }
+            }
+          }
+        },
+        "evidence": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/evidence" } },
+        "benefits": { "type": "array", "items": { "$ref": "#/$defs/message" } },
+        "information_gaps": { "type": "array", "items": { "$ref": "#/$defs/message" } },
+        "risks_for_local_review": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/message" } },
+        "confidence": { "enum": ["low", "medium", "high"] }
+      }
+    },
+    "StrategyResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "generated_at", "location", "features_summary", "priorities", "strategies", "notes"],
+      "properties": {
+        "schema_version": { "const": "1.0" },
+        "generated_at": { "type": "string", "format": "date-time" },
+        "location": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["latitude", "longitude"],
+          "properties": {
+            "latitude": { "type": "number", "minimum": -90, "maximum": 90 },
+            "longitude": { "type": "number", "minimum": -180, "maximum": 180 }
+          }
+        },
+        "features_summary": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["climate_period", "soil_status", "data_gaps"],
+          "properties": {
+            "climate_period": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["start_year", "end_year"],
+              "properties": {
+                "start_year": { "type": "integer" },
+                "end_year": { "type": "integer" }
+              }
+            },
+            "soil_status": { "enum": ["live", "cache", "fallback", "unavailable"] },
+            "data_gaps": { "type": "array", "items": { "type": "string" }, "description": "codes copied from features.data_gaps." }
+          }
+        },
+        "priorities": { "$ref": "#/$defs/priorities" },
+        "strategies": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 5,
+          "items": { "$ref": "#/$defs/strategy" },
+          "contains": { "type": "object", "properties": { "is_current": { "const": true } }, "required": ["is_current"] },
+          "minContains": 1,
+          "maxContains": 1,
+          "description": "Sorted by rank. Exactly one is the farmer's current rotation."
+        },
+        "notes": {
+          "type": "array",
+          "minItems": 2,
+          "items": { "$ref": "#/$defs/message" },
+          "description": "Must include: scores are relative comparisons, not yield predictions; discuss any option with a local expert before acting."
+        }
+      }
+    }
+  }
+}

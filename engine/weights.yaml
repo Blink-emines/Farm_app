@@ -1,0 +1,51 @@
+# ALL rule points live here. No number is hard-coded in rules.py.
+# Points and normalisation approved by user 2026-11-14. Any change goes to the lead first.
+status: "approved by user 2026-11-14"
+
+# "all": min-max each priority over ALL scored candidates (templates + current).
+# "returned": min-max only over the 3-5 strategies returned.
+normalise_over: all
+
+# How many template strategies are returned next to the farmer's current rotation.
+templates_returned: 3
+
+# Rooting-depth class from FAO-56 Table 22 minimum effective depth Zr (m).
+rooting_class:
+  deep_min_zr_m: 1.0
+  medium_min_zr_m: 0.6
+
+# Points are per event and are divided by the number of years in the rotation.
+rules:
+  n_credit_legume_after_cereal:
+    priority: improve_soil
+    points_per_transition: 10
+  family_break:
+    priority: improve_soil
+    points_per_family_change: 5
+    points_per_same_family_repeat: -10
+  deep_root_structure:
+    priority: improve_soil
+    points_per_deep_crop_year: 5
+  bare_months_penalty:
+    priority: reduce_erosion
+    points_per_bare_month: -2
+  cover_fills_bare:
+    priority: reduce_erosion
+    points_per_cover_month: 3
+  water_demand_match:
+    priority: save_water
+    points_per_ok_month: 5
+    points_per_stress_month: -5
+  income_flag:
+    priority: extra_income
+    points_by_level: {high: 10, medium: 5, low: 0}
+  forage_flag:
+    priority: forage
+    points_by_level: {high: 10, medium: 5, low: 0}
+
+# Generic warning levels (NOT crop-specific, no score points): a growing month is
+# marked "stress" when its average frost_days or heat_days reaches the level.
+warnings:
+  frost_days_min: 1
+  heat_threshold_c: 35
+  heat_days_min: 1

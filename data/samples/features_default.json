@@ -1,0 +1,391 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-11-14T13:52:25Z",
+  "location": {
+    "latitude": 33.96,
+    "longitude": -5.27,
+    "elevation_m": 575.32,
+    "region": "saiss"
+  },
+  "climate": {
+    "period": {
+      "start_year": 2005,
+      "end_year": 2024
+    },
+    "monthly": {
+      "t2m_mean": {
+        "values": [
+          10.19,
+          11.22,
+          13.55,
+          16.46,
+          20.35,
+          24.33,
+          29.1,
+          29.67,
+          24.89,
+          20.92,
+          14.69,
+          11.61
+        ],
+        "unit": "°C",
+        "source": "nasa_power",
+        "method": "monthly mean of daily T2M, averaged over the period",
+        "nasa_parameter": "T2M"
+      },
+      "t2m_max": {
+        "values": [
+          16.66,
+          17.99,
+          20.59,
+          23.77,
+          28.04,
+          32.61,
+          38.05,
+          38.49,
+          32.73,
+          28.29,
+          21.28,
+          18.21
+        ],
+        "unit": "°C",
+        "source": "nasa_power",
+        "method": "monthly mean of daily T2M_MAX, averaged over the period",
+        "nasa_parameter": "T2M_MAX"
+      },
+      "t2m_min": {
+        "values": [
+          5.78,
+          6.31,
+          8.1,
+          10.48,
+          13.71,
+          17.07,
+          21.17,
+          22.06,
+          18.7,
+          15.48,
+          10.11,
+          7.31
+        ],
+        "unit": "°C",
+        "source": "nasa_power",
+        "method": "monthly mean of daily T2M_MIN, averaged over the period",
+        "nasa_parameter": "T2M_MIN"
+      },
+      "precipitation": {
+        "values": [
+          94.99,
+          86.29,
+          98.03,
+          64.92,
+          35.36,
+          9.62,
+          3.3,
+          7.7,
+          26.8,
+          66.57,
+          100.7,
+          84.7
+        ],
+        "unit": "mm/month",
+        "source": "nasa_power",
+        "method": "monthly sum of daily PRECTOTCORR, averaged over the period",
+        "nasa_parameter": "PRECTOTCORR"
+      },
+      "et0": {
+        "values": [
+          51.35,
+          63.29,
+          95.48,
+          123.02,
+          165.74,
+          199.23,
+          245.94,
+          237.67,
+          165.89,
+          122.86,
+          69.62,
+          51.83
+        ],
+        "unit": "mm/month",
+        "source": "nasa_power",
+        "method": "FAO-56 Penman-Monteith computed per day (G=0, wind used as given at 2 m, es from Tmax/Tmin, ea from mean RH), summed per month, averaged over the period",
+        "nasa_parameter": "T2M,T2M_MAX,T2M_MIN,RH2M,WS2M,ALLSKY_SFC_SW_DWN"
+      },
+      "water_balance": {
+        "values": [
+          43.65,
+          23.0,
+          2.54,
+          -58.1,
+          -130.38,
+          -189.61,
+          -242.64,
+          -229.97,
+          -139.09,
+          -56.28,
+          31.08,
+          32.87
+        ],
+        "unit": "mm/month",
+        "source": "nasa_power",
+        "method": "precipitation minus et0, per month and year, averaged over the period",
+        "nasa_parameter": null
+      },
+      "rh2m": {
+        "values": [
+          69.12,
+          68.87,
+          68.09,
+          65.49,
+          59.24,
+          51.69,
+          38.48,
+          36.04,
+          48.23,
+          52.41,
+          63.41,
+          67.84
+        ],
+        "unit": "%",
+        "source": "nasa_power",
+        "method": "monthly mean of daily RH2M, averaged over the period",
+        "nasa_parameter": "RH2M"
+      },
+      "ws2m": {
+        "values": [
+          2.19,
+          2.42,
+          2.48,
+          2.44,
+          2.38,
+          2.35,
+          2.37,
+          2.45,
+          2.33,
+          2.26,
+          2.34,
+          2.18
+        ],
+        "unit": "m/s",
+        "source": "nasa_power",
+        "method": "monthly mean of daily WS2M, averaged over the period",
+        "nasa_parameter": "WS2M"
+      },
+      "solar_radiation": {
+        "values": [
+          11.48,
+          14.41,
+          18.4,
+          22.07,
+          25.03,
+          27.72,
+          27.67,
+          25.15,
+          20.63,
+          16.15,
+          12.13,
+          10.71
+        ],
+        "unit": "MJ/m²/day",
+        "source": "nasa_power",
+        "method": "monthly mean of daily ALLSKY_SFC_SW_DWN (MJ/m^2/day for community AG), averaged over the period",
+        "nasa_parameter": "ALLSKY_SFC_SW_DWN"
+      },
+      "root_zone_wetness": {
+        "values": [
+          0.697,
+          0.73,
+          0.744,
+          0.709,
+          0.632,
+          0.534,
+          0.455,
+          0.428,
+          0.436,
+          0.465,
+          0.541,
+          0.637
+        ],
+        "unit": "0-1",
+        "source": "nasa_power",
+        "method": "monthly mean of daily GWETROOT, averaged over the period",
+        "nasa_parameter": "GWETROOT"
+      },
+      "frost_days": {
+        "values": [
+          0.5,
+          0.6,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.05
+        ],
+        "unit": "days/month",
+        "source": "nasa_power",
+        "method": "days with daily T2M_MIN below 0 °C, counted per month, averaged over the period",
+        "nasa_parameter": "T2M_MIN"
+      },
+      "heat_days": {
+        "30": {
+          "values": [
+            0.0,
+            0.05,
+            0.6,
+            2.75,
+            11.9,
+            20.5,
+            30.55,
+            30.7,
+            22.35,
+            12.55,
+            0.4,
+            0.0
+          ],
+          "unit": "days/month",
+          "source": "nasa_power",
+          "method": "days with daily T2M_MAX above 30 °C, counted per month, averaged over the period",
+          "nasa_parameter": "T2M_MAX"
+        },
+        "32": {
+          "values": [
+            0.0,
+            0.0,
+            0.15,
+            0.95,
+            7.9,
+            15.85,
+            29.5,
+            29.9,
+            17.55,
+            7.55,
+            0.0,
+            0.0
+          ],
+          "unit": "days/month",
+          "source": "nasa_power",
+          "method": "days with daily T2M_MAX above 32 °C, counted per month, averaged over the period",
+          "nasa_parameter": "T2M_MAX"
+        },
+        "35": {
+          "values": [
+            0.0,
+            0.0,
+            0.0,
+            0.2,
+            3.3,
+            9.65,
+            23.75,
+            26.4,
+            9.15,
+            1.6,
+            0.0,
+            0.0
+          ],
+          "unit": "days/month",
+          "source": "nasa_power",
+          "method": "days with daily T2M_MAX above 35 °C, counted per month, averaged over the period",
+          "nasa_parameter": "T2M_MAX"
+        },
+        "38": {
+          "values": [
+            0.0,
+            0.0,
+            0.0,
+            0.05,
+            0.3,
+            4.75,
+            16.1,
+            17.6,
+            3.2,
+            0.25,
+            0.0,
+            0.0
+          ],
+          "unit": "days/month",
+          "source": "nasa_power",
+          "method": "days with daily T2M_MAX above 38 °C, counted per month, averaged over the period",
+          "nasa_parameter": "T2M_MAX"
+        }
+      }
+    }
+  },
+  "soil": {
+    "status": "live",
+    "source": "soilgrids",
+    "layers": [
+      {
+        "depth": "0-5cm",
+        "clay_pct": 36.1,
+        "sand_pct": 27.5,
+        "silt_pct": 36.3,
+        "soc_g_kg": 26.2,
+        "ph_h2o": 8.0
+      },
+      {
+        "depth": "5-15cm",
+        "clay_pct": 36.1,
+        "sand_pct": 28.0,
+        "silt_pct": 35.9,
+        "soc_g_kg": 13.3,
+        "ph_h2o": 8.0
+      },
+      {
+        "depth": "15-30cm",
+        "clay_pct": 35.3,
+        "sand_pct": 28.4,
+        "silt_pct": 36.3,
+        "soc_g_kg": 13.9,
+        "ph_h2o": 8.1
+      }
+    ]
+  },
+  "data_gaps": [
+    {
+      "code": "climate_coarse_grid",
+      "message": "NASA POWER is satellite/model data on a coarse grid (about 50 km), so all fields in the same cell get the same climate. It is not a weather-station record.",
+      "affects": [
+        "climate"
+      ]
+    },
+    {
+      "code": "root_zone_wetness_model",
+      "message": "Root-zone wetness is a satellite/model estimate, not a measurement in your field.",
+      "affects": [
+        "climate.monthly.root_zone_wetness"
+      ]
+    },
+    {
+      "code": "soil_model_estimate",
+      "message": "SoilGrids values are 250 m model estimates, not a soil test; check with a local soil analysis.",
+      "affects": [
+        "soil"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "nasa_power",
+      "name": "NASA POWER",
+      "dataset": "NASA POWER daily point API, community AG",
+      "url": "https://power.larc.nasa.gov/api/temporal/daily/point",
+      "accessed_at": "2026-11-14T13:52:18Z",
+      "cache_status": "live"
+    },
+    {
+      "id": "soilgrids",
+      "name": "ISRIC SoilGrids",
+      "dataset": "SoilGrids 2.0 point query, mean, 0-5/5-15/15-30 cm",
+      "url": "https://rest.isric.org/soilgrids/v2.0/properties/query",
+      "accessed_at": "2026-11-14T13:52:25Z",
+      "cache_status": "live"
+    }
+  ]
+}

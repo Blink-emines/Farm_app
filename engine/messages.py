@@ -1,0 +1,72 @@
+"""Every message code the engine can emit. The UI translates each code to FR/AR.
+engine/messages.md is generated from this table: run `python -m engine.messages`."""
+from pathlib import Path
+
+MESSAGES = {
+    # strategy names
+    "strategy_name_current": (["crops"], "Your current rotation: {crops}"),
+    "strategy_name_template": (["crops"], "Rotation: {crops}"),
+    # why (rule explanations)
+    "n_credit_applied": (["from_crop", "to_crop"], "{to_crop} after {from_crop}: the legume leaves nitrogen for the next crop."),
+    "family_change": (["from_crop", "to_crop"], "{to_crop} after {from_crop}: different crop families help break pest and disease cycles."),
+    "family_repeat": (["from_crop", "to_crop"], "{to_crop} after {from_crop}: same crop family in consecutive seasons keeps pest and disease cycles going."),
+    "deep_root_present": (["crops", "years"], "Deep-rooting crops ({crops}) in {years} season(s) help soil structure and water infiltration."),
+    "bare_months": (["count", "months"], "{count} bare-field month(s) per rotation (months {months}) leave the soil exposed to erosion."),
+    "cover_crop_months": (["crop", "count"], "{crop} covers the field for {count} month(s) per rotation, protecting the soil and adding organic matter."),
+    "water_ok_months": (["count"], "{count} growing month(s) where rainfall covers the crop's estimated water need."),
+    "water_stress_months": (["count"], "{count} growing month(s) where rainfall is below the crop's estimated water need."),
+    "income_flag_points": (["levels"], "Income potential from qualitative crop flags only ({levels}); there is no price data."),
+    "forage_flag_points": (["levels"], "Forage value from qualitative crop flags only ({levels}); there is no price data."),
+    # calendar stress reasons
+    "stress_water_deficit": (["crop", "need_mm", "rain_mm"], "Rain ({rain_mm} mm) is below the estimated water need of {crop} ({need_mm} mm)."),
+    "stress_frost_generic": (["crop", "frost_days", "level"], "Average frost days this month ({frost_days}) reach the generic warning level of {level}; generic level, not crop-specific ({crop})."),
+    "stress_heat_generic": (["crop", "heat_days", "threshold_c", "level"], "Average days above {threshold_c} C this month ({heat_days}) reach the generic warning level of {level}; generic level, not crop-specific ({crop})."),
+    # benefits
+    "benefit_n_credit_legume_after_cereal": ([], "Nitrogen credit from a legume after a cereal."),
+    "benefit_family_break": ([], "Crop family changes between seasons, which breaks pest and disease cycles."),
+    "benefit_deep_root_structure": ([], "Deep roots improve soil structure and infiltration."),
+    "benefit_cover_fills_bare": ([], "A cover crop protects the soil and adds organic matter."),
+    "benefit_water_demand_match": ([], "Crop water need is mostly met by rainfall in its growing months."),
+    "benefit_income_flag": ([], "Qualitatively favourable for income (low confidence, no price data)."),
+    "benefit_forage_flag": ([], "Qualitatively favourable for forage (low confidence, no price data)."),
+    # information gaps
+    "gap_local_prices": ([], "Local prices are not available, so income and forage are compared only from qualitative crop flags."),
+    "gap_kc_unknown": (["crops"], "Water need cannot be estimated for {crops}: crop coefficient unknown, needs local data."),
+    "gap_rooting_unknown": (["crops"], "Rooting depth unknown, needs local data: {crops}."),
+    "gap_flag_unknown": (["crops", "flag"], "Qualitative {flag} flag unknown, needs local data: {crops}."),
+    "gap_frost_heat_tolerance_unknown": (["crops"], "Crop frost and heat tolerance unknown, needs local data: {crops}."),
+    "gap_default_months": (["crops"], "Sowing and harvest months for {crops} are defaults, to confirm locally."),
+    "gap_frost_underestimated": ([], "NASA frost days are likely underestimated for the Saiss (coarse grid); check frost risk locally."),
+    "gap_water_stress_indicative": ([], "Water stress is estimated from NASA model data (ET0 at the high end of typical Saiss values); treat it as indicative."),
+    "gap_climate_month_missing": (["months"], "Climate data missing for months {months}; those months are not assessed."),
+    # risks for local review
+    "risk_local_review": ([], "Check this option with a local agronomist or extension officer before acting; it is an option to discuss, not an order."),
+    "risk_water_stress_months": (["months"], "Rainfall is below the estimated crop water need in months {months}; check soil moisture and irrigation access locally."),
+    "risk_frost_heat_generic": (["months"], "Frost or heat warning (generic level, not crop-specific) in growing months {months}; check the crop's real tolerance locally."),
+    "risk_frost_heat_unassessed": ([], "Crop frost and heat tolerance is unknown, so frost and heat risk is only flagged at generic levels."),
+    # notes
+    "note_relative_scores": ([], "Scores are relative comparisons among the options shown, not yield or income predictions."),
+    "note_local_expert": ([], "Discuss any option with a local expert before acting."),
+    "note_soil_not_scored": ([], "Soil data is shown for context but is not used by any scoring rule yet."),
+    "note_normalisation": ([], "Each goal score is scaled 0-100 against all candidate rotations the engine evaluated."),
+}
+
+
+def msg(code, **params):
+    keys, text = MESSAGES[code]
+    assert sorted(keys) == sorted(params), f"{code}: params {sorted(params)} != {sorted(keys)}"
+    return {"code": code, "params": params, "default_text": text.format(**params)}
+
+
+def render_markdown():
+    lines = ["# Message codes", "",
+             "Generated by `python -m engine.messages` from `engine/messages.py`. "
+             "The UI holds FR and AR text for every code. `{name}` marks a param.", "",
+             "| code | params | English default_text |", "|---|---|---|"]
+    for code, (keys, text) in MESSAGES.items():
+        lines.append(f"| `{code}` | {', '.join(keys) or '-'} | {text} |")
+    return "\n".join(lines) + "\n"
+
+
+if __name__ == "__main__":
+    (Path(__file__).parent / "messages.md").write_text(render_markdown())

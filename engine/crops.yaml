@@ -1,0 +1,193 @@
+# Crop parameters. Every value has a source. Never invent numbers:
+# anything not verified is the string "unknown, needs local data" (an information gap).
+# FAO-56 = FAO Irrigation and Drainage Paper 56 (Allen et al. 1998), Chapter 6 Tables 11/12, Chapter 8 Table 22.
+# Months: "default approved by user 2026-11-14, to confirm locally"; request months override.
+# income_flag/forage_flag: qualitative, no price data, always low confidence.
+crops:
+  wheat:
+    family: {value: poaceae, source: "botanical taxonomy"}
+    legume: {value: false, source: "botanical taxonomy"}
+    cereal: {value: true, source: "botanical taxonomy"}
+    perennial: {value: false, source: "botanical taxonomy"}
+    cover: {value: false, source: "classification"}
+    rooting_zr_min_m: {value: 1.0, source: "FAO-56 Table 22, Spring Wheat 1.0-1.5 m (Winter Wheat row is 1.5-1.8 m; deep either way)"}
+    kc_ini: {value: "unknown, needs local data", source: "FAO-56 Table 12 Kc ini column not readable in the fetched text"}
+    kc_mid: {value: 1.15, source: "FAO-56 Table 12, Wheat"}
+    kc_end: {value: "0.25-0.4", source: "FAO-56 Table 12, Wheat (printed as a range)"}
+    stage_lengths_days: {value: "unknown, needs local data", source: "FAO-56 Table 11 gives regional examples only"}
+    sow_month: {value: 11, source: "default approved by user 2026-11-14, to confirm locally", basis: "FAO-56 Table 11 winter wheat, Mediterranean: planted November, 240 days"}
+    harvest_month: {value: 6, source: "default approved by user 2026-11-14, to confirm locally", basis: "FAO-56 Table 11 winter wheat, Mediterranean: November + 240 days ends late June"}
+    frost_tolerance: {value: "unknown, needs local data", source: "not in FAO-56"}
+    heat_threshold_c: {value: "unknown, needs local data", source: "not in FAO-56"}
+    income_flag: {value: medium, source: "qualitative, approved by user 2026-11-14, no price data"}
+    forage_flag: {value: low, source: "qualitative, approved by user 2026-11-14, no price data"}
+  barley:
+    family: {value: poaceae, source: "botanical taxonomy"}
+    legume: {value: false, source: "botanical taxonomy"}
+    cereal: {value: true, source: "botanical taxonomy"}
+    perennial: {value: false, source: "botanical taxonomy"}
+    cover: {value: false, source: "classification"}
+    rooting_zr_min_m: {value: 1.0, source: "FAO-56 Table 22, Barley 1.0-1.5 m"}
+    kc_ini: {value: "unknown, needs local data", source: "FAO-56 Table 12 Kc ini column not readable in the fetched text"}
+    kc_mid: {value: 1.15, source: "FAO-56 Table 12, Barley"}
+    kc_end: {value: 0.25, source: "FAO-56 Table 12, Barley"}
+    stage_lengths_days: {value: "unknown, needs local data", source: "FAO-56 Table 11 has no Mediterranean barley row"}
+    sow_month: {value: 11, source: "default approved by user 2026-11-14, to confirm locally", basis: "best estimate, same window as winter wheat"}
+    harvest_month: {value: 5, source: "default approved by user 2026-11-14, to confirm locally", basis: "best estimate, earlier than wheat"}
+    frost_tolerance: {value: "unknown, needs local data", source: "not in FAO-56"}
+    heat_threshold_c: {value: "unknown, needs local data", source: "not in FAO-56"}
+    income_flag: {value: low, source: "qualitative, approved by user 2026-11-14, no price data"}
+    forage_flag: {value: medium, source: "qualitative, approved by user 2026-11-14, no price data"}
+  chickpea:
+    family: {value: fabaceae, source: "botanical taxonomy"}
+    legume: {value: true, source: "botanical taxonomy"}
+    cereal: {value: false, source: "botanical taxonomy"}
+    perennial: {value: false, source: "botanical taxonomy"}
+    cover: {value: false, source: "classification"}
+    rooting_zr_min_m: {value: 0.6, source: "FAO-56 Table 22, Chick pea 0.6-1.0 m"}
+    kc_ini: {value: "unknown, needs local data", source: "FAO-56 Table 12 Kc ini column not readable in the fetched text"}
+    kc_mid: {value: 1.00, source: "FAO-56 Table 12, Chick pea"}
+    kc_end: {value: 0.35, source: "FAO-56 Table 12, Chick pea"}
+    stage_lengths_days: {value: "unknown, needs local data", source: "not in FAO-56 Table 11"}
+    sow_month: {value: 3, source: "default approved by user 2026-11-14, to confirm locally", basis: "best estimate (spring sowing), not in FAO-56 Table 11"}
+    harvest_month: {value: 7, source: "default approved by user 2026-11-14, to confirm locally", basis: "best estimate, not in FAO-56 Table 11"}
+    frost_tolerance: {value: "unknown, needs local data", source: "not in FAO-56"}
+    heat_threshold_c: {value: "unknown, needs local data", source: "not in FAO-56"}
+    income_flag: {value: medium, source: "qualitative, approved by user 2026-11-14, no price data"}
+    forage_flag: {value: low, source: "qualitative, approved by user 2026-11-14, no price data"}
+  lentil:
+    family: {value: fabaceae, source: "botanical taxonomy"}
+    legume: {value: true, source: "botanical taxonomy"}
+    cereal: {value: false, source: "botanical taxonomy"}
+    perennial: {value: false, source: "botanical taxonomy"}
+    cover: {value: false, source: "classification"}
+    rooting_zr_min_m: {value: 0.6, source: "FAO-56 Table 22, Lentil 0.6-0.8 m"}
+    kc_ini: {value: "unknown, needs local data", source: "FAO-56 Table 12 Kc ini column not readable in the fetched text"}
+    kc_mid: {value: 1.10, source: "FAO-56 Table 12, Lentil"}
+    kc_end: {value: 0.30, source: "FAO-56 Table 12, Lentil"}
+    stage_lengths_days: {value: "unknown, needs local data", source: "FAO-56 Table 11 gives regional examples only"}
+    sow_month: {value: 11, source: "default approved by user 2026-11-14, to confirm locally", basis: "FAO-56 Table 11 lentil, arid region: planted Oct/Nov, 170 days"}
+    harvest_month: {value: 5, source: "default approved by user 2026-11-14, to confirm locally", basis: "FAO-56 Table 11 lentil, arid region: November + 170 days ends late April/May"}
+    frost_tolerance: {value: "unknown, needs local data", source: "not in FAO-56"}
+    heat_threshold_c: {value: "unknown, needs local data", source: "not in FAO-56"}
+    income_flag: {value: medium, source: "qualitative, approved by user 2026-11-14, no price data"}
+    forage_flag: {value: low, source: "qualitative, approved by user 2026-11-14, no price data"}
+  faba_bean:
+    family: {value: fabaceae, source: "botanical taxonomy"}
+    legume: {value: true, source: "botanical taxonomy"}
+    cereal: {value: false, source: "botanical taxonomy"}
+    perennial: {value: false, source: "botanical taxonomy"}
+    cover: {value: false, source: "classification"}
+    rooting_zr_min_m: {value: 0.5, source: "FAO-56 Table 22, Fababean 0.5-0.7 m"}
+    kc_ini: {value: 0.5, source: "FAO-56 Table 12, Faba bean"}
+    kc_mid: {value: 1.15, source: "FAO-56 Table 12, Faba bean (footnote 2)"}
+    kc_end: {value: 0.30, source: "FAO-56 Table 12, Faba bean dry/seed"}
+    stage_lengths_days: {value: "unknown, needs local data", source: "FAO-56 Table 11 gives regional examples only"}
+    sow_month: {value: 11, source: "default approved by user 2026-11-14, to confirm locally", basis: "Morocco autumn sowing, user decision"}
+    harvest_month: {value: 5, source: "default approved by user 2026-11-14, to confirm locally", basis: "Morocco autumn sowing, user decision"}
+    frost_tolerance: {value: "unknown, needs local data", source: "not in FAO-56"}
+    heat_threshold_c: {value: "unknown, needs local data", source: "not in FAO-56"}
+    income_flag: {value: medium, source: "qualitative, approved by user 2026-11-14, no price data"}
+    forage_flag: {value: low, source: "qualitative, approved by user 2026-11-14, no price data"}
+  alfalfa:
+    family: {value: fabaceae, source: "botanical taxonomy"}
+    legume: {value: true, source: "botanical taxonomy"}
+    cereal: {value: false, source: "botanical taxonomy"}
+    perennial: {value: true, source: "agronomic fact"}
+    cover: {value: false, source: "classification"}
+    rooting_zr_min_m: {value: 1.0, source: "FAO-56 Table 22, Alfalfa for hay 1.0-2.0 m"}
+    kc_ini: {value: 0.40, source: "FAO-56 Table 12, Alfalfa hay"}
+    kc_mid: {value: 0.95, source: "FAO-56 Table 12, Alfalfa hay, averaged cutting effects"}
+    kc_end: {value: 0.90, source: "FAO-56 Table 12, Alfalfa hay, averaged cutting effects"}
+    stage_lengths_days: {value: "unknown, needs local data", source: "FAO-56 Table 11 gives per-cutting examples for California/Idaho only"}
+    sow_month: {value: 1, source: "default approved by user 2026-11-14, to confirm locally", basis: "perennial: occupies the field all year (convention)"}
+    harvest_month: {value: 12, source: "default approved by user 2026-11-14, to confirm locally", basis: "perennial: occupies the field all year (convention)"}
+    frost_tolerance: {value: "unknown, needs local data", source: "not in FAO-56"}
+    heat_threshold_c: {value: "unknown, needs local data", source: "not in FAO-56"}
+    income_flag: {value: medium, source: "qualitative, approved by user 2026-11-14, no price data"}
+    forage_flag: {value: high, source: "qualitative, approved by user 2026-11-14, no price data"}
+  vetch_oat_cover:
+    family: {value: fabaceae, source: "oats are generally a break crop for wheat diseases; family treated as fabaceae by user decision"}
+    legume: {value: true, source: "botanical taxonomy (the vetch half fixes nitrogen)"}
+    cereal: {value: false, source: "classification (mixture, counted as cover crop)"}
+    perennial: {value: false, source: "botanical taxonomy"}
+    cover: {value: true, source: "classification"}
+    rooting_zr_min_m: {value: "unknown, needs local data", source: "vetch is not in FAO-56 Table 22"}
+    kc_ini: {value: "unknown, needs local data", source: "vetch and the mixture are not in FAO-56 Table 12"}
+    kc_mid: {value: "unknown, needs local data", source: "vetch and the mixture are not in FAO-56 Table 12"}
+    kc_end: {value: "unknown, needs local data", source: "vetch and the mixture are not in FAO-56 Table 12"}
+    stage_lengths_days: {value: "unknown, needs local data", source: "not in FAO-56 Table 11"}
+    sow_month: {value: 11, source: "default approved by user 2026-11-14, to confirm locally", basis: "best estimate, not in FAO-56"}
+    harvest_month: {value: 4, source: "default approved by user 2026-11-14, to confirm locally", basis: "best estimate (cut or terminated in spring), not in FAO-56"}
+    frost_tolerance: {value: "unknown, needs local data", source: "not in FAO-56"}
+    heat_threshold_c: {value: "unknown, needs local data", source: "not in FAO-56"}
+    income_flag: {value: low, source: "qualitative, approved by user 2026-11-14, no price data"}
+    forage_flag: {value: high, source: "qualitative, approved by user 2026-11-14, no price data"}
+  sunflower:
+    family: {value: asteraceae, source: "botanical taxonomy"}
+    legume: {value: false, source: "botanical taxonomy"}
+    cereal: {value: false, source: "botanical taxonomy"}
+    perennial: {value: false, source: "botanical taxonomy"}
+    cover: {value: false, source: "classification"}
+    rooting_zr_min_m: {value: 0.8, source: "FAO-56 Table 22, Sunflower 0.8-1.5 m"}
+    kc_ini: {value: "unknown, needs local data", source: "FAO-56 Table 12 Kc ini column not consistently readable in the fetched text"}
+    kc_mid: {value: 1.0, source: "FAO-56 Table 12, Sunflower, lower end of the printed 1.0-1.15 (footnote 9: lower values for rainfed)"}
+    kc_end: {value: 0.35, source: "FAO-56 Table 12, Sunflower"}
+    stage_lengths_days: {value: "unknown, needs local data", source: "FAO-56 Table 11 gives one regional example only (130 days)"}
+    sow_month: {value: 4, source: "default approved by user 2026-11-14, to confirm locally", basis: "FAO-56 Table 11 sunflower, Mediterranean: planted April/May, 130 days"}
+    harvest_month: {value: 8, source: "default approved by user 2026-11-14, to confirm locally", basis: "FAO-56 Table 11 sunflower: April + 130 days ends mid August"}
+    frost_tolerance: {value: "unknown, needs local data", source: "not in FAO-56"}
+    heat_threshold_c: {value: "unknown, needs local data", source: "not in FAO-56"}
+    income_flag: {value: medium, source: "qualitative, approved by user 2026-11-14, no price data"}
+    forage_flag: {value: low, source: "qualitative, approved by user 2026-11-14, no price data"}
+  potato:
+    family: {value: solanaceae, source: "botanical taxonomy"}
+    legume: {value: false, source: "botanical taxonomy"}
+    cereal: {value: false, source: "botanical taxonomy"}
+    perennial: {value: false, source: "botanical taxonomy"}
+    cover: {value: false, source: "classification"}
+    rooting_zr_min_m: {value: 0.4, source: "FAO-56 Table 22, Potato 0.4-0.6 m"}
+    kc_ini: {value: "unknown, needs local data", source: "FAO-56 Table 12 Kc ini column not readable in the fetched text"}
+    kc_mid: {value: 1.15, source: "FAO-56 Table 12, Potato"}
+    kc_end: {value: 0.75, source: "FAO-56 Table 12, Potato (footnote 4)"}
+    stage_lengths_days: {value: "unknown, needs local data", source: "FAO-56 Table 11 gives regional examples only"}
+    sow_month: {value: 1, source: "default approved by user 2026-11-14, to confirm locally", basis: "FAO-56 Table 11 potato, (semi) arid climate: planted Jan/Nov, 115/130 days"}
+    harvest_month: {value: 5, source: "default approved by user 2026-11-14, to confirm locally", basis: "FAO-56 Table 11 potato: January + 130 days ends mid May"}
+    frost_tolerance: {value: "unknown, needs local data", source: "not in FAO-56"}
+    heat_threshold_c: {value: "unknown, needs local data", source: "not in FAO-56"}
+    income_flag: {value: high, source: "qualitative, approved by user 2026-11-14, no price data"}
+    forage_flag: {value: low, source: "qualitative, approved by user 2026-11-14, no price data"}
+  olive_intercrop:
+    family: {value: oleaceae, source: "botanical taxonomy"}
+    legume: {value: false, source: "botanical taxonomy"}
+    cereal: {value: false, source: "botanical taxonomy"}
+    perennial: {value: true, source: "botanical taxonomy"}
+    cover: {value: false, source: "classification"}
+    rooting_zr_min_m: {value: 1.2, source: "FAO-56 Table 22, Olives (40-60% canopy) 1.2-1.7 m"}
+    kc_ini: {value: 0.65, source: "FAO-56 Table 12, Olives (40-60% ground cover); the intercrop under the trees is not included"}
+    kc_mid: {value: 0.70, source: "FAO-56 Table 12, Olives (40-60% ground cover); the intercrop under the trees is not included"}
+    kc_end: {value: 0.70, source: "FAO-56 Table 12, Olives (40-60% ground cover)"}
+    stage_lengths_days: {value: "unknown, needs local data", source: "FAO-56 Table 11 gives 270 days for olive only"}
+    sow_month: {value: 1, source: "default approved by user 2026-11-14, to confirm locally", basis: "perennial: occupies the field all year (convention)"}
+    harvest_month: {value: 12, source: "default approved by user 2026-11-14, to confirm locally", basis: "perennial: occupies the field all year (convention)"}
+    frost_tolerance: {value: "unknown, needs local data", source: "not in FAO-56"}
+    heat_threshold_c: {value: "unknown, needs local data", source: "not in FAO-56"}
+    income_flag: {value: medium, source: "qualitative, approved by user 2026-11-14, no price data"}
+    forage_flag: {value: low, source: "qualitative, approved by user 2026-11-14, no price data"}
+  fallow:
+    family: {value: "not applicable", source: "no crop"}
+    legume: {value: false, source: "no crop"}
+    cereal: {value: false, source: "no crop"}
+    perennial: {value: false, source: "no crop"}
+    cover: {value: false, source: "no crop"}
+    rooting_zr_min_m: {value: "not applicable", source: "no crop"}
+    kc_ini: {value: "unknown, needs local data", source: "bare soil is not in FAO-56 Table 12"}
+    kc_mid: {value: "unknown, needs local data", source: "bare soil is not in FAO-56 Table 12"}
+    kc_end: {value: "unknown, needs local data", source: "bare soil is not in FAO-56 Table 12"}
+    stage_lengths_days: {value: "not applicable", source: "no crop"}
+    sow_month: {value: 1, source: "convention: fallow occupies the whole rotation year", basis: "convention"}
+    harvest_month: {value: 12, source: "convention: fallow occupies the whole rotation year", basis: "convention"}
+    frost_tolerance: {value: "not applicable", source: "no crop"}
+    heat_threshold_c: {value: "not applicable", source: "no crop"}
+    income_flag: {value: low, source: "qualitative, approved by user 2026-11-14, no price data"}
+    forage_flag: {value: low, source: "qualitative, approved by user 2026-11-14, no price data"}
