@@ -228,10 +228,14 @@ def test_optimiser_returns_plans_and_pareto_chart(page):
     page.get_by_role("button", name=t["optimiser_mode"]).click()
     expect(page.get_by_role("heading", name=t["optimiser_title"])).to_be_visible()
 
+    # the first parcel is open by default: set its area first
+    area_first = page.get_by_label("Surface (hectares)").first
+    expect(area_first).to_be_visible()
+    area_first.fill("3")
     page.get_by_role("button", name=t["add_parcel"]).click()
-    areas = page.get_by_label("Surface (hectares)")
-    areas.nth(0).fill("3")
-    areas.nth(1).fill("2")
+    # the second parcel is a closed <details>: open it, then set its area
+    page.locator("details").filter(has_text="Parcelle 2").locator("summary").first.click()
+    page.get_by_label("Surface (hectares)").nth(1).fill("2")
 
     page.get_by_role("button", name=t["profile_balanced"]).click()
     page.get_by_role("button", name=t["run"], exact=True).click()
