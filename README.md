@@ -141,6 +141,7 @@ adding data.
 
 ## Documentation
 
+- [AGENTS.md](AGENTS.md): architecture and how to make changes (for AI models and new developers)
 - [Build summary](docs/build-summary.md)
 - [Decision log](docs/decisions.md)
 - [Progress](docs/progress.md)
