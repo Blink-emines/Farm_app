@@ -59,9 +59,15 @@ The React dev server runs on http://localhost:3000 and proxies `/api` to port
 
 ## Shared rules
 
-- **Pilot region (Saïss), approximate box:** latitude 33.70 to 34.20, longitude
-  −5.70 to −4.70. Points outside → `outside_pilot_region`.
-  Default point for demos and tests: 33.96, −5.27 (between Meknès and Fès).
+- **Region: all of Morocco** (user decision 2026-11-14, as defined by the user),
+  box latitude 20.70 to 35.95, longitude −17.20 to −0.95. Points outside the box
+  or over the sea (no SoilGrids land pixel) → `outside_pilot_region`.
+  Default point for demos and tests: 33.96, −5.27 (Saïss, between Meknès and Fès).
+- **Server-side data:** all NASA POWER grid cells over Moroccan land and the
+  SoilGrids rasters for the box are downloaded once to the server; requests are
+  answered locally. Cache key for NASA = the POWER grid cell, not the exact point.
+- **Optimiser:** POST /api/optimize, contract in `optimize.schema.json`
+  (drafted by agronomy-engine, approved by the lead before use).
 - **Coordinates** are rounded to 2 decimals before fetching and caching.
 - **Cache key** = endpoint + sorted query parameters (after rounding).
   Files in `data/cache/`. An identical request is never sent twice.

@@ -17,6 +17,36 @@ def test_daily_url_has_verified_parameters_and_ag_community():
         "T2M", "T2M_MAX", "T2M_MIN", "PRECTOTCORR", "RH2M", "WS2M", "ALLSKY_SFC_SW_DWN", "GWETROOT"}
 
 
+@pytest.mark.parametrize("point,merra,radiation", [
+    ((33.96, -5.27), (34.0, -5.0), (33.5, -5.5)),
+    ((33.24, -5.27), (33.0, -5.0), (33.5, -5.5)),    # just south of the 33.25 edge
+    ((33.25, -5.27), (33.5, -5.0), (33.5, -5.5)),    # on the edge: northern cell
+    ((33.75, -5.27), (34.0, -5.0), (33.5, -5.5)),
+    ((34.00, -5.27), (34.0, -5.0), (34.5, -5.5)),    # radiation cell edge at whole degrees
+    ((33.96, -5.30), (34.0, -5.0), (33.5, -5.5)),
+    ((33.96, -5.35), (34.0, -5.625), (33.5, -5.5)),  # west of the -5.3125 edge
+    ((33.96, -5.00), (34.0, -5.0), (33.5, -4.5)),    # radiation edge at -5.00: eastern cell
+    ((20.70, -17.20), (20.5, -17.5), (20.5, -17.5)),
+])
+def test_cell_centres_match_probed_grid(point, merra, radiation):
+    assert nasa_power.merra_cell_centre(*point) == merra
+    assert nasa_power.radiation_cell_centre(*point) == radiation
+
+
+def test_every_point_in_a_cell_makes_the_same_requests():
+    a = nasa_power.cell_requests(33.96, -5.27)
+    b = nasa_power.cell_requests(33.80, -5.10)
+    assert a == b
+    assert [r[2] for r in a] == [nasa_power.MERRA_PARAMETERS, nasa_power.RADIATION_PARAMETERS]
+
+
+def test_cell_requests_are_made_at_the_centre_with_three_decimals():
+    url = nasa_power.build_url(34.0, -5.625, nasa_power.MERRA_PARAMETERS)
+    q = parse_qs(urlparse(url).query)
+    assert q["latitude"] == ["34.000"] and q["longitude"] == ["-5.625"]
+    assert "ALLSKY_SFC_SW_DWN" not in q["parameters"][0]
+
+
 def test_parse_daily_dataframe_and_elevation(power_raw):
     df, elev = nasa_power.parse_daily(power_raw)
     assert elev == pytest.approx(575.32)

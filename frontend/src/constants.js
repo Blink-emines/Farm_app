@@ -1,4 +1,4 @@
-export const BOX = { south: 33.7, north: 34.2, west: -5.7, east: -4.7 };
+export const BOX = { south: 20.7, north: 35.95, west: -17.2, east: -0.95 };
 export const DEFAULT_POINT = { lat: 33.96, lon: -5.27 };
 export const CROPS = [
   'wheat', 'barley', 'chickpea', 'lentil', 'faba_bean', 'alfalfa',
@@ -28,4 +28,33 @@ export function buildRequest(form) {
     },
     priorities: form.priorities,
   };
+}
+
+// Slider presets, same as engine/weights.yaml (optimiser.profiles).
+export const PROFILES = {
+  economic: { save_water: 1, improve_soil: 1, extra_income: 5, reduce_erosion: 0, forage: 1 },
+  balanced: { save_water: 3, improve_soil: 3, extra_income: 3, reduce_erosion: 3, forage: 3 },
+  ecological: { save_water: 4, improve_soil: 5, extra_income: 1, reduce_erosion: 4, forage: 1 },
+};
+
+const num = (v) => Number(String(v).replace(',', '.'));
+
+// Build the OptimizeRequest. parcels[i].id is P1, P2, ... (the name is for display only).
+export function buildOptimizeRequest({ lat, lon, parcels, priorities, waterM3, budget }) {
+  const body = {
+    latitude: lat,
+    longitude: lon,
+    parcels: parcels.map((p, i) => ({
+      id: `P${i + 1}`,
+      area_ha: num(p.area_ha),
+      irrigated: p.irrigated,
+      current_rotation: buildRequest({ lat, lon, seasons: p.seasons, priorities }).current_rotation,
+    })),
+    pareto_points: 6,
+  };
+  const preset = Object.entries(PROFILES).find(([, v]) => Object.keys(v).every((k) => v[k] === priorities[k]));
+  if (preset) body.profile = preset[0]; else body.priorities = priorities;
+  if (String(waterM3).trim() !== '' && num(waterM3) >= 0) body.water = { monthly_irrigation_m3: Array(12).fill(num(waterM3)) };
+  if (String(budget).trim() !== '' && num(budget) >= 0) body.budget_mad = num(budget);
+  return body;
 }

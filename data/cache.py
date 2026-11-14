@@ -1,4 +1,5 @@
 """Disk cache for raw API responses. Key = endpoint + sorted query parameters."""
+import gzip
 import hashlib
 import json
 from datetime import datetime, timezone
@@ -30,19 +31,24 @@ def _path(endpoint, params):
 
 
 def lookup(endpoint, params):
+    """Return the saved entry (plain .json or compressed .json.gz), or None."""
     path = _path(endpoint, params)
-    if not path.exists():
-        return None
-    try:
-        return json.loads(path.read_text())
-    except ValueError:
-        return None  # damaged file: treat as a miss
+    for candidate in (path, path.with_name(path.name + ".gz")):
+        if candidate.exists():
+            try:
+                opener = gzip.open if candidate.suffix == ".gz" else open
+                with opener(candidate, "rt", encoding="utf-8") as f:
+                    return json.load(f)
+            except (ValueError, OSError):
+                return None  # damaged file: treat as a miss
+    return None
 
 
-def cached_get(endpoint, params, fetcher):
+def cached_get(endpoint, params, fetcher, compress=False):
     """Return the cached response, or call fetcher(url) once and store the result.
 
-    fetcher raises on failure, and failures are never cached."""
+    fetcher raises on failure, and failures are never cached. compress=True stores .json.gz
+    (used for the large NASA POWER responses)."""
     hit = lookup(endpoint, params)
     if hit is not None:
         return Cached(hit["response"], hit["fetched_at"], "cache")
@@ -50,8 +56,15 @@ def cached_get(endpoint, params, fetcher):
     response = fetcher(url)
     fetched_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    _path(endpoint, params).write_text(json.dumps({
-        "endpoint": endpoint, "params": _sorted_params(params),
-        "fetched_at": fetched_at, "response": response,
-    }))
+    entry = json.dumps({"endpoint": endpoint, "params": _sorted_params(params),
+                        "fetched_at": fetched_at, "response": response})
+    path = _path(endpoint, params)
+    if compress:
+        path = path.with_name(path.name + ".gz")
+        tmp = path.with_name(path.name + ".part")
+        with gzip.open(tmp, "wt", encoding="utf-8") as f:
+            f.write(entry)
+        tmp.replace(path)  # a half-written file is never seen as a cache hit
+    else:
+        path.write_text(entry)
     return Cached(response, fetched_at, "live")

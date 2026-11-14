@@ -1,0 +1,540 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://farm-app.local/contracts/optimize.schema.json",
+ "title": "OptimizeResponse",
+ "description": "DRAFT for POST /api/optimize (engine/optimize). Request = $defs/OptimizeRequest, response = $defs/OptimizeResponse. Reuses message, priorities, season, calendarMonth, why, evidence and strategy from strategy.schema.json. All user-facing text is a message object (code + params + default_text). Scores are relative 0-100 against the ideal/nadir of the optimiser's single-objective solves, not yield or income predictions.",
+ "$ref": "#/$defs/OptimizeResponse",
+ "$defs": {
+  "cropId": {
+   "$ref": "https://farm-app.local/contracts/strategy.schema.json#/$defs/cropId"
+  },
+  "OptimizeRequest": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "latitude",
+    "longitude",
+    "parcels"
+   ],
+   "description": "Give exactly one of profile or priorities. Parcels that are not coupled by water or budget share one optimal plan.",
+   "oneOf": [
+    {
+     "required": [
+      "profile"
+     ],
+     "not": {
+      "required": [
+       "priorities"
+      ]
+     }
+    },
+    {
+     "required": [
+      "priorities"
+     ],
+     "not": {
+      "required": [
+       "profile"
+      ]
+     }
+    }
+   ],
+   "properties": {
+    "latitude": {
+     "type": "number",
+     "minimum": -90,
+     "maximum": 90
+    },
+    "longitude": {
+     "type": "number",
+     "minimum": -180,
+     "maximum": 180
+    },
+    "parcels": {
+     "type": "array",
+     "minItems": 1,
+     "maxItems": 20,
+     "items": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+       "id",
+       "area_ha",
+       "current_rotation"
+      ],
+      "properties": {
+       "id": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9_-]{1,40}$"
+       },
+       "area_ha": {
+        "type": "number",
+        "exclusiveMinimum": 0,
+        "maximum": 100000
+       },
+       "current_rotation": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+         "seasons"
+        ],
+        "properties": {
+         "seasons": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 6,
+          "items": {
+           "$ref": "https://farm-app.local/contracts/strategy.schema.json#/$defs/seasonInput"
+          }
+         }
+        }
+       },
+       "irrigated": {
+        "type": "boolean",
+        "default": false,
+        "description": "false (default) = rainfed: crops that need irrigation are excluded and the water goal measures rainfed deficit (stress risk). The water cap applies to irrigated parcels only."
+       }
+      }
+     }
+    },
+    "profile": {
+     "enum": [
+      "economic",
+      "balanced",
+      "ecological"
+     ],
+     "description": "Slider preset; the response echoes the resulting priorities."
+    },
+    "priorities": {
+     "$ref": "https://farm-app.local/contracts/strategy.schema.json#/$defs/priorities"
+    },
+    "water": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "monthly_irrigation_m3"
+     ],
+     "description": "Optional cap on irrigation water for the whole farm, per calendar month, repeated every year.",
+     "properties": {
+      "monthly_irrigation_m3": {
+       "type": "array",
+       "minItems": 12,
+       "maxItems": 12,
+       "items": {
+        "type": "number",
+        "minimum": 0
+       }
+      }
+     }
+    },
+    "budget_mad": {
+     "type": "number",
+     "minimum": 0,
+     "description": "Optional yearly cost budget for the whole farm; only used when costs are known."
+    },
+    "price_overrides": {
+     "type": "object",
+     "description": "Per crop overrides of the editable defaults in engine/economics.yaml.",
+     "propertyNames": {
+      "$ref": "#/$defs/cropId"
+     },
+     "additionalProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+       "price_mad_per_t": {
+        "type": "number",
+        "minimum": 0
+       },
+       "yield_t_per_ha": {
+        "type": "number",
+        "minimum": 0
+       },
+       "cost_mad_per_ha": {
+        "type": "number",
+        "minimum": 0
+       }
+      }
+     }
+    },
+    "pareto_points": {
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 8,
+     "description": "Number of income-versus-water Pareto points; 0 = none."
+    }
+   }
+  },
+  "objectiveInfo": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "unit",
+    "ideal",
+    "nadir",
+    "plan_value"
+   ],
+   "properties": {
+    "unit": {
+     "type": "string"
+    },
+    "ideal": {
+     "type": "number"
+    },
+    "nadir": {
+     "type": "number"
+    },
+    "plan_value": {
+     "type": "number"
+    },
+    "description": {
+     "type": "string"
+    }
+   }
+  },
+  "parcelResult": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "id",
+    "area_ha",
+    "irrigated",
+    "plan",
+    "baseline",
+    "values"
+   ],
+   "properties": {
+    "id": {
+     "type": "string"
+    },
+    "area_ha": {
+     "type": "number"
+    },
+    "plan": {
+     "$ref": "https://farm-app.local/contracts/strategy.schema.json#/$defs/strategy",
+     "description": "The optimised 24-month cyclic plan, explained by the existing rules (why, evidence, risks, gaps)."
+    },
+    "baseline": {
+     "$ref": "https://farm-app.local/contracts/strategy.schema.json#/$defs/strategy",
+     "description": "The farmer's current rotation scored by the same rules and the same normalisation (is_current = true)."
+    },
+    "values": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "water_deficit_mm_per_year",
+      "revenue_mad_per_ha_year",
+      "revenue_range_mad_per_ha_year",
+      "profit_mad_per_ha_year",
+      "baseline_revenue_mad_per_ha_year",
+      "baseline_water_deficit_mm_per_year"
+     ],
+     "properties": {
+      "water_deficit_mm_per_year": {
+       "type": "number",
+       "description": "Rainfed parcels: stress risk, not a volume to supply. Irrigated parcels: irrigation need in mm."
+      },
+      "revenue_mad_per_ha_year": {
+       "type": "number"
+      },
+      "revenue_range_mad_per_ha_year": {
+       "type": "object",
+       "additionalProperties": false,
+       "required": [
+        "bad_year",
+        "average_year",
+        "good_year"
+       ],
+       "properties": {
+        "bad_year": {
+         "type": "number"
+        },
+        "average_year": {
+         "type": "number"
+        },
+        "good_year": {
+         "type": "number"
+        }
+       }
+      },
+      "profit_mad_per_ha_year": {
+       "type": [
+        "number",
+        "null"
+       ],
+       "description": "null unless the farmer entered costs."
+      },
+      "baseline_revenue_mad_per_ha_year": {
+       "type": "number"
+      },
+      "baseline_water_deficit_mm_per_year": {
+       "type": "number"
+      }
+     }
+    },
+    "irrigated": {
+     "type": "boolean"
+    }
+   }
+  },
+  "paretoPoint": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "revenue_mad_per_ha_year",
+    "water_deficit_mm_per_year",
+    "scores",
+    "crops"
+   ],
+   "properties": {
+    "revenue_mad_per_ha_year": {
+     "type": "number"
+    },
+    "water_deficit_mm_per_year": {
+     "type": "number"
+    },
+    "profit_mad_per_ha_year": {
+     "type": [
+      "number",
+      "null"
+     ]
+    },
+    "scores": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "extra_income",
+      "save_water"
+     ],
+     "properties": {
+      "extra_income": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 100
+      },
+      "save_water": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 100
+      }
+     }
+    },
+    "crops": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     },
+     "description": "One crop sequence per parcel, e.g. \"wheat > chickpea\"."
+    }
+   }
+  },
+  "OptimizeResponse": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "schema_version",
+    "generated_at",
+    "location",
+    "profile",
+    "priorities",
+    "solver",
+    "objectives",
+    "parcels",
+    "totals",
+    "pareto",
+    "information_gaps",
+    "notes"
+   ],
+   "properties": {
+    "schema_version": {
+     "const": "1.0"
+    },
+    "generated_at": {
+     "type": "string",
+     "format": "date-time"
+    },
+    "location": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "latitude",
+      "longitude"
+     ],
+     "properties": {
+      "latitude": {
+       "type": "number"
+      },
+      "longitude": {
+       "type": "number"
+      }
+     }
+    },
+    "profile": {
+     "type": [
+      "string",
+      "null"
+     ]
+    },
+    "priorities": {
+     "$ref": "https://farm-app.local/contracts/strategy.schema.json#/$defs/priorities"
+    },
+    "solver": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "status",
+      "time_s",
+      "backend",
+      "solves"
+     ],
+     "properties": {
+      "status": {
+       "enum": [
+        "optimal",
+        "feasible"
+       ]
+      },
+      "time_s": {
+       "type": "number",
+       "minimum": 0
+      },
+      "backend": {
+       "type": "string"
+      },
+      "solves": {
+       "type": "integer",
+       "minimum": 1
+      },
+      "coupled": {
+       "type": "boolean",
+       "description": "true when water or budget limits couple the parcels in one joint solve."
+      }
+     }
+    },
+    "objectives": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "save_water",
+      "improve_soil",
+      "extra_income",
+      "reduce_erosion",
+      "forage"
+     ],
+     "properties": {
+      "save_water": {
+       "$ref": "#/$defs/objectiveInfo"
+      },
+      "improve_soil": {
+       "$ref": "#/$defs/objectiveInfo"
+      },
+      "extra_income": {
+       "$ref": "#/$defs/objectiveInfo"
+      },
+      "reduce_erosion": {
+       "$ref": "#/$defs/objectiveInfo"
+      },
+      "forage": {
+       "$ref": "#/$defs/objectiveInfo"
+      }
+     },
+     "description": "Farm-level (area-weighted, per hectare and year) value of the chosen plan against the ideal and nadir used for normalisation. All objectives are maximised; save_water is minus the water deficit in mm."
+    },
+    "windows": {
+     "type": "object",
+     "description": "Sowing months allowed per crop for this point.",
+     "propertyNames": {
+      "$ref": "#/$defs/cropId"
+     },
+     "additionalProperties": {
+      "type": "array",
+      "items": {
+       "$ref": "https://farm-app.local/contracts/strategy.schema.json#/$defs/month"
+      }
+     }
+    },
+    "parcels": {
+     "type": "array",
+     "minItems": 1,
+     "items": {
+      "$ref": "#/$defs/parcelResult"
+     }
+    },
+    "totals": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "area_ha",
+      "gross_revenue_mad_per_year",
+      "revenue_range_mad_per_year",
+      "profit_mad_per_year",
+      "irrigation_need_m3_per_year",
+      "baseline_gross_revenue_mad_per_year"
+     ],
+     "properties": {
+      "area_ha": {
+       "type": "number"
+      },
+      "gross_revenue_mad_per_year": {
+       "type": "number"
+      },
+      "revenue_range_mad_per_year": {
+       "type": "object",
+       "additionalProperties": false,
+       "required": [
+        "bad_year",
+        "average_year",
+        "good_year"
+       ],
+       "properties": {
+        "bad_year": {
+         "type": "number"
+        },
+        "average_year": {
+         "type": "number"
+        },
+        "good_year": {
+         "type": "number"
+        }
+       }
+      },
+      "profit_mad_per_year": {
+       "type": [
+        "number",
+        "null"
+       ]
+      },
+      "baseline_gross_revenue_mad_per_year": {
+       "type": "number"
+      },
+      "irrigation_need_m3_per_year": {
+       "type": "number",
+       "description": "Irrigated parcels only: sum of area x 10 x water deficit (mm)."
+      }
+     }
+    },
+    "pareto": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/paretoPoint"
+     },
+     "description": "Income-versus-water trade-off, sorted by revenue ascending."
+    },
+    "information_gaps": {
+     "type": "array",
+     "items": {
+      "$ref": "https://farm-app.local/contracts/strategy.schema.json#/$defs/message"
+     },
+     "description": "Farm-level gaps (e.g. sowing windows that fell back to default months)."
+    },
+    "notes": {
+     "type": "array",
+     "minItems": 2,
+     "items": {
+      "$ref": "https://farm-app.local/contracts/strategy.schema.json#/$defs/message"
+     }
+    }
+   }
+  }
+ }
+}

@@ -11,7 +11,7 @@ def error_response(status, code, message):
 KNOWN_ERRORS = {
     'OutsidePilotRegion': (
         422, 'outside_pilot_region',
-        'This point is outside the Saiss pilot area (latitude 33.70 to 34.20, longitude -5.70 to -4.70).',
+        'This point is outside the covered area (Morocco, latitude 20.70 to 35.95, longitude -17.20 to -0.95) or not on land.',
     ),
     'UpstreamUnavailable': (
         502, 'upstream_unavailable',

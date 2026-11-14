@@ -158,6 +158,10 @@ def water_demand_match(ctx):
     if stress:
         res.why.append(_why("water_demand_match", w, w["points_per_stress_month"] * stress / n,
                             msg("water_stress_months", count=stress)))
+    proxy = sorted({c for c in ctx.ids if c != "fallow"
+                    and str(crop_field(ctx.crops, c, "kc_mid")["source"]).startswith("proxy")})
+    if proxy:
+        res.gaps.append(msg("gap_kc_proxy", crops=",".join(proxy)))
     if no_kc:
         res.gaps.append(msg("gap_kc_unknown", crops=",".join(sorted(no_kc))))
     if missing:

@@ -73,14 +73,18 @@ def month_stress(crops, crop, features, m, warnings):
     return reasons
 
 
-def build_calendar(seasons, crops, features, warnings):
-    """Returns (calendar rows, seasons with the months actually used)."""
-    lay = layout(seasons, crops)
+def calendar_from_spans(spans, length, crops, features, warnings):
+    """Rows of 12 months from spans (start, end, crop) on a cyclic axis of `length` months
+    (absolute index 0 = January of row 1; indexes wrap modulo `length`)."""
+    slots = [None] * length
+    for start, end, cid in spans:
+        for a in range(start, end + 1):
+            slots[a % length] = cid
     rows = []
-    for y in range(lay["length"] // 12):
+    for y in range(length // 12):
         months = []
         for m in range(1, 13):
-            crop = lay["slots"][(12 * y + m - 1 - lay["t0"]) % lay["length"]]
+            crop = slots[(12 * y + m - 1) % length]
             if crop is None:
                 months.append({"month": m, "crop_id": None, "status": "bare", "stress_reasons": []})
             elif crop == "fallow":
@@ -90,4 +94,10 @@ def build_calendar(seasons, crops, features, warnings):
                 months.append({"month": m, "crop_id": crop,
                                "status": "stress" if reasons else "growing", "stress_reasons": reasons})
         rows.append({"year": y + 1, "months": months})
-    return rows, lay["seasons"]
+    return rows
+
+
+def build_calendar(seasons, crops, features, warnings):
+    """Returns (calendar rows, seasons with the months actually used)."""
+    lay = layout(seasons, crops)
+    return calendar_from_spans(lay["spans"], lay["length"], crops, features, warnings), lay["seasons"]

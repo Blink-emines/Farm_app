@@ -51,8 +51,15 @@ def test_water_demand_match(make_ctx):
     assert r.evidence
 
 
-def test_water_unknown_kc_is_a_gap(make_ctx):
+def test_water_vetch_oat_uses_proxy_kc_and_says_so(make_ctx):
     r = rules.water_demand_match(make_ctx(["vetch_oat_cover"]))
+    assert r.why and any(g["code"] == "gap_kc_proxy" for g in r.gaps)
+
+
+def test_water_unknown_kc_is_a_gap(make_ctx):
+    ctx = make_ctx(["wheat"])
+    ctx.crops["wheat"]["kc_mid"]["value"] = "unknown, needs local data"
+    r = rules.water_demand_match(ctx)
     assert r.why == [] and any(g["code"] == "gap_kc_unknown" for g in r.gaps)
 
 

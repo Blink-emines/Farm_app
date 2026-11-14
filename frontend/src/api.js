@@ -48,3 +48,12 @@ export async function getStrategies(requestBody) {
     body: JSON.stringify(requestBody),
   });
 }
+
+export async function optimize(requestBody) {
+  if (USE_MOCK) return (await import('./mock/mockOptimize.json')).default;
+  return request('/api/optimize', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(requestBody),
+  });
+}

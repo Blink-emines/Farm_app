@@ -7,3 +7,6 @@ PyYAML~=6.0.3
 jsonschema~=4.26.0
 pytest~=9.2.0
 playwright~=1.65.2
+pyomo~=6.10.1
+highspy~=1.16.0
+rasterio~=1.5.2

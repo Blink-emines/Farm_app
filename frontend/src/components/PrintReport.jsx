@@ -5,8 +5,8 @@ import { StatusKey } from './charts.jsx';
 
 // Shown only when printing (see the print rules in styles.css). Browser print gives a PDF.
 export default function PrintReport({ form, data, features }) {
-  const { t, tm, crop, month, lang } = useI18n();
-  const date = new Date().toLocaleDateString(lang === 'ar' ? 'ar-MA-u-nu-latn' : 'fr-FR', { dateStyle: 'long' });
+  const { t, tm, crop, month, date: fmtDate } = useI18n();
+  const date = fmtDate(new Date());
   const top = data.strategies.slice(0, 3);
   const gaps = [
     ...(features?.data_gaps ?? []).map((g) => ({ key: g.code, text: t(`gap.${g.code}`) !== `gap.${g.code}` ? t(`gap.${g.code}`) : g.message })),
@@ -15,6 +15,7 @@ export default function PrintReport({ form, data, features }) {
 
   return (
     <article className="report">
+      <p>{t('ui.brand')}</p>
       <h1>{t('ui.report_title')}</h1>
       <p>{t('ui.report_date')} : {date}</p>
       <p>{t('ui.report_point')} : <bdi dir="ltr">{data.location.latitude}, {data.location.longitude}</bdi></p>

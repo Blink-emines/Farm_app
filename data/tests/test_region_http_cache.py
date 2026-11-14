@@ -13,12 +13,12 @@ def test_rounding_to_two_decimals():
     assert region.round_point(33.9649, -5.2751) == (33.96, -5.28)
 
 
-@pytest.mark.parametrize("lat,lon", [(33.96, -5.27), (33.70, -5.70), (34.20, -4.70)])
+@pytest.mark.parametrize("lat,lon", [(33.96, -5.27), (20.70, -17.20), (35.95, -0.95), (30.43, -9.60)])
 def test_inside_box_including_edges(lat, lon):
     region.check_in_pilot_region(lat, lon)
 
 
-@pytest.mark.parametrize("lat,lon", [(35.0, -5.27), (33.96, -3.0), (33.69, -5.27), (0.0, 0.0)])
+@pytest.mark.parametrize("lat,lon", [(36.20, -5.27), (33.96, -0.50), (20.69, -9.0), (33.96, -17.30), (0.0, 0.0), (48.85, 2.35)])
 def test_outside_box_raises(lat, lon):
     with pytest.raises(OutsidePilotRegion):
         region.check_in_pilot_region(lat, lon)

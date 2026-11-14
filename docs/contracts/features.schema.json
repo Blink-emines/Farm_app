@@ -17,7 +17,7 @@
         "latitude": { "type": "number", "minimum": -90, "maximum": 90, "description": "Decimal degrees, rounded to 2 decimals." },
         "longitude": { "type": "number", "minimum": -180, "maximum": 180, "description": "Decimal degrees, rounded to 2 decimals." },
         "elevation_m": { "type": ["number", "null"], "description": "Metres above sea level as reported by NASA POWER; null if not reported." },
-        "region": { "const": "saiss" }
+        "region": { "enum": ["saiss", "morocco"], "description": "\"morocco\" from 2026-11-14 (whole-country scope); \"saiss\" accepted during the transition." }
       }
     },
     "climate": {

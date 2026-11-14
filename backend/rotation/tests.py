@@ -31,9 +31,12 @@ class ApiTestCase(SimpleTestCase):
         pipeline.get_features = self.get_features
         scorer = types.ModuleType('engine.scorer')
         scorer.score = self.score
+        self.optimize = mock.Mock(return_value={'fake': 'plan'})
+        optimiser = types.ModuleType('engine.optimize')
+        optimiser.optimize = self.optimize
         patcher = mock.patch.dict(sys.modules, {
             'data': types.ModuleType('data'), 'data.pipeline': pipeline,
-            'engine': types.ModuleType('engine'), 'engine.scorer': scorer,
+            'engine': types.ModuleType('engine'), 'engine.scorer': scorer, 'engine.optimize': optimiser,
         })
         patcher.start()
         self.addCleanup(patcher.stop)
@@ -120,3 +123,80 @@ class StrategiesEndpointTests(ApiTestCase):
     def test_unexpected_error_is_500(self):
         self.score.side_effect = ValueError('boom')
         self.assert_error(self.post(GOOD_BODY), 500, 'internal_error')
+
+
+OPT_BODY = {
+    'latitude': 33.96,
+    'longitude': -5.27,
+    'parcels': [
+        {'id': 'A', 'area_ha': 2, 'irrigated': False, 'current_rotation': {'seasons': [{'crop_id': 'wheat'}, {'crop_id': 'fallow'}]}},
+        {'id': 'B', 'area_ha': 3, 'irrigated': True, 'current_rotation': {'seasons': [{'crop_id': 'barley'}]}},
+    ],
+    'profile': 'balanced',
+    'pareto_points': 4,
+}
+
+
+class OptimizeEndpointTests(ApiTestCase):
+    def post(self, body):
+        return self.client.post('/api/optimize', body, format='json')
+
+    def test_success_calls_pipeline_then_optimiser(self):
+        r = self.post(OPT_BODY)
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.json(), {'fake': 'plan'})
+        self.get_features.assert_called_once_with(33.96, -5.27)
+        self.optimize.assert_called_once_with({'fake': 'features'}, OPT_BODY)
+
+    def test_priorities_instead_of_profile_is_accepted(self):
+        body = {k: v for k, v in OPT_BODY.items() if k != 'profile'}
+        body['priorities'] = GOOD_BODY['priorities']
+        self.assertEqual(self.post(body).status_code, 200)
+
+    def test_invalid_bodies_are_400(self):
+        no_parcels = {k: v for k, v in OPT_BODY.items() if k != 'parcels'}
+        cases = {
+            'no parcels': no_parcels,
+            'empty parcels': {**OPT_BODY, 'parcels': []},
+            'profile and priorities': {**OPT_BODY, 'priorities': GOOD_BODY['priorities']},
+            'neither profile nor priorities': {k: v for k, v in OPT_BODY.items() if k != 'profile'},
+            'unknown profile': {**OPT_BODY, 'profile': 'greedy'},
+            'zero area': {**OPT_BODY, 'parcels': [{**OPT_BODY['parcels'][0], 'area_ha': 0}]},
+            'bad parcel id': {**OPT_BODY, 'parcels': [{**OPT_BODY['parcels'][0], 'id': 'a b'}]},
+            'unknown crop': {**OPT_BODY, 'parcels': [{**OPT_BODY['parcels'][0], 'current_rotation': {'seasons': [{'crop_id': 'rice'}]}}]},
+            'short water list': {**OPT_BODY, 'water': {'monthly_irrigation_m3': [1, 2]}},
+            'too many pareto points': {**OPT_BODY, 'pareto_points': 20},
+            'list instead of object': [1],
+        }
+        for name, body in cases.items():
+            with self.subTest(name):
+                self.assert_error(self.post(body), 400, 'invalid_request')
+        self.optimize.assert_not_called()
+
+    def test_malformed_json_is_400(self):
+        r = self.client.post('/api/optimize', 'nope', content_type='application/json')
+        self.assert_error(r, 400, 'invalid_request')
+
+    def test_outside_region_is_422(self):
+        self.get_features.side_effect = OutsidePilotRegion('x')
+        self.assert_error(self.post(OPT_BODY), 422, 'outside_pilot_region')
+
+    def test_upstream_is_502(self):
+        self.optimize.side_effect = UpstreamUnavailable('x')
+        self.assert_error(self.post(OPT_BODY), 502, 'upstream_unavailable')
+
+    def test_unexpected_error_is_500(self):
+        self.optimize.side_effect = RuntimeError('boom')
+        self.assert_error(self.post(OPT_BODY), 500, 'internal_error')
+
+
+class OptimizeRealSmokeTest(SimpleTestCase):
+    """No mocks: the real pipeline (offline for the default point) and the real optimiser."""
+
+    def test_default_point_returns_a_valid_plan(self):
+        r = APIClient().post('/api/optimize', OPT_BODY, format='json')
+        self.assertEqual(r.status_code, 200, r.content[:300])
+        data = r.json()
+        self.assertEqual({p['id'] for p in data['parcels']}, {'A', 'B'})
+        self.assertIn('irrigation_need_m3_per_year', data['totals'])
+        self.assertGreater(data['totals']['gross_revenue_mad_per_year'], 0)

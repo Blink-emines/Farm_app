@@ -10,6 +10,8 @@ crops:
     cereal: {value: true, source: "botanical taxonomy"}
     perennial: {value: false, source: "botanical taxonomy"}
     cover: {value: false, source: "classification"}
+    sowing_season: {value: autumn, source: "classification from the sowing months approved by the user 2026-11-14"}
+    irrigation_required: {value: false, source: "labelled judgement, approved by the lead 2026-11-14: no source found that rules out rainfed cultivation in Morocco; check locally"}
     rooting_zr_min_m: {value: 1.0, source: "FAO-56 Table 22, Spring Wheat 1.0-1.5 m (Winter Wheat row is 1.5-1.8 m; deep either way)"}
     kc_ini: {value: "unknown, needs local data", source: "FAO-56 Table 12 Kc ini column not readable in the fetched text"}
     kc_mid: {value: 1.15, source: "FAO-56 Table 12, Wheat"}
@@ -27,6 +29,8 @@ crops:
     cereal: {value: true, source: "botanical taxonomy"}
     perennial: {value: false, source: "botanical taxonomy"}
     cover: {value: false, source: "classification"}
+    sowing_season: {value: autumn, source: "classification from the sowing months approved by the user 2026-11-14"}
+    irrigation_required: {value: false, source: "labelled judgement, approved by the lead 2026-11-14: no source found that rules out rainfed cultivation in Morocco; check locally"}
     rooting_zr_min_m: {value: 1.0, source: "FAO-56 Table 22, Barley 1.0-1.5 m"}
     kc_ini: {value: "unknown, needs local data", source: "FAO-56 Table 12 Kc ini column not readable in the fetched text"}
     kc_mid: {value: 1.15, source: "FAO-56 Table 12, Barley"}
@@ -44,6 +48,8 @@ crops:
     cereal: {value: false, source: "botanical taxonomy"}
     perennial: {value: false, source: "botanical taxonomy"}
     cover: {value: false, source: "classification"}
+    sowing_season: {value: spring, source: "classification from the sowing months approved by the user 2026-11-14"}
+    irrigation_required: {value: false, source: "labelled judgement, approved by the lead 2026-11-14: no source found that rules out rainfed cultivation in Morocco; check locally"}
     rooting_zr_min_m: {value: 0.6, source: "FAO-56 Table 22, Chick pea 0.6-1.0 m"}
     kc_ini: {value: "unknown, needs local data", source: "FAO-56 Table 12 Kc ini column not readable in the fetched text"}
     kc_mid: {value: 1.00, source: "FAO-56 Table 12, Chick pea"}
@@ -61,6 +67,8 @@ crops:
     cereal: {value: false, source: "botanical taxonomy"}
     perennial: {value: false, source: "botanical taxonomy"}
     cover: {value: false, source: "classification"}
+    sowing_season: {value: autumn, source: "classification from the sowing months approved by the user 2026-11-14"}
+    irrigation_required: {value: false, source: "labelled judgement, approved by the lead 2026-11-14: no source found that rules out rainfed cultivation in Morocco; check locally"}
     rooting_zr_min_m: {value: 0.6, source: "FAO-56 Table 22, Lentil 0.6-0.8 m"}
     kc_ini: {value: "unknown, needs local data", source: "FAO-56 Table 12 Kc ini column not readable in the fetched text"}
     kc_mid: {value: 1.10, source: "FAO-56 Table 12, Lentil"}
@@ -78,6 +86,8 @@ crops:
     cereal: {value: false, source: "botanical taxonomy"}
     perennial: {value: false, source: "botanical taxonomy"}
     cover: {value: false, source: "classification"}
+    sowing_season: {value: autumn, source: "classification from the sowing months approved by the user 2026-11-14"}
+    irrigation_required: {value: false, source: "labelled judgement, approved by the lead 2026-11-14: no source found that rules out rainfed cultivation in Morocco; check locally"}
     rooting_zr_min_m: {value: 0.5, source: "FAO-56 Table 22, Fababean 0.5-0.7 m"}
     kc_ini: {value: 0.5, source: "FAO-56 Table 12, Faba bean"}
     kc_mid: {value: 1.15, source: "FAO-56 Table 12, Faba bean (footnote 2)"}
@@ -95,6 +105,8 @@ crops:
     cereal: {value: false, source: "botanical taxonomy"}
     perennial: {value: true, source: "agronomic fact"}
     cover: {value: false, source: "classification"}
+    sowing_season: {value: any, source: "classification from the sowing months approved by the user 2026-11-14"}
+    irrigation_required: {value: false, source: "labelled judgement, approved by the lead 2026-11-14: no source found that rules out rainfed cultivation in Morocco; check locally"}
     rooting_zr_min_m: {value: 1.0, source: "FAO-56 Table 22, Alfalfa for hay 1.0-2.0 m"}
     kc_ini: {value: 0.40, source: "FAO-56 Table 12, Alfalfa hay"}
     kc_mid: {value: 0.95, source: "FAO-56 Table 12, Alfalfa hay, averaged cutting effects"}
@@ -112,9 +124,11 @@ crops:
     cereal: {value: false, source: "classification (mixture, counted as cover crop)"}
     perennial: {value: false, source: "botanical taxonomy"}
     cover: {value: true, source: "classification"}
+    sowing_season: {value: autumn, source: "classification from the sowing months approved by the user 2026-11-14"}
+    irrigation_required: {value: false, source: "labelled judgement, approved by the lead 2026-11-14: no source found that rules out rainfed cultivation in Morocco; check locally"}
     rooting_zr_min_m: {value: "unknown, needs local data", source: "vetch is not in FAO-56 Table 22"}
     kc_ini: {value: "unknown, needs local data", source: "vetch and the mixture are not in FAO-56 Table 12"}
-    kc_mid: {value: "unknown, needs local data", source: "vetch and the mixture are not in FAO-56 Table 12"}
+    kc_mid: {value: 1.15, source: "proxy: FAO-56 Table 12, Oats (vetch and the vetch-oat mixture are not in Table 12); lead decision 2026-11-14"}
     kc_end: {value: "unknown, needs local data", source: "vetch and the mixture are not in FAO-56 Table 12"}
     stage_lengths_days: {value: "unknown, needs local data", source: "not in FAO-56 Table 11"}
     sow_month: {value: 11, source: "default approved by user 2026-11-14, to confirm locally", basis: "best estimate, not in FAO-56"}
@@ -129,6 +143,8 @@ crops:
     cereal: {value: false, source: "botanical taxonomy"}
     perennial: {value: false, source: "botanical taxonomy"}
     cover: {value: false, source: "classification"}
+    sowing_season: {value: spring, source: "classification from the sowing months approved by the user 2026-11-14"}
+    irrigation_required: {value: false, source: "labelled judgement, approved by the lead 2026-11-14: no source found that rules out rainfed cultivation in Morocco; check locally"}
     rooting_zr_min_m: {value: 0.8, source: "FAO-56 Table 22, Sunflower 0.8-1.5 m"}
     kc_ini: {value: "unknown, needs local data", source: "FAO-56 Table 12 Kc ini column not consistently readable in the fetched text"}
     kc_mid: {value: 1.0, source: "FAO-56 Table 12, Sunflower, lower end of the printed 1.0-1.15 (footnote 9: lower values for rainfed)"}
@@ -146,6 +162,8 @@ crops:
     cereal: {value: false, source: "botanical taxonomy"}
     perennial: {value: false, source: "botanical taxonomy"}
     cover: {value: false, source: "classification"}
+    sowing_season: {value: spring, source: "classification from the sowing months approved by the user 2026-11-14"}
+    irrigation_required: {value: true, source: "FAO-56 Table 22: potato has the lowest soil water depletion fraction p (0.35) of the listed crops, i.e. the most sensitive to water stress; Saiss summer rainfall is near zero in the features; labelled judgement, approved by the lead 2026-11-14"}
     rooting_zr_min_m: {value: 0.4, source: "FAO-56 Table 22, Potato 0.4-0.6 m"}
     kc_ini: {value: "unknown, needs local data", source: "FAO-56 Table 12 Kc ini column not readable in the fetched text"}
     kc_mid: {value: 1.15, source: "FAO-56 Table 12, Potato"}
@@ -163,6 +181,8 @@ crops:
     cereal: {value: false, source: "botanical taxonomy"}
     perennial: {value: true, source: "botanical taxonomy"}
     cover: {value: false, source: "classification"}
+    sowing_season: {value: any, source: "classification from the sowing months approved by the user 2026-11-14"}
+    irrigation_required: {value: false, source: "labelled judgement, approved by the lead 2026-11-14: no source found that rules out rainfed cultivation in Morocco; check locally"}
     rooting_zr_min_m: {value: 1.2, source: "FAO-56 Table 22, Olives (40-60% canopy) 1.2-1.7 m"}
     kc_ini: {value: 0.65, source: "FAO-56 Table 12, Olives (40-60% ground cover); the intercrop under the trees is not included"}
     kc_mid: {value: 0.70, source: "FAO-56 Table 12, Olives (40-60% ground cover); the intercrop under the trees is not included"}
@@ -180,6 +200,8 @@ crops:
     cereal: {value: false, source: "no crop"}
     perennial: {value: false, source: "no crop"}
     cover: {value: false, source: "no crop"}
+    sowing_season: {value: any, source: "classification from the sowing months approved by the user 2026-11-14"}
+    irrigation_required: {value: false, source: "labelled judgement, approved by the lead 2026-11-14: no source found that rules out rainfed cultivation in Morocco; check locally"}
     rooting_zr_min_m: {value: "not applicable", source: "no crop"}
     kc_ini: {value: "unknown, needs local data", source: "bare soil is not in FAO-56 Table 12"}
     kc_mid: {value: "unknown, needs local data", source: "bare soil is not in FAO-56 Table 12"}

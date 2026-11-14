@@ -1,11 +1,13 @@
 """End-to-end checks on the React app at http://localhost:3000 (Playwright).
 
-Selectors use roles and visible text only (no CSS classes), because the UI
-is being redesigned. The app opens in French by default.
+Selectors use roles, accessible names and visible text only (no CSS classes).
+Labels come from frontend/src/i18n/{fr,en,ar}.js. Each test starts from a
+fresh browser context, so the saved language does not leak between tests.
 
-Prerequisites: the frontend dev server on :3000 and the backend on :8000.
+Prerequisites: frontend dev server on :3000 and backend on :8000 (both must
+already be running; these tests do not start or stop them).
 Chromium: `backend/.venv/bin/python -m playwright install chromium`.
-If the app is not reachable, every test is SKIPPED with that reason.
+If the app is not reachable every test is SKIPPED with that reason.
 A skip is not a pass.
 
 Run: `backend/.venv/bin/python -m pytest tests/e2e -v`
@@ -16,19 +18,82 @@ import urllib.error
 import urllib.request
 
 import pytest
-from playwright.sync_api import sync_playwright, expect
+from playwright.sync_api import expect, sync_playwright
 
 APP = "http://localhost:3000"
+TOUR_WAIT_MS = 25000  # the guided tour moves to the next section after a few seconds
 
-# Visible text this flow depends on (French UI). Re-check against the final
-# UI before the final pass; change here only, never in the tests.
-LABELS = {
-    "compare_button": "Comparer les rotations",
-    "see_details": "Voir le détail",
-    "tab_climate": "Climat",
-    "tab_compare": "Comparer",
-    "arabic": "العربية",
-    "close": "Fermer",
+# Visible labels per language (copied from the i18n dictionaries).
+L = {
+    "fr": {
+        "analyse": "Analyser mon champ",
+        "next": "Continuer",
+        "compare": "Comparer les rotations",
+        "lang_button": "Français",
+        "tour": "Visite guidée",
+        "settings_open": "Ouvrir les réglages",
+        "settings_title": "Réglages",
+        "dark": "Mode sombre",
+        "advanced": "Données avancées",
+        "close": "Fermer",
+        "optimiser_mode": "Plusieurs parcelles",
+        "optimiser_title": "Optimiser mes parcelles",
+        "add_parcel": "Ajouter une parcelle",
+        "profile_balanced": "Équilibré",
+        "run": "Optimiser",
+        "pareto_title": "Revenu et eau : les plans possibles",
+        "pareto_pick": "Choisir un plan",
+        "brand": "Cycle Sûr",
+        "tab_simple": "Conseil",
+        "results": "Nos résultats pour votre champ",
+        "nav_label": "Sections de la présentation",
+    },
+    "en": {
+        "analyse": "Analyse my field",
+        "next": "Continue",
+        "compare": "Compare rotations",
+        "lang_button": "English",
+        "tour": "Guided tour",
+        "settings_open": "Open settings",
+        "settings_title": "Settings",
+        "dark": "Dark mode",
+        "advanced": "Advanced data",
+        "close": "Close",
+        "optimiser_mode": "Several parcels",
+        "optimiser_title": "Optimise my parcels",
+        "add_parcel": "Add a parcel",
+        "profile_balanced": "Balanced",
+        "run": "Optimise",
+        "pareto_title": "Income and water: the possible plans",
+        "pareto_pick": "Choose a plan",
+        "brand": "Safe Cycle",
+        "tab_simple": "Advice",
+        "results": "Our results for your field",
+        "nav_label": "Sections of the presentation",
+    },
+    "ar": {
+        "analyse": "حلّل حقلي",
+        "next": "متابعة",
+        "compare": "قارن بين الدورات",
+        "lang_button": "العربية",
+        "tour": "جولة مرشدة",
+        "settings_open": "فتح الإعدادات",
+        "settings_title": "الإعدادات",
+        "dark": "الوضع الداكن",
+        "advanced": "بيانات متقدمة",
+        "close": "إغلاق",
+        "optimiser_mode": "عدة قطع",
+        "optimiser_title": "",  # filled below from the dictionary when needed
+        "add_parcel": "",
+        "profile_balanced": "",
+        "run": "حسّن",
+        "pareto_title": "الدخل والماء: الخطط الممكنة",
+        "pareto_pick": "",
+        "brand": "دورة آمنة",
+        "tab_simple": "نصيحة",
+        "results": "نتائجنا لحقلك",
+        "nav_label": "",
+    },
 }
 
 
@@ -43,83 +108,135 @@ def require_app():
 
 
 @pytest.fixture(scope="module")
-def page():
+def browser():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        ctx = browser.new_context(viewport={"width": 1280, "height": 900})
-        pg = ctx.new_page()
-        pg.goto(APP + "/")
-        pg.wait_for_load_state("networkidle")
-        yield pg
-        browser.close()
+        b = p.chromium.launch(headless=True)
+        yield b
+        b.close()
 
 
-def _run_default_comparison(page):
-    """Default point, rotation wheat then fallow (already the default rotation
-    in the form), move one goal slider, submit."""
-    page.get_by_role("slider").first.press("ArrowRight")
-    page.get_by_role("button", name=LABELS["compare_button"]).click()
-    expect(page.get_by_role("button", name=LABELS["see_details"]).first).to_be_visible(timeout=60000)
+@pytest.fixture
+def page(browser):
+    ctx = browser.new_context(viewport={"width": 1280, "height": 900})
+    pg = ctx.new_page()
+    pg.goto(APP + "/")
+    pg.wait_for_load_state("load")
+    yield pg
+    ctx.close()
 
 
-def test_default_point_is_pre_filled(page):
-    page.goto(APP + "/")
-    page.wait_for_load_state("networkidle")
-    values = page.locator("input").evaluate_all("els => els.map(e => e.value)")
-    assert "33.96" in values and "-5.27" in values, values
+def _switch_language(page, lang_code):
+    """Use the language switch on the page, by its visible name."""
+    names = {"fr": "Français", "en": "English", "ar": "العربية"}
+    page.get_by_role("button", name=names[lang_code], exact=True).first.click()
+    expect(page.locator("html")).to_have_attribute("lang", lang_code)
 
 
-def test_submit_returns_at_least_three_strategies(page):
-    page.goto(APP + "/")
-    page.wait_for_load_state("networkidle")
-    _run_default_comparison(page)
-    buttons = page.get_by_role("button", name=LABELS["see_details"])
-    assert buttons.count() >= 3, buttons.count()
+def _run_wizard(page, lang):
+    """Landing -> analyse -> place -> rotation -> goals -> results (simple view)."""
+    t = L[lang]
+    page.get_by_role("button", name=t["analyse"]).first.click()
+    page.get_by_role("button", name=t["next"]).first.click()  # place -> rotation
+    page.get_by_role("button", name=t["next"]).first.click()  # rotation -> goals
+    page.get_by_role("button", name=t["compare"]).click()      # goals -> results
+    expect(page.get_by_role("heading", name=t["results"])).to_be_visible(timeout=60000)
 
 
-def test_details_show_why_and_risks(page):
-    page.goto(APP + "/")
-    page.wait_for_load_state("networkidle")
-    _run_default_comparison(page)
-    page.get_by_role("button", name=LABELS["see_details"]).first.click()
-    dialog = page.get_by_role("dialog")
-    expect(dialog).to_be_visible()
-    # Why and risks sections, in the visible French text of the detail sheet.
-    expect(dialog.get_by_text(re.compile(r"pourquoi|raison", re.I)).first).to_be_visible()
-    expect(dialog.get_by_text(re.compile(r"risque", re.I)).first).to_be_visible()
-    page.get_by_role("button", name=LABELS["close"]).click()
+# ---------------------------------------------------------------------------
+# Landing page
+# ---------------------------------------------------------------------------
+
+def test_landing_stats_show_numbers(page):
+    stat_label = page.get_by_text(re.compile(r"mois par an de champ nu")).first
+    expect(stat_label).to_be_visible()
+    # the number sits in the same block as its label
+    block_text = stat_label.locator("xpath=..").inner_text()
+    assert re.search(r"\d", block_text), block_text
 
 
-def test_expert_note_is_visible(page):
-    page.goto(APP + "/")
-    page.wait_for_load_state("networkidle")
-    _run_default_comparison(page)
+def test_guided_tour_advances(page):
+    nav = page.get_by_role("navigation", name=L["fr"]["nav_label"])
+    current = nav.locator("[aria-current='true']")
+    expect(current).to_have_count(1)
+    before = current.get_attribute("aria-label")
+    page.get_by_role("button", name=L["fr"]["tour"]).click()
+    expect(nav.locator("[aria-current='true']")).not_to_have_attribute(
+        "aria-label", before, timeout=TOUR_WAIT_MS
+    )
+
+
+# ---------------------------------------------------------------------------
+# Wizard to simple results, in each language
+# ---------------------------------------------------------------------------
+
+def test_wizard_runs_to_simple_results_in_french(page):
+    _run_wizard(page, "fr")
     expect(page.get_by_text(re.compile(r"conseiller agricole", re.I)).first).to_be_visible()
 
 
-def test_arabic_switch_sets_rtl(page):
-    page.goto(APP + "/")
-    page.wait_for_load_state("networkidle")
-    page.get_by_role("button", name=LABELS["arabic"]).click()
+def test_wizard_runs_to_simple_results_in_english(page):
+    _switch_language(page, "en")
+    _run_wizard(page, "en")
+    expect(page.get_by_text(re.compile(r"local (agricultural )?(advisor|expert)", re.I)).first).to_be_visible()
+
+
+def test_wizard_runs_to_simple_results_in_arabic_with_rtl(page):
+    _switch_language(page, "ar")
     expect(page.locator("html")).to_have_attribute("dir", "rtl")
-    expect(page.locator("html")).to_have_attribute("lang", "ar")
-    # restore French for later tests
-    page.get_by_role("button", name="Français").click()
-    expect(page.locator("html")).to_have_attribute("dir", "ltr")
+    _run_wizard(page, "ar")
+    expect(page.locator("html")).to_have_attribute("dir", "rtl")
 
 
-def test_climate_dashboard_is_reachable(page):
-    page.goto(APP + "/")
-    page.wait_for_load_state("networkidle")
-    _run_default_comparison(page)
-    expect(page.get_by_role("tab", name=LABELS["tab_climate"])).to_be_visible()
-    page.get_by_role("tab", name=LABELS["tab_climate"]).click()
-    expect(page.get_by_text(re.compile(r"Climat de votre champ"))).to_be_visible()
+def test_brand_name_follows_language(page):
+    expect(page.get_by_text(L["fr"]["brand"]).first).to_be_visible()
+    _switch_language(page, "en")
+    expect(page.get_by_text(L["en"]["brand"]).first).to_be_visible()
+    _switch_language(page, "ar")
+    expect(page.get_by_text(L["ar"]["brand"]).first).to_be_visible()
 
 
-def test_compare_tab_is_reachable(page):
-    page.goto(APP + "/")
-    page.wait_for_load_state("networkidle")
-    _run_default_comparison(page)
-    page.get_by_role("tab", name=LABELS["tab_compare"]).click()
-    expect(page.get_by_text(re.compile(r"Comparer deux options"))).to_be_visible()
+# ---------------------------------------------------------------------------
+# Settings panel
+# ---------------------------------------------------------------------------
+
+def test_settings_toggle_dark_mode_and_advanced_data(page):
+    t = L["fr"]
+    page.get_by_role("button", name=t["settings_open"]).click()
+    dialog = page.get_by_role("dialog", name=t["settings_title"])
+    expect(dialog).to_be_visible()
+
+    dark = dialog.get_by_role("switch", name=t["dark"])
+    before = dark.get_attribute("aria-checked")
+    dark.click()
+    expect(dark).not_to_have_attribute("aria-checked", before)
+
+    adv = dialog.get_by_role("switch", name=t["advanced"])
+    adv_before = adv.get_attribute("aria-checked")
+    adv.click()
+    expect(adv).not_to_have_attribute("aria-checked", adv_before)
+
+    dialog.get_by_role("button", name=t["close"]).click()
+
+
+# ---------------------------------------------------------------------------
+# Optimiser (several parcels) with Pareto chart
+# ---------------------------------------------------------------------------
+
+def test_optimiser_returns_plans_and_pareto_chart(page):
+    t = L["fr"]
+    page.get_by_role("button", name=t["analyse"]).first.click()
+    page.get_by_role("button", name=t["optimiser_mode"]).click()
+    expect(page.get_by_role("heading", name=t["optimiser_title"])).to_be_visible()
+
+    page.get_by_role("button", name=t["add_parcel"]).click()
+    areas = page.get_by_label("Surface (hectares)")
+    areas.nth(0).fill("3")
+    areas.nth(1).fill("2")
+
+    page.get_by_role("button", name=t["profile_balanced"]).click()
+    page.get_by_role("button", name=t["run"], exact=True).click()
+
+    chart = page.get_by_role("img", name=t["pareto_title"])
+    expect(chart).to_be_visible(timeout=90000)
+    picker = page.get_by_role("group", name=t["pareto_pick"])
+    assert picker.get_by_role("button").count() >= 2

@@ -60,9 +60,14 @@ def _walk_numbers(obj, path="$"):
             yield from _walk_numbers(value, f"{path}[{index}]")
 
 
+# Exact missing-data sentinels. A value like -1338 mm of water balance is
+# real (dry years), so we do not use a "<= -999" threshold.
+SENTINELS = {-999, -999.0, -9999, -9999.0, -99, -99.0}
+
+
 def _assert_no_sentinels(obj):
-    bad = [(p, v) for p, v in _walk_numbers(obj) if v <= -999]
-    assert not bad, f"sentinel values (<= -999) found: {bad[:5]}"
+    bad = [(p, v) for p, v in _walk_numbers(obj) if v in SENTINELS or v != v]
+    assert not bad, f"sentinel or NaN values found: {bad[:5]}"
 
 
 def _assert_valid(validator, obj):
@@ -82,6 +87,62 @@ def test_features_sample_is_valid_against_schema(features_validator):
 def test_features_sample_has_no_sentinel_values():
     features = _require_features_sample()
     _assert_no_sentinels(features)
+
+
+def _in_range(v, lo, hi):
+    return v is None or lo <= v <= hi
+
+
+# Plausible physical ranges per unit. water_balance is excluded from the
+# "non-negative" rule on purpose: it is legitimately negative.
+UNIT_RANGES = {
+    "°C": (-30, 60),
+    "%": (0, 100),
+    "0-1": (0, 1),
+    "m/s": (0, 30),
+    "MJ/m²/day": (0, 40),
+    "days/month": (0, 31),
+    "mm/month": (0, 2000),
+}
+
+
+def test_features_sample_monthly_values_in_plausible_ranges():
+    features = _require_features_sample()
+    for name, series in features["climate"]["monthly"].items():
+        if name == "heat_days":
+            subseries = series.values()
+        else:
+            subseries = [series]
+        for s in subseries:
+            if name == "water_balance":
+                lo, hi = -3000, 2000
+            else:
+                lo, hi = UNIT_RANGES[s["unit"]]
+            bad = [v for v in s["values"] if not _in_range(v, lo, hi)]
+            assert not bad, f"{name} ({s['unit']}) out of range {lo}..{hi}: {bad[:3]}"
+
+
+def test_features_sample_yearly_values_in_plausible_ranges():
+    features = _require_features_sample()
+    yearly = features["yearly"]
+    for key in ("precipitation", "et0", "frost_days", "heat_days_35"):
+        bad = [v for v in yearly[key] if not _in_range(v, 0, 5000)]
+        assert not bad, f"yearly {key} out of range: {bad[:3]}"
+    # water_balance is precipitation minus et0 per year: may be negative.
+    for year_index, wb in enumerate(yearly["water_balance"]):
+        if wb is None:
+            continue
+        expected = yearly["precipitation"][year_index] - yearly["et0"][year_index]
+        assert abs(wb - expected) < 1.0, (year_index, wb, expected)
+
+
+def test_features_sample_soil_layers_in_plausible_ranges():
+    features = _require_features_sample()
+    for layer in features["soil"]["layers"]:
+        for key in ("clay_pct", "sand_pct", "silt_pct"):
+            assert _in_range(layer[key], 0, 100), (layer["depth"], key, layer[key])
+        assert _in_range(layer["ph_h2o"], 0, 14), (layer["depth"], layer["ph_h2o"])
+        assert layer["soc_g_kg"] is None or layer["soc_g_kg"] >= 0, layer
 
 
 def test_features_sample_data_gaps_are_well_formed():

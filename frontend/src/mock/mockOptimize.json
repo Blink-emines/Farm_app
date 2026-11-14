@@ -1,0 +1,2942 @@
+{
+ "schema_version": "1.0",
+ "generated_at": "2026-11-14T15:21:58Z",
+ "location": {
+  "latitude": 33.96,
+  "longitude": -5.27
+ },
+ "profile": "balanced",
+ "priorities": {
+  "save_water": 3,
+  "improve_soil": 3,
+  "extra_income": 3,
+  "reduce_erosion": 3,
+  "forage": 3
+ },
+ "solver": {
+  "status": "optimal",
+  "time_s": 1.637,
+  "backend": "HiGHS via Pyomo (appsi_highs)",
+  "solves": 12,
+  "coupled": false
+ },
+ "objectives": {
+  "save_water": {
+   "unit": "mm/year (minus the water deficit)",
+   "ideal": -0.0,
+   "nadir": -983.062,
+   "plan_value": -593.839
+  },
+  "improve_soil": {
+   "unit": "rule points/year",
+   "ideal": 15.0,
+   "nadir": -5.0,
+   "plan_value": 15.0
+  },
+  "extra_income": {
+   "unit": "MAD/ha/year",
+   "ideal": 46179.37,
+   "nadir": 0.0,
+   "plan_value": 41438.855
+  },
+  "reduce_erosion": {
+   "unit": "rule points/year",
+   "ideal": 4.0,
+   "nadir": -24.0,
+   "plan_value": 3.0
+  },
+  "forage": {
+   "unit": "rule points/year",
+   "ideal": 10.0,
+   "nadir": 0.0,
+   "plan_value": 7.5
+  }
+ },
+ "windows": {
+  "wheat": [
+   10,
+   11,
+   12
+  ],
+  "barley": [
+   10,
+   11,
+   12
+  ],
+  "chickpea": [
+   2,
+   3,
+   4
+  ],
+  "lentil": [
+   10,
+   11,
+   12
+  ],
+  "faba_bean": [
+   10,
+   11,
+   12
+  ],
+  "alfalfa": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12
+  ],
+  "vetch_oat_cover": [
+   10,
+   11,
+   12
+  ],
+  "sunflower": [
+   2,
+   3,
+   4
+  ],
+  "potato": [
+   2,
+   3,
+   4
+  ],
+  "olive_intercrop": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12
+  ],
+  "fallow": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12
+  ]
+ },
+ "parcels": [
+  {
+   "id": "A",
+   "area_ha": 2,
+   "irrigated": false,
+   "plan": {
+    "id": "optimised_plan_1",
+    "name": {
+     "code": "strategy_name_template",
+     "params": {
+      "crops": "vetch_oat_cover > sunflower > barley"
+     },
+     "default_text": "Rotation: vetch_oat_cover > sunflower > barley"
+    },
+    "is_current": false,
+    "seasons": [
+     {
+      "crop_id": "vetch_oat_cover",
+      "sow_month": 10,
+      "harvest_month": 3
+     },
+     {
+      "crop_id": "sunflower",
+      "sow_month": 4,
+      "harvest_month": 8
+     },
+     {
+      "crop_id": "barley",
+      "sow_month": 10,
+      "harvest_month": 4
+     }
+    ],
+    "calendar": [
+     {
+      "year": 1,
+      "months": [
+       {
+        "month": 1,
+        "crop_id": "barley",
+        "status": "growing",
+        "stress_reasons": []
+       },
+       {
+        "month": 2,
+        "crop_id": "barley",
+        "status": "growing",
+        "stress_reasons": []
+       },
+       {
+        "month": 3,
+        "crop_id": "barley",
+        "status": "stress",
+        "stress_reasons": [
+         {
+          "code": "stress_water_deficit",
+          "params": {
+           "crop": "barley",
+           "need_mm": 110,
+           "rain_mm": 98
+          },
+          "default_text": "Rain (98 mm) is below the estimated water need of barley (110 mm)."
+         }
+        ]
+       },
+       {
+        "month": 4,
+        "crop_id": "barley",
+        "status": "stress",
+        "stress_reasons": [
+         {
+          "code": "stress_water_deficit",
+          "params": {
+           "crop": "barley",
+           "need_mm": 141,
+           "rain_mm": 65
+          },
+          "default_text": "Rain (65 mm) is below the estimated water need of barley (141 mm)."
+         }
+        ]
+       },
+       {
+        "month": 5,
+        "crop_id": null,
+        "status": "bare",
+        "stress_reasons": []
+       },
+       {
+        "month": 6,
+        "crop_id": null,
+        "status": "bare",
+        "stress_reasons": []
+       },
+       {
+        "month": 7,
+        "crop_id": null,
+        "status": "bare",
+        "stress_reasons": []
+       },
+       {
+        "month": 8,
+        "crop_id": null,
+        "status": "bare",
+        "stress_reasons": []
+       },
+       {
+        "month": 9,
+        "crop_id": null,
+        "status": "bare",
+        "stress_reasons": []
+       },
+       {
+        "month": 10,
+        "crop_id": "vetch_oat_cover",
+        "status": "stress",
+        "stress_reasons": [
+         {
+          "code": "stress_water_deficit",
+          "params": {
+           "crop": "vetch_oat_cover",
+           "need_mm": 141,
+           "rain_mm": 67
+          },
+          "default_text": "Rain (67 mm) is below the estimated water need of vetch_oat_cover (141 mm)."
+         },
+         {
+          "code": "stress_heat_generic",
+          "params": {
+           "crop": "vetch_oat_cover",
+           "heat_days": 1.6,
+           "threshold_c": 35,
+           "level": 1
+          },
+          "default_text": "Average days above 35 C this month (1.6) reach the generic warning level of 1; generic level, not crop-specific (vetch_oat_cover)."
+         }
+        ]
+       },
+       {
+        "month": 11,
+        "crop_id": "vetch_oat_cover",
+        "status": "growing",
+        "stress_reasons": []
+       },
+       {
+        "month": 12,
+        "crop_id": "vetch_oat_cover",
+        "status": "growing",
+        "stress_reasons": []
+       }
+      ]
+     },
+     {
+      "year": 2,
+      "months": [
+       {
+        "month": 1,
+        "crop_id": "vetch_oat_cover",
+        "status": "growing",
+        "stress_reasons": []
+       },
+       {
+        "month": 2,
+        "crop_id": "vetch_oat_cover",
+        "status": "growing",
+        "stress_reasons": []
+       },
+       {
+        "month": 3,
+        "crop_id": "vetch_oat_cover",
+        "status": "stress",
+        "stress_reasons": [
+         {
+          "code": "stress_water_deficit",
+          "params": {
+           "crop": "vetch_oat_cover",
+           "need_mm": 110,
+           "rain_mm": 98
+          },
+          "default_text": "Rain (98 mm) is below the estimated water need of vetch_oat_cover (110 mm)."
+         }
+        ]
+       },
+       {
+        "month": 4,
+        "crop_id": "sunflower",
+        "status": "stress",
+        "stress_reasons": [
+         {
+          "code": "stress_water_deficit",
+          "params": {
+           "crop": "sunflower",
+           "need_mm": 123,
+           "rain_mm": 65
+          },
+          "default_text": "Rain (65 mm) is below the estimated water need of sunflower (123 mm)."
+         }
+        ]
+       },
+       {
+        "month": 5,
+        "crop_id": "sunflower",
+        "status": "stress",
+        "stress_reasons": [
+         {
+          "code": "stress_water_deficit",
+          "params": {
+           "crop": "sunflower",
+           "need_mm": 166,
+           "rain_mm": 35
+          },
+          "default_text": "Rain (35 mm) is below the estimated water need of sunflower (166 mm)."
+         },
+         {
+          "code": "stress_heat_generic",
+          "params": {
+           "crop": "sunflower",
+           "heat_days": 3.3,
+           "threshold_c": 35,
+           "level": 1
+          },
+          "default_text": "Average days above 35 C this month (3.3) reach the generic warning level of 1; generic level, not crop-specific (sunflower)."
+         }
+        ]
+       },
+       {
+        "month": 6,
+        "crop_id": "sunflower",
+        "status": "stress",
+        "stress_reasons": [
+         {
+          "code": "stress_water_deficit",
+          "params": {
+           "crop": "sunflower",
+           "need_mm": 199,
+           "rain_mm": 10
+          },
+          "default_text": "Rain (10 mm) is below the estimated water need of sunflower (199 mm)."
+         },
+         {
+          "code": "stress_heat_generic",
+          "params": {
+           "crop": "sunflower",
+           "heat_days": 9.7,
+           "threshold_c": 35,
+           "level": 1
+          },
+          "default_text": "Average days above 35 C this month (9.7) reach the generic warning level of 1; generic level, not crop-specific (sunflower)."
+         }
+        ]
+       },
+       {
+        "month": 7,
+        "crop_id": "sunflower",
+        "status": "stress",
+        "stress_reasons": [
+         {
+          "code": "stress_water_deficit",
+          "params": {
+           "crop": "sunflower",
+           "need_mm": 246,
+           "rain_mm": 3
+          },
+          "default_text": "Rain (3 mm) is below the estimated water need of sunflower (246 mm)."
+         },
+         {
+          "code": "stress_heat_generic",
+          "params": {
+           "crop": "sunflower",
+           "heat_days": 23.8,
+           "threshold_c": 35,
+           "level": 1
+          },
+          "default_text": "Average days above 35 C this month (23.8) reach the generic warning level of 1; generic level, not crop-specific (sunflower)."
+         }
+        ]
+       },
+       {
+        "month": 8,
+        "crop_id": "sunflower",
+        "status": "stress",
+        "stress_reasons": [
+         {
+          "code": "stress_water_deficit",
+          "params": {
+           "crop": "sunflower",
+           "need_mm": 238,
+           "rain_mm": 8
+          },
+          "default_text": "Rain (8 mm) is below the estimated water need of sunflower (238 mm)."
+         },
+         {
+          "code": "stress_heat_generic",
+          "params": {
+           "crop": "sunflower",
+           "heat_days": 26.4,
+           "threshold_c": 35,
+           "level": 1
+          },
+          "default_text": "Average days above 35 C this month (26.4) reach the generic warning level of 1; generic level, not crop-specific (sunflower)."
+         }
+        ]
+       },
+       {
+        "month": 9,
+        "crop_id": null,
+        "status": "bare",
+        "stress_reasons": []
+       },
+       {
+        "month": 10,
+        "crop_id": "barley",
+        "status": "stress",
+        "stress_reasons": [
+         {
+          "code": "stress_water_deficit",
+          "params": {
+           "crop": "barley",
+           "need_mm": 141,
+           "rain_mm": 67
+          },
+          "default_text": "Rain (67 mm) is below the estimated water need of barley (141 mm)."
+         },
+         {
+          "code": "stress_heat_generic",
+          "params": {
+           "crop": "barley",
+           "heat_days": 1.6,
+           "threshold_c": 35,
+           "level": 1
+          },
+          "default_text": "Average days above 35 C this month (1.6) reach the generic warning level of 1; generic level, not crop-specific (barley)."
+         }
+        ]
+       },
+       {
+        "month": 11,
+        "crop_id": "barley",
+        "status": "growing",
+        "stress_reasons": []
+       },
+       {
+        "month": 12,
+        "crop_id": "barley",
+        "status": "growing",
+        "stress_reasons": []
+       }
+      ]
+     }
+    ],
+    "why": [
+     {
+      "rule_id": "n_credit_legume_after_cereal",
+      "effect": "bonus",
+      "points": 5.0,
+      "priority": "improve_soil",
+      "message": {
+       "code": "n_credit_applied",
+       "params": {
+        "from_crop": "barley",
+        "to_crop": "vetch_oat_cover"
+       },
+       "default_text": "vetch_oat_cover after barley: the legume leaves nitrogen for the next crop."
+      }
+     },
+     {
+      "rule_id": "family_break",
+      "effect": "bonus",
+      "points": 2.5,
+      "priority": "improve_soil",
+      "message": {
+       "code": "family_change",
+       "params": {
+        "from_crop": "barley",
+        "to_crop": "vetch_oat_cover"
+       },
+       "default_text": "vetch_oat_cover after barley: different crop families help break pest and disease cycles."
+      }
+     },
+     {
+      "rule_id": "family_break",
+      "effect": "bonus",
+      "points": 2.5,
+      "priority": "improve_soil",
+      "message": {
+       "code": "family_change",
+       "params": {
+        "from_crop": "vetch_oat_cover",
+        "to_crop": "sunflower"
+       },
+       "default_text": "sunflower after vetch_oat_cover: different crop families help break pest and disease cycles."
+      }
+     },
+     {
+      "rule_id": "family_break",
+      "effect": "bonus",
+      "points": 2.5,
+      "priority": "improve_soil",
+      "message": {
+       "code": "family_change",
+       "params": {
+        "from_crop": "sunflower",
+        "to_crop": "barley"
+       },
+       "default_text": "barley after sunflower: different crop families help break pest and disease cycles."
+      }
+     },
+     {
+      "rule_id": "deep_root_structure",
+      "effect": "bonus",
+      "points": 2.5,
+      "priority": "improve_soil",
+      "message": {
+       "code": "deep_root_present",
+       "params": {
+        "crops": "barley",
+        "years": 1
+       },
+       "default_text": "Deep-rooting crops (barley) in 1 season(s) help soil structure and water infiltration."
+      }
+     },
+     {
+      "rule_id": "bare_months_penalty",
+      "effect": "penalty",
+      "points": -6.0,
+      "priority": "reduce_erosion",
+      "message": {
+       "code": "bare_months",
+       "params": {
+        "count": 6,
+        "months": "5,6,7,8,9"
+       },
+       "default_text": "6 bare-field month(s) per rotation (months 5,6,7,8,9) leave the soil exposed to erosion."
+      }
+     },
+     {
+      "rule_id": "cover_fills_bare",
+      "effect": "bonus",
+      "points": 9.0,
+      "priority": "reduce_erosion",
+      "message": {
+       "code": "cover_crop_months",
+       "params": {
+        "crop": "vetch_oat_cover",
+        "count": 6
+       },
+       "default_text": "vetch_oat_cover covers the field for 6 month(s) per rotation, protecting the soil and adding organic matter."
+      }
+     },
+     {
+      "rule_id": "water_demand_match",
+      "effect": "bonus",
+      "points": 20.0,
+      "priority": "save_water",
+      "message": {
+       "code": "water_ok_months",
+       "params": {
+        "count": 8
+       },
+       "default_text": "8 growing month(s) where rainfall covers the crop's estimated water need."
+      }
+     },
+     {
+      "rule_id": "water_demand_match",
+      "effect": "penalty",
+      "points": -25.0,
+      "priority": "save_water",
+      "message": {
+       "code": "water_stress_months",
+       "params": {
+        "count": 10
+       },
+       "default_text": "10 growing month(s) where rainfall is below the crop's estimated water need."
+      }
+     },
+     {
+      "rule_id": "income_flag",
+      "effect": "bonus",
+      "points": 2.5,
+      "priority": "extra_income",
+      "message": {
+       "code": "income_flag_points",
+       "params": {
+        "levels": "vetch_oat_cover:low,sunflower:medium,barley:low"
+       },
+       "default_text": "Income potential from qualitative crop flags only (vetch_oat_cover:low,sunflower:medium,barley:low); there is no price data."
+      }
+     },
+     {
+      "rule_id": "forage_flag",
+      "effect": "bonus",
+      "points": 7.5,
+      "priority": "forage",
+      "message": {
+       "code": "forage_flag_points",
+       "params": {
+        "levels": "vetch_oat_cover:high,sunflower:low,barley:medium"
+       },
+       "default_text": "Forage value from qualitative crop flags only (vetch_oat_cover:high,sunflower:low,barley:medium); there is no price data."
+      }
+     }
+    ],
+    "evidence": [
+     {
+      "feature": "crops.vetch_oat_cover.legume",
+      "value": "yes",
+      "unit": "yes/no",
+      "source": "botanical taxonomy (the vetch half fixes nitrogen)"
+     },
+     {
+      "feature": "crops.vetch_oat_cover.family",
+      "value": "fabaceae",
+      "unit": "taxon",
+      "source": "oats are generally a break crop for wheat diseases; family treated as fabaceae by user decision"
+     },
+     {
+      "feature": "crops.sunflower.family",
+      "value": "asteraceae",
+      "unit": "taxon",
+      "source": "botanical taxonomy"
+     },
+     {
+      "feature": "crops.barley.family",
+      "value": "poaceae",
+      "unit": "taxon",
+      "source": "botanical taxonomy"
+     },
+     {
+      "feature": "crops.barley.rooting_zr_min_m",
+      "value": 1.0,
+      "unit": "m",
+      "source": "FAO-56 Table 22, Barley 1.0-1.5 m"
+     },
+     {
+      "feature": "crops.vetch_oat_cover.cover",
+      "value": "yes",
+      "unit": "yes/no",
+      "source": "classification"
+     },
+     {
+      "feature": "climate.monthly.precipitation",
+      "value": [
+       94.99,
+       86.29,
+       98.03,
+       64.92,
+       35.36,
+       9.62,
+       3.3,
+       7.7,
+       26.8,
+       66.57,
+       100.7,
+       84.7
+      ],
+      "unit": "mm/month",
+      "source": "NASA POWER"
+     },
+     {
+      "feature": "climate.monthly.et0",
+      "value": [
+       51.35,
+       63.29,
+       95.48,
+       123.02,
+       165.74,
+       199.23,
+       245.94,
+       237.67,
+       165.89,
+       122.86,
+       69.62,
+       51.83
+      ],
+      "unit": "mm/month",
+      "source": "NASA POWER"
+     },
+     {
+      "feature": "crops.barley.kc_mid",
+      "value": 1.15,
+      "unit": "FAO-56 Kc (-)",
+      "source": "FAO-56 Table 12, Barley"
+     },
+     {
+      "feature": "crops.sunflower.kc_mid",
+      "value": 1.0,
+      "unit": "FAO-56 Kc (-)",
+      "source": "FAO-56 Table 12, Sunflower, lower end of the printed 1.0-1.15 (footnote 9: lower values for rainfed)"
+     },
+     {
+      "feature": "crops.vetch_oat_cover.kc_mid",
+      "value": 1.15,
+      "unit": "FAO-56 Kc (-)",
+      "source": "proxy: FAO-56 Table 12, Oats (vetch and the vetch-oat mixture are not in Table 12); lead decision 2026-11-14"
+     },
+     {
+      "feature": "crops.vetch_oat_cover.income_flag",
+      "value": "low",
+      "unit": "qualitative",
+      "source": "qualitative, approved by user 2026-11-14, no price data"
+     },
+     {
+      "feature": "crops.sunflower.income_flag",
+      "value": "medium",
+      "unit": "qualitative",
+      "source": "qualitative, approved by user 2026-11-14, no price data"
+     },
+     {
+      "feature": "crops.barley.income_flag",
+      "value": "low",
+      "unit": "qualitative",
+      "source": "qualitative, approved by user 2026-11-14, no price data"
+     },
+     {
+      "feature": "crops.vetch_oat_cover.forage_flag",
+      "value": "high",
+      "unit": "qualitative",
+      "source": "qualitative, approved by user 2026-11-14, no price data"
+     },
+     {
+      "feature": "crops.sunflower.forage_flag",
+      "value": "low",
+      "unit": "qualitative",
+      "source": "qualitative, approved by user 2026-11-14, no price data"
+     },
+     {
+      "feature": "crops.barley.forage_flag",
+      "value": "medium",
+      "unit": "qualitative",
+      "source": "qualitative, approved by user 2026-11-14, no price data"
+     },
+     {
+      "feature": "climate.monthly.frost_days",
+      "value": [
+       0.5,
+       0.6,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.05
+      ],
+      "unit": "days/month",
+      "months": [
+       5,
+       6,
+       7,
+       8,
+       10
+      ],
+      "source": "NASA POWER"
+     },
+     {
+      "feature": "climate.monthly.heat_days.35",
+      "value": [
+       0.0,
+       0.0,
+       0.0,
+       0.2,
+       3.3,
+       9.65,
+       23.75,
+       26.4,
+       9.15,
+       1.6,
+       0.0,
+       0.0
+      ],
+      "unit": "days/month",
+      "months": [
+       5,
+       6,
+       7,
+       8,
+       10
+      ],
+      "source": "NASA POWER"
+     },
+     {
+      "feature": "economics.revenue_range",
+      "value": [
+       5513,
+       10349,
+       15269
+      ],
+      "unit": "MAD/ha/year (bad, average, good year: min, mean, max yield 2015-2024)",
+      "source": "FAOSTAT Crops and livestock products (domain QCL), FAOSTAT Producer Prices (domain PP)"
+     }
+    ],
+    "benefits": [
+     {
+      "code": "benefit_n_credit_legume_after_cereal",
+      "params": {},
+      "default_text": "Nitrogen credit from a legume after a cereal."
+     },
+     {
+      "code": "benefit_family_break",
+      "params": {},
+      "default_text": "Crop family changes between seasons, which breaks pest and disease cycles."
+     },
+     {
+      "code": "benefit_deep_root_structure",
+      "params": {},
+      "default_text": "Deep roots improve soil structure and infiltration."
+     },
+     {
+      "code": "benefit_cover_fills_bare",
+      "params": {},
+      "default_text": "A cover crop protects the soil and adds organic matter."
+     },
+     {
+      "code": "benefit_water_demand_match",
+      "params": {},
+      "default_text": "Crop water need is mostly met by rainfall in its growing months."
+     },
+     {
+      "code": "benefit_income_flag",
+      "params": {},
+      "default_text": "Qualitatively favourable for income (low confidence, no price data)."
+     },
+     {
+      "code": "benefit_forage_flag",
+      "params": {},
+      "default_text": "Qualitatively favourable for forage (low confidence, no price data)."
+     }
+    ],
+    "information_gaps": [
+     {
+      "code": "gap_rooting_unknown",
+      "params": {
+       "crops": "vetch_oat_cover"
+      },
+      "default_text": "Rooting depth unknown, needs local data: vetch_oat_cover."
+     },
+     {
+      "code": "gap_kc_proxy",
+      "params": {
+       "crops": "vetch_oat_cover"
+      },
+      "default_text": "Water need for vetch_oat_cover uses the coefficient of a proxy crop (oats, FAO-56 Table 12); treat it as indicative."
+     },
+     {
+      "code": "gap_local_prices",
+      "params": {},
+      "default_text": "Local prices are not available, so income and forage are compared only from qualitative crop flags."
+     },
+     {
+      "code": "gap_water_stress_indicative",
+      "params": {},
+      "default_text": "Water stress is estimated from NASA model data (ET0 at the high end of typical Saiss values); treat it as indicative."
+     },
+     {
+      "code": "gap_frost_heat_tolerance_unknown",
+      "params": {
+       "crops": "barley,sunflower,vetch_oat_cover"
+      },
+      "default_text": "Crop frost and heat tolerance unknown, needs local data: barley,sunflower,vetch_oat_cover."
+     },
+     {
+      "code": "gap_frost_underestimated",
+      "params": {},
+      "default_text": "NASA frost days are likely underestimated for the Saiss (coarse grid); check frost risk locally."
+     },
+     {
+      "code": "gap_no_price_crops",
+      "params": {
+       "crops": "vetch_oat_cover"
+      },
+      "default_text": "No price data for vetch_oat_cover: they count as zero revenue in the optimiser."
+     },
+     {
+      "code": "gap_costs_unknown",
+      "params": {},
+      "default_text": "Production costs are unknown, so only gross revenue is shown, not profit; enter your costs to see profit."
+     },
+     {
+      "code": "gap_yield_national",
+      "params": {},
+      "default_text": "Prices and yields are FAOSTAT national averages for Morocco that mix irrigated and rainfed farms; they are not specific to your field."
+     }
+    ],
+    "risks_for_local_review": [
+     {
+      "code": "risk_local_review",
+      "params": {},
+      "default_text": "Check this option with a local agronomist or extension officer before acting; it is an option to discuss, not an order."
+     },
+     {
+      "code": "risk_water_stress_months",
+      "params": {
+       "months": "3,4,5,6,7,8,10"
+      },
+      "default_text": "Rainfall is below the estimated crop water need in months 3,4,5,6,7,8,10; check soil moisture and irrigation access locally."
+     },
+     {
+      "code": "risk_frost_heat_generic",
+      "params": {
+       "months": "5,6,7,8,10"
+      },
+      "default_text": "Frost or heat warning (generic level, not crop-specific) in growing months 5,6,7,8,10; check the crop's real tolerance locally."
+     },
+     {
+      "code": "risk_frost_heat_unassessed",
+      "params": {},
+      "default_text": "Crop frost and heat tolerance is unknown, so frost and heat risk is only flagged at generic levels."
+     },
+     {
+      "code": "risk_revenue_range",
+      "params": {
+       "bad_mad": 5513,
+       "avg_mad": 10349,
+       "good_mad": 15269
+      },
+      "default_text": "Revenue swings with the weather: about 5513 MAD/ha in a bad year, 10349 in an average year, 15269 in a good year (FAOSTAT 2015-2024 yields)."
+     }
+    ],
+    "confidence": "medium",
+    "score": {
+     "total": 67.58,
+     "by_priority": {
+      "save_water": 44.04,
+      "improve_soil": 100.0,
+      "extra_income": 22.41,
+      "reduce_erosion": 96.43,
+      "forage": 75.0
+     }
+    },
+    "rank": 1
+   },
+   "baseline": {
+    "id": "current_rotation_1",
+    "name": {
+     "code": "strategy_name_current",
+     "params": {
+      "crops": "wheat > fallow"
+     },
+     "default_text": "Your current rotation: wheat > fallow"
+    },
+    "is_current": true,
+    "seasons": [
+     {
+      "crop_id": "wheat",
+      "sow_month": 11,
+      "harvest_month": 6
+     },
+     {
+      "crop_id": "fallow",
+      "sow_month": 7,
+      "harvest_month": 6
+     }
+    ],
+    "calendar": [
+     {
+      "year": 1,
+      "months": [
+       {
+        "month": 1,
+        "crop_id": "fallow",
+        "status": "bare",
+        "stress_reasons": []
+       },
+       {
+        "month": 2,
+        "crop_id": "fallow",
+        "status": "bare",
+        "stress_reasons": []
+       },
+       {
+        "month": 3,
+        "crop_id": "fallow",
+        "status": "bare",
+        "stress_reasons": []
+       },
+       {
+        "month": 4,
+        "crop_id": "fallow",
+        "status": "bare",
+        "stress_reasons": []
+       },
+       {
+        "month": 5,
+        "crop_id": "fallow",
+        "status": "bare",
+        "stress_reasons": []
+       },
+       {
+        "month": 6,
+        "crop_id": "fallow",
+        "status": "bare",
+        "stress_reasons": []
+       },
+       {
+        "month": 7,
+        "crop_id": null,
+        "status": "bare",
+        "stress_reasons": []
+       },
+       {
+        "month": 8,
+        "crop_id": null,
+        "status": "bare",
+        "stress_reasons": []
+       },
+       {
+        "month": 9,
+        "crop_id": null,
+        "status": "bare",
+        "stress_reasons": []
+       },
+       {
+        "month": 10,
+        "crop_id": null,
+        "status": "bare",
+        "stress_reasons": []
+       },
+       {
+        "month": 11,
+        "crop_id": "wheat",
+        "status": "growing",
+        "stress_reasons": []
+       },
+       {
+        "month": 12,
+        "crop_id": "wheat",
+        "status": "growing",
+        "stress_reasons": []
+       }
+      ]
+     },
+     {
+      "year": 2,
+      "months": [
+       {
+        "month": 1,
+        "crop_id": "wheat",
+        "status": "growing",
+        "stress_reasons": []
+       },
+       {
+        "month": 2,
+        "crop_id": "wheat",
+        "status": "growing",
+        "stress_reasons": []
+       },
+       {
+        "month": 3,
+        "crop_id": "wheat",
+        "status": "stress",
+        "stress_reasons": [
+         {
+          "code": "stress_water_deficit",
+          "params": {
+           "crop": "wheat",
+           "need_mm": 110,
+           "rain_mm": 98
+          },
+          "default_text": "Rain (98 mm) is below the estimated water need of wheat (110 mm)."
+         }
+        ]
+       },
+       {
+        "month": 4,
+        "crop_id": "wheat",
+        "status": "stress",
+        "stress_reasons": [
+         {
+          "code": "stress_water_deficit",
+          "params": {
+           "crop": "wheat",
+           "need_mm": 141,
+           "rain_mm": 65
+          },
+          "default_text": "Rain (65 mm) is below the estimated water need of wheat (141 mm)."
+         }
+        ]
+       },
+       {
+        "month": 5,
+        "crop_id": "wheat",
+        "status": "stress",
+        "stress_reasons": [
+         {
+          "code": "stress_water_deficit",
+          "params": {
+           "crop": "wheat",
+           "need_mm": 191,
+           "rain_mm": 35
+          },
+          "default_text": "Rain (35 mm) is below the estimated water need of wheat (191 mm)."
+         },
+         {
+          "code": "stress_heat_generic",
+          "params": {
+           "crop": "wheat",
+           "heat_days": 3.3,
+           "threshold_c": 35,
+           "level": 1
+          },
+          "default_text": "Average days above 35 C this month (3.3) reach the generic warning level of 1; generic level, not crop-specific (wheat)."
+         }
+        ]
+       },
+       {
+        "month": 6,
+        "crop_id": "wheat",
+        "status": "stress",
+        "stress_reasons": [
+         {
+          "code": "stress_water_deficit",
+          "params": {
+           "crop": "wheat",
+           "need_mm": 229,
+           "rain_mm": 10
+          },
+          "default_text": "Rain (10 mm) is below the estimated water need of wheat (229 mm)."
+         },
+         {
+          "code": "stress_heat_generic",
+          "params": {
+           "crop": "wheat",
+           "heat_days": 9.7,
+           "threshold_c": 35,
+           "level": 1
+          },
+          "default_text": "Average days above 35 C this month (9.7) reach the generic warning level of 1; generic level, not crop-specific (wheat)."
+         }
+        ]
+       },
+       {
+        "month": 7,
+        "crop_id": "fallow",
+        "status": "bare",
+        "stress_reasons": []
+       },
+       {
+        "month": 8,
+        "crop_id": "fallow",
+        "status": "bare",
+        "stress_reasons": []
+       },
+       {
+        "month": 9,
+        "crop_id": "fallow",
+        "status": "bare",
+        "stress_reasons": []
+       },
+       {
+        "month": 10,
+        "crop_id": "fallow",
+        "status": "bare",
+        "stress_reasons": []
+       },
+       {
+        "month": 11,
+        "crop_id": "fallow",
+        "status": "bare",
+        "stress_reasons": []
+       },
+       {
+        "month": 12,
+        "crop_id": "fallow",
+        "status": "bare",
+        "stress_reasons": []
+       }
+      ]
+     }
+    ],
+    "why": [
+     {
+      "rule_id": "deep_root_structure",
+      "effect": "bonus",
+      "points": 2.5,
+      "priority": "improve_soil",
+      "message": {
+       "code": "deep_root_present",
+       "params": {
+        "crops": "wheat",
+        "years": 1
+       },
+       "default_text": "Deep-rooting crops (wheat) in 1 season(s) help soil structure and water infiltration."
+      }
+     },
+     {
+      "rule_id": "bare_months_penalty",
+      "effect": "penalty",
+      "points": -16.0,
+      "priority": "reduce_erosion",
+      "message": {
+       "code": "bare_months",
+       "params": {
+        "count": 16,
+        "months": "1,2,3,4,5,6,7,8,9,10,11,12"
+       },
+       "default_text": "16 bare-field month(s) per rotation (months 1,2,3,4,5,6,7,8,9,10,11,12) leave the soil exposed to erosion."
+      }
+     },
+     {
+      "rule_id": "water_demand_match",
+      "effect": "bonus",
+      "points": 10.0,
+      "priority": "save_water",
+      "message": {
+       "code": "water_ok_months",
+       "params": {
+        "count": 4
+       },
+       "default_text": "4 growing month(s) where rainfall covers the crop's estimated water need."
+      }
+     },
+     {
+      "rule_id": "water_demand_match",
+      "effect": "penalty",
+      "points": -10.0,
+      "priority": "save_water",
+      "message": {
+       "code": "water_stress_months",
+       "params": {
+        "count": 4
+       },
+       "default_text": "4 growing month(s) where rainfall is below the crop's estimated water need."
+      }
+     },
+     {
+      "rule_id": "income_flag",
+      "effect": "bonus",
+      "points": 2.5,
+      "priority": "extra_income",
+      "message": {
+       "code": "income_flag_points",
+       "params": {
+        "levels": "wheat:medium,fallow:low"
+       },
+       "default_text": "Income potential from qualitative crop flags only (wheat:medium,fallow:low); there is no price data."
+      }
+     },
+     {
+      "rule_id": "forage_flag",
+      "effect": "neutral",
+      "points": 0.0,
+      "priority": "forage",
+      "message": {
+       "code": "forage_flag_points",
+       "params": {
+        "levels": "wheat:low,fallow:low"
+       },
+       "default_text": "Forage value from qualitative crop flags only (wheat:low,fallow:low); there is no price data."
+      }
+     }
+    ],
+    "evidence": [
+     {
+      "feature": "crops.wheat.rooting_zr_min_m",
+      "value": 1.0,
+      "unit": "m",
+      "source": "FAO-56 Table 22, Spring Wheat 1.0-1.5 m (Winter Wheat row is 1.5-1.8 m; deep either way)"
+     },
+     {
+      "feature": "climate.monthly.precipitation",
+      "value": [
+       94.99,
+       86.29,
+       98.03,
+       64.92,
+       35.36,
+       9.62,
+       3.3,
+       7.7,
+       26.8,
+       66.57,
+       100.7,
+       84.7
+      ],
+      "unit": "mm/month",
+      "source": "NASA POWER"
+     },
+     {
+      "feature": "climate.monthly.et0",
+      "value": [
+       51.35,
+       63.29,
+       95.48,
+       123.02,
+       165.74,
+       199.23,
+       245.94,
+       237.67,
+       165.89,
+       122.86,
+       69.62,
+       51.83
+      ],
+      "unit": "mm/month",
+      "source": "NASA POWER"
+     },
+     {
+      "feature": "crops.wheat.kc_mid",
+      "value": 1.15,
+      "unit": "FAO-56 Kc (-)",
+      "source": "FAO-56 Table 12, Wheat"
+     },
+     {
+      "feature": "crops.wheat.income_flag",
+      "value": "medium",
+      "unit": "qualitative",
+      "source": "qualitative, approved by user 2026-11-14, no price data"
+     },
+     {
+      "feature": "crops.fallow.income_flag",
+      "value": "low",
+      "unit": "qualitative",
+      "source": "qualitative, approved by user 2026-11-14, no price data"
+     },
+     {
+      "feature": "crops.wheat.forage_flag",
+      "value": "low",
+      "unit": "qualitative",
+      "source": "qualitative, approved by user 2026-11-14, no price data"
+     },
+     {
+      "feature": "crops.fallow.forage_flag",
+      "value": "low",
+      "unit": "qualitative",
+      "source": "qualitative, approved by user 2026-11-14, no price data"
+     },
+     {
+      "feature": "climate.monthly.frost_days",
+      "value": [
+       0.5,
+       0.6,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.05
+      ],
+      "unit": "days/month",
+      "months": [
+       5,
+       6
+      ],
+      "source": "NASA POWER"
+     },
+     {
+      "feature": "climate.monthly.heat_days.35",
+      "value": [
+       0.0,
+       0.0,
+       0.0,
+       0.2,
+       3.3,
+       9.65,
+       23.75,
+       26.4,
+       9.15,
+       1.6,
+       0.0,
+       0.0
+      ],
+      "unit": "days/month",
+      "months": [
+       5,
+       6
+      ],
+      "source": "NASA POWER"
+     },
+     {
+      "feature": "economics.revenue_range",
+      "value": [
+       1952,
+       3821,
+       5712
+      ],
+      "unit": "MAD/ha/year (bad, average, good year: min, mean, max yield 2015-2024)",
+      "source": "FAOSTAT Crops and livestock products (domain QCL), FAOSTAT Producer Prices (domain PP)"
+     }
+    ],
+    "benefits": [
+     {
+      "code": "benefit_deep_root_structure",
+      "params": {},
+      "default_text": "Deep roots improve soil structure and infiltration."
+     },
+     {
+      "code": "benefit_water_demand_match",
+      "params": {},
+      "default_text": "Crop water need is mostly met by rainfall in its growing months."
+     },
+     {
+      "code": "benefit_income_flag",
+      "params": {},
+      "default_text": "Qualitatively favourable for income (low confidence, no price data)."
+     }
+    ],
+    "information_gaps": [
+     {
+      "code": "gap_local_prices",
+      "params": {},
+      "default_text": "Local prices are not available, so income and forage are compared only from qualitative crop flags."
+     },
+     {
+      "code": "gap_water_stress_indicative",
+      "params": {},
+      "default_text": "Water stress is estimated from NASA model data (ET0 at the high end of typical Saiss values); treat it as indicative."
+     },
+     {
+      "code": "gap_frost_heat_tolerance_unknown",
+      "params": {
+       "crops": "wheat"
+      },
+      "default_text": "Crop frost and heat tolerance unknown, needs local data: wheat."
+     },
+     {
+      "code": "gap_frost_underestimated",
+      "params": {},
+      "default_text": "NASA frost days are likely underestimated for the Saiss (coarse grid); check frost risk locally."
+     },
+     {
+      "code": "gap_costs_unknown",
+      "params": {},
+      "default_text": "Production costs are unknown, so only gross revenue is shown, not profit; enter your costs to see profit."
+     },
+     {
+      "code": "gap_yield_national",
+      "params": {},
+      "default_text": "Prices and yields are FAOSTAT national averages for Morocco that mix irrigated and rainfed farms; they are not specific to your field."
+     }
+    ],
+    "risks_for_local_review": [
+     {
+      "code": "risk_local_review",
+      "params": {},
+      "default_text": "Check this option with a local agronomist or extension officer before acting; it is an option to discuss, not an order."
+     },
+     {
+      "code": "risk_water_stress_months",
+      "params": {
+       "months": "3,4,5,6"
+      },
+      "default_text": "Rainfall is below the estimated crop water need in months 3,4,5,6; check soil moisture and irrigation access locally."
+     },
+     {
+      "code": "risk_frost_heat_generic",
+      "params": {
+       "months": "5,6"
+      },
+      "default_text": "Frost or heat warning (generic level, not crop-specific) in growing months 5,6; check the crop's real tolerance locally."
+     },
+     {
+      "code": "risk_frost_heat_unassessed",
+      "params": {},
+      "default_text": "Crop frost and heat tolerance is unknown, so frost and heat risk is only flagged at generic levels."
+     },
+     {
+      "code": "risk_revenue_range",
+      "params": {
+       "bad_mad": 1952,
+       "avg_mad": 3821,
+       "good_mad": 5712
+      },
+      "default_text": "Revenue swings with the weather: about 1952 MAD/ha in a bad year, 3821 in an average year, 5712 in a good year (FAOSTAT 2015-2024 yields)."
+     }
+    ],
+    "confidence": "medium",
+    "score": {
+     "total": 30.16,
+     "by_priority": {
+      "save_water": 76.45,
+      "improve_soil": 37.5,
+      "extra_income": 8.27,
+      "reduce_erosion": 28.57,
+      "forage": 0.0
+     }
+    },
+    "rank": 2
+   },
+   "values": {
+    "water_deficit_mm_per_year": 550.12,
+    "revenue_mad_per_ha_year": 10349.21,
+    "revenue_range_mad_per_ha_year": {
+     "bad_year": 5512.65,
+     "average_year": 10349.21,
+     "good_year": 15268.66
+    },
+    "profit_mad_per_ha_year": null,
+    "baseline_revenue_mad_per_ha_year": 3821.34,
+    "baseline_water_deficit_mm_per_year": 231.53
+   }
+  },
+  {
+   "id": "B",
+   "area_ha": 3,
+   "irrigated": true,
+   "plan": {
+    "id": "optimised_plan_2",
+    "name": {
+     "code": "strategy_name_template",
+     "params": {
+      "crops": "potato > barley > vetch_oat_cover"
+     },
+     "default_text": "Rotation: potato > barley > vetch_oat_cover"
+    },
+    "is_current": false,
+    "seasons": [
+     {
+      "crop_id": "potato",
+      "sow_month": 4,
+      "harvest_month": 8
+     },
+     {
+      "crop_id": "barley",
+      "sow_month": 10,
+      "harvest_month": 4
+     },
+     {
+      "crop_id": "vetch_oat_cover",
+      "sow_month": 10,
+      "harvest_month": 3
+     }
+    ],
+    "calendar": [
+     {
+      "year": 1,
+      "months": [
+       {
+        "month": 1,
+        "crop_id": "vetch_oat_cover",
+        "status": "growing",
+        "stress_reasons": []
+       },
+       {
+        "month": 2,
+        "crop_id": "vetch_oat_cover",
+        "status": "growing",
+        "stress_reasons": []
+       },
+       {
+        "month": 3,
+        "crop_id": "vetch_oat_cover",
+        "status": "stress",
+        "stress_reasons": [
+         {
+          "code": "stress_water_deficit",
+          "params": {
+           "crop": "vetch_oat_cover",
+           "need_mm": 110,
+           "rain_mm": 98
+          },
+          "default_text": "Rain (98 mm) is below the estimated water need of vetch_oat_cover (110 mm)."
+         }
+        ]
+       },
+       {
+        "month": 4,
+        "crop_id": "potato",
+        "status": "stress",
+        "stress_reasons": [
+         {
+          "code": "stress_water_deficit",
+          "params": {
+           "crop": "potato",
+           "need_mm": 141,
+           "rain_mm": 65
+          },
+          "default_text": "Rain (65 mm) is below the estimated water need of potato (141 mm)."
+         }
+        ]
+       },
+       {
+        "month": 5,
+        "crop_id": "potato",
+        "status": "stress",
+        "stress_reasons": [
+         {
+          "code": "stress_water_deficit",
+          "params": {
+           "crop": "potato",
+           "need_mm": 191,
+           "rain_mm": 35
+          },
+          "default_text": "Rain (35 mm) is below the estimated water need of potato (191 mm)."
+         },
+         {
+          "code": "stress_heat_generic",
+          "params": {
+           "crop": "potato",
+           "heat_days": 3.3,
+           "threshold_c": 35,
+           "level": 1
+          },
+          "default_text": "Average days above 35 C this month (3.3) reach the generic warning level of 1; generic level, not crop-specific (potato)."
+         }
+        ]
+       },
+       {
+        "month": 6,
+        "crop_id": "potato",
+        "status": "stress",
+        "stress_reasons": [
+         {
+          "code": "stress_water_deficit",
+          "params": {
+           "crop": "potato",
+           "need_mm": 229,
+           "rain_mm": 10
+          },
+          "default_text": "Rain (10 mm) is below the estimated water need of potato (229 mm)."
+         },
+         {
+          "code": "stress_heat_generic",
+          "params": {
+           "crop": "potato",
+           "heat_days": 9.7,
+           "threshold_c": 35,
+           "level": 1
+          },
+          "default_text": "Average days above 35 C this month (9.7) reach the generic warning level of 1; generic level, not crop-specific (potato)."
+         }
+        ]
+       },
+       {
+        "month": 7,
+        "crop_id": "potato",
+        "status": "stress",
+        "stress_reasons": [
+         {
+          "code": "stress_water_deficit",
+          "params": {
+           "crop": "potato",
+           "need_mm": 283,
+           "rain_mm": 3
+          },
+          "default_text": "Rain (3 mm) is below the estimated water need of potato (283 mm)."
+         },
+         {
+          "code": "stress_heat_generic",
+          "params": {
+           "crop": "potato",
+           "heat_days": 23.8,
+           "threshold_c": 35,
+           "level": 1
+          },
+          "default_text": "Average days above 35 C this month (23.8) reach the generic warning level of 1; generic level, not crop-specific (potato)."
+         }
+        ]
+       },
+       {
+        "month": 8,
+        "crop_id": "potato",
+        "status": "stress",
+        "stress_reasons": [
+         {
+          "code": "stress_water_deficit",
+          "params": {
+           "crop": "potato",
+           "need_mm": 273,
+           "rain_mm": 8
+          },
+          "default_text": "Rain (8 mm) is below the estimated water need of potato (273 mm)."
+         },
+         {
+          "code": "stress_heat_generic",
+          "params": {
+           "crop": "potato",
+           "heat_days": 26.4,
+           "threshold_c": 35,
+           "level": 1
+          },
+          "default_text": "Average days above 35 C this month (26.4) reach the generic warning level of 1; generic level, not crop-specific (potato)."
+         }
+        ]
+       },
+       {
+        "month": 9,
+        "crop_id": null,
+        "status": "bare",
+        "stress_reasons": []
+       },
+       {
+        "month": 10,
+        "crop_id": "barley",
+        "status": "stress",
+        "stress_reasons": [
+         {
+          "code": "stress_water_deficit",
+          "params": {
+           "crop": "barley",
+           "need_mm": 141,
+           "rain_mm": 67
+          },
+          "default_text": "Rain (67 mm) is below the estimated water need of barley (141 mm)."
+         },
+         {
+          "code": "stress_heat_generic",
+          "params": {
+           "crop": "barley",
+           "heat_days": 1.6,
+           "threshold_c": 35,
+           "level": 1
+          },
+          "default_text": "Average days above 35 C this month (1.6) reach the generic warning level of 1; generic level, not crop-specific (barley)."
+         }
+        ]
+       },
+       {
+        "month": 11,
+        "crop_id": "barley",
+        "status": "growing",
+        "stress_reasons": []
+       },
+       {
+        "month": 12,
+        "crop_id": "barley",
+        "status": "growing",
+        "stress_reasons": []
+       }
+      ]
+     },
+     {
+      "year": 2,
+      "months": [
+       {
+        "month": 1,
+        "crop_id": "barley",
+        "status": "growing",
+        "stress_reasons": []
+       },
+       {
+        "month": 2,
+        "crop_id": "barley",
+        "status": "growing",
+        "stress_reasons": []
+       },
+       {
+        "month": 3,
+        "crop_id": "barley",
+        "status": "stress",
+        "stress_reasons": [
+         {
+          "code": "stress_water_deficit",
+          "params": {
+           "crop": "barley",
+           "need_mm": 110,
+           "rain_mm": 98
+          },
+          "default_text": "Rain (98 mm) is below the estimated water need of barley (110 mm)."
+         }
+        ]
+       },
+       {
+        "month": 4,
+        "crop_id": "barley",
+        "status": "stress",
+        "stress_reasons": [
+         {
+          "code": "stress_water_deficit",
+          "params": {
+           "crop": "barley",
+           "need_mm": 141,
+           "rain_mm": 65
+          },
+          "default_text": "Rain (65 mm) is below the estimated water need of barley (141 mm)."
+         }
+        ]
+       },
+       {
+        "month": 5,
+        "crop_id": null,
+        "status": "bare",
+        "stress_reasons": []
+       },
+       {
+        "month": 6,
+        "crop_id": null,
+        "status": "bare",
+        "stress_reasons": []
+       },
+       {
+        "month": 7,
+        "crop_id": null,
+        "status": "bare",
+        "stress_reasons": []
+       },
+       {
+        "month": 8,
+        "crop_id": null,
+        "status": "bare",
+        "stress_reasons": []
+       },
+       {
+        "month": 9,
+        "crop_id": null,
+        "status": "bare",
+        "stress_reasons": []
+       },
+       {
+        "month": 10,
+        "crop_id": "vetch_oat_cover",
+        "status": "stress",
+        "stress_reasons": [
+         {
+          "code": "stress_water_deficit",
+          "params": {
+           "crop": "vetch_oat_cover",
+           "need_mm": 141,
+           "rain_mm": 67
+          },
+          "default_text": "Rain (67 mm) is below the estimated water need of vetch_oat_cover (141 mm)."
+         },
+         {
+          "code": "stress_heat_generic",
+          "params": {
+           "crop": "vetch_oat_cover",
+           "heat_days": 1.6,
+           "threshold_c": 35,
+           "level": 1
+          },
+          "default_text": "Average days above 35 C this month (1.6) reach the generic warning level of 1; generic level, not crop-specific (vetch_oat_cover)."
+         }
+        ]
+       },
+       {
+        "month": 11,
+        "crop_id": "vetch_oat_cover",
+        "status": "growing",
+        "stress_reasons": []
+       },
+       {
+        "month": 12,
+        "crop_id": "vetch_oat_cover",
+        "status": "growing",
+        "stress_reasons": []
+       }
+      ]
+     }
+    ],
+    "why": [
+     {
+      "rule_id": "n_credit_legume_after_cereal",
+      "effect": "bonus",
+      "points": 5.0,
+      "priority": "improve_soil",
+      "message": {
+       "code": "n_credit_applied",
+       "params": {
+        "from_crop": "barley",
+        "to_crop": "vetch_oat_cover"
+       },
+       "default_text": "vetch_oat_cover after barley: the legume leaves nitrogen for the next crop."
+      }
+     },
+     {
+      "rule_id": "family_break",
+      "effect": "bonus",
+      "points": 2.5,
+      "priority": "improve_soil",
+      "message": {
+       "code": "family_change",
+       "params": {
+        "from_crop": "vetch_oat_cover",
+        "to_crop": "potato"
+       },
+       "default_text": "potato after vetch_oat_cover: different crop families help break pest and disease cycles."
+      }
+     },
+     {
+      "rule_id": "family_break",
+      "effect": "bonus",
+      "points": 2.5,
+      "priority": "improve_soil",
+      "message": {
+       "code": "family_change",
+       "params": {
+        "from_crop": "potato",
+        "to_crop": "barley"
+       },
+       "default_text": "barley after potato: different crop families help break pest and disease cycles."
+      }
+     },
+     {
+      "rule_id": "family_break",
+      "effect": "bonus",
+      "points": 2.5,
+      "priority": "improve_soil",
+      "message": {
+       "code": "family_change",
+       "params": {
+        "from_crop": "barley",
+        "to_crop": "vetch_oat_cover"
+       },
+       "default_text": "vetch_oat_cover after barley: different crop families help break pest and disease cycles."
+      }
+     },
+     {
+      "rule_id": "deep_root_structure",
+      "effect": "bonus",
+      "points": 2.5,
+      "priority": "improve_soil",
+      "message": {
+       "code": "deep_root_present",
+       "params": {
+        "crops": "barley",
+        "years": 1
+       },
+       "default_text": "Deep-rooting crops (barley) in 1 season(s) help soil structure and water infiltration."
+      }
+     },
+     {
+      "rule_id": "bare_months_penalty",
+      "effect": "penalty",
+      "points": -6.0,
+      "priority": "reduce_erosion",
+      "message": {
+       "code": "bare_months",
+       "params": {
+        "count": 6,
+        "months": "5,6,7,8,9"
+       },
+       "default_text": "6 bare-field month(s) per rotation (months 5,6,7,8,9) leave the soil exposed to erosion."
+      }
+     },
+     {
+      "rule_id": "cover_fills_bare",
+      "effect": "bonus",
+      "points": 9.0,
+      "priority": "reduce_erosion",
+      "message": {
+       "code": "cover_crop_months",
+       "params": {
+        "crop": "vetch_oat_cover",
+        "count": 6
+       },
+       "default_text": "vetch_oat_cover covers the field for 6 month(s) per rotation, protecting the soil and adding organic matter."
+      }
+     },
+     {
+      "rule_id": "water_demand_match",
+      "effect": "bonus",
+      "points": 20.0,
+      "priority": "save_water",
+      "message": {
+       "code": "water_ok_months",
+       "params": {
+        "count": 8
+       },
+       "default_text": "8 growing month(s) where rainfall covers the crop's estimated water need."
+      }
+     },
+     {
+      "rule_id": "water_demand_match",
+      "effect": "penalty",
+      "points": -25.0,
+      "priority": "save_water",
+      "message": {
+       "code": "water_stress_months",
+       "params": {
+        "count": 10
+       },
+       "default_text": "10 growing month(s) where rainfall is below the crop's estimated water need."
+      }
+     },
+     {
+      "rule_id": "income_flag",
+      "effect": "bonus",
+      "points": 5.0,
+      "priority": "extra_income",
+      "message": {
+       "code": "income_flag_points",
+       "params": {
+        "levels": "potato:high,barley:low,vetch_oat_cover:low"
+       },
+       "default_text": "Income potential from qualitative crop flags only (potato:high,barley:low,vetch_oat_cover:low); there is no price data."
+      }
+     },
+     {
+      "rule_id": "forage_flag",
+      "effect": "bonus",
+      "points": 7.5,
+      "priority": "forage",
+      "message": {
+       "code": "forage_flag_points",
+       "params": {
+        "levels": "potato:low,barley:medium,vetch_oat_cover:high"
+       },
+       "default_text": "Forage value from qualitative crop flags only (potato:low,barley:medium,vetch_oat_cover:high); there is no price data."
+      }
+     }
+    ],
+    "evidence": [
+     {
+      "feature": "crops.vetch_oat_cover.legume",
+      "value": "yes",
+      "unit": "yes/no",
+      "source": "botanical taxonomy (the vetch half fixes nitrogen)"
+     },
+     {
+      "feature": "crops.potato.family",
+      "value": "solanaceae",
+      "unit": "taxon",
+      "source": "botanical taxonomy"
+     },
+     {
+      "feature": "crops.barley.family",
+      "value": "poaceae",
+      "unit": "taxon",
+      "source": "botanical taxonomy"
+     },
+     {
+      "feature": "crops.vetch_oat_cover.family",
+      "value": "fabaceae",
+      "unit": "taxon",
+      "source": "oats are generally a break crop for wheat diseases; family treated as fabaceae by user decision"
+     },
+     {
+      "feature": "crops.barley.rooting_zr_min_m",
+      "value": 1.0,
+      "unit": "m",
+      "source": "FAO-56 Table 22, Barley 1.0-1.5 m"
+     },
+     {
+      "feature": "crops.vetch_oat_cover.cover",
+      "value": "yes",
+      "unit": "yes/no",
+      "source": "classification"
+     },
+     {
+      "feature": "climate.monthly.precipitation",
+      "value": [
+       94.99,
+       86.29,
+       98.03,
+       64.92,
+       35.36,
+       9.62,
+       3.3,
+       7.7,
+       26.8,
+       66.57,
+       100.7,
+       84.7
+      ],
+      "unit": "mm/month",
+      "source": "NASA POWER"
+     },
+     {
+      "feature": "climate.monthly.et0",
+      "value": [
+       51.35,
+       63.29,
+       95.48,
+       123.02,
+       165.74,
+       199.23,
+       245.94,
+       237.67,
+       165.89,
+       122.86,
+       69.62,
+       51.83
+      ],
+      "unit": "mm/month",
+      "source": "NASA POWER"
+     },
+     {
+      "feature": "crops.barley.kc_mid",
+      "value": 1.15,
+      "unit": "FAO-56 Kc (-)",
+      "source": "FAO-56 Table 12, Barley"
+     },
+     {
+      "feature": "crops.potato.kc_mid",
+      "value": 1.15,
+      "unit": "FAO-56 Kc (-)",
+      "source": "FAO-56 Table 12, Potato"
+     },
+     {
+      "feature": "crops.vetch_oat_cover.kc_mid",
+      "value": 1.15,
+      "unit": "FAO-56 Kc (-)",
+      "source": "proxy: FAO-56 Table 12, Oats (vetch and the vetch-oat mixture are not in Table 12); lead decision 2026-11-14"
+     },
+     {
+      "feature": "crops.potato.income_flag",
+      "value": "high",
+      "unit": "qualitative",
+      "source": "qualitative, approved by user 2026-11-14, no price data"
+     },
+     {
+      "feature": "crops.barley.income_flag",
+      "value": "low",
+      "unit": "qualitative",
+      "source": "qualitative, approved by user 2026-11-14, no price data"
+     },
+     {
+      "feature": "crops.vetch_oat_cover.income_flag",
+      "value": "low",
+      "unit": "qualitative",
+      "source": "qualitative, approved by user 2026-11-14, no price data"
+     },
+     {
+      "feature": "crops.potato.forage_flag",
+      "value": "low",
+      "unit": "qualitative",
+      "source": "qualitative, approved by user 2026-11-14, no price data"
+     },
+     {
+      "feature": "crops.barley.forage_flag",
+      "value": "medium",
+      "unit": "qualitative",
+      "source": "qualitative, approved by user 2026-11-14, no price data"
+     },
+     {
+      "feature": "crops.vetch_oat_cover.forage_flag",
+      "value": "high",
+      "unit": "qualitative",
+      "source": "qualitative, approved by user 2026-11-14, no price data"
+     },
+     {
+      "feature": "climate.monthly.frost_days",
+      "value": [
+       0.5,
+       0.6,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.05
+      ],
+      "unit": "days/month",
+      "months": [
+       5,
+       6,
+       7,
+       8,
+       10
+      ],
+      "source": "NASA POWER"
+     },
+     {
+      "feature": "climate.monthly.heat_days.35",
+      "value": [
+       0.0,
+       0.0,
+       0.0,
+       0.2,
+       3.3,
+       9.65,
+       23.75,
+       26.4,
+       9.15,
+       1.6,
+       0.0,
+       0.0
+      ],
+      "unit": "days/month",
+      "months": [
+       5,
+       6,
+       7,
+       8,
+       10
+      ],
+      "source": "NASA POWER"
+     },
+     {
+      "feature": "economics.revenue_range",
+      "value": [
+       57543,
+       62165,
+       67516
+      ],
+      "unit": "MAD/ha/year (bad, average, good year: min, mean, max yield 2015-2024)",
+      "source": "FAOSTAT Crops and livestock products (domain QCL), FAOSTAT Producer Prices (domain PP)"
+     }
+    ],
+    "benefits": [
+     {
+      "code": "benefit_n_credit_legume_after_cereal",
+      "params": {},
+      "default_text": "Nitrogen credit from a legume after a cereal."
+     },
+     {
+      "code": "benefit_family_break",
+      "params": {},
+      "default_text": "Crop family changes between seasons, which breaks pest and disease cycles."
+     },
+     {
+      "code": "benefit_deep_root_structure",
+      "params": {},
+      "default_text": "Deep roots improve soil structure and infiltration."
+     },
+     {
+      "code": "benefit_cover_fills_bare",
+      "params": {},
+      "default_text": "A cover crop protects the soil and adds organic matter."
+     },
+     {
+      "code": "benefit_water_demand_match",
+      "params": {},
+      "default_text": "Crop water need is mostly met by rainfall in its growing months."
+     },
+     {
+      "code": "benefit_income_flag",
+      "params": {},
+      "default_text": "Qualitatively favourable for income (low confidence, no price data)."
+     },
+     {
+      "code": "benefit_forage_flag",
+      "params": {},
+      "default_text": "Qualitatively favourable for forage (low confidence, no price data)."
+     }
+    ],
+    "information_gaps": [
+     {
+      "code": "gap_rooting_unknown",
+      "params": {
+       "crops": "vetch_oat_cover"
+      },
+      "default_text": "Rooting depth unknown, needs local data: vetch_oat_cover."
+     },
+     {
+      "code": "gap_kc_proxy",
+      "params": {
+       "crops": "vetch_oat_cover"
+      },
+      "default_text": "Water need for vetch_oat_cover uses the coefficient of a proxy crop (oats, FAO-56 Table 12); treat it as indicative."
+     },
+     {
+      "code": "gap_local_prices",
+      "params": {},
+      "default_text": "Local prices are not available, so income and forage are compared only from qualitative crop flags."
+     },
+     {
+      "code": "gap_water_stress_indicative",
+      "params": {},
+      "default_text": "Water stress is estimated from NASA model data (ET0 at the high end of typical Saiss values); treat it as indicative."
+     },
+     {
+      "code": "gap_frost_heat_tolerance_unknown",
+      "params": {
+       "crops": "barley,potato,vetch_oat_cover"
+      },
+      "default_text": "Crop frost and heat tolerance unknown, needs local data: barley,potato,vetch_oat_cover."
+     },
+     {
+      "code": "gap_frost_underestimated",
+      "params": {},
+      "default_text": "NASA frost days are likely underestimated for the Saiss (coarse grid); check frost risk locally."
+     },
+     {
+      "code": "gap_no_price_crops",
+      "params": {
+       "crops": "vetch_oat_cover"
+      },
+      "default_text": "No price data for vetch_oat_cover: they count as zero revenue in the optimiser."
+     },
+     {
+      "code": "gap_costs_unknown",
+      "params": {},
+      "default_text": "Production costs are unknown, so only gross revenue is shown, not profit; enter your costs to see profit."
+     },
+     {
+      "code": "gap_yield_national",
+      "params": {},
+      "default_text": "Prices and yields are FAOSTAT national averages for Morocco that mix irrigated and rainfed farms; they are not specific to your field."
+     }
+    ],
+    "risks_for_local_review": [
+     {
+      "code": "risk_local_review",
+      "params": {},
+      "default_text": "Check this option with a local agronomist or extension officer before acting; it is an option to discuss, not an order."
+     },
+     {
+      "code": "risk_water_stress_months",
+      "params": {
+       "months": "3,4,5,6,7,8,10"
+      },
+      "default_text": "Rainfall is below the estimated crop water need in months 3,4,5,6,7,8,10; check soil moisture and irrigation access locally."
+     },
+     {
+      "code": "risk_frost_heat_generic",
+      "params": {
+       "months": "5,6,7,8,10"
+      },
+      "default_text": "Frost or heat warning (generic level, not crop-specific) in growing months 5,6,7,8,10; check the crop's real tolerance locally."
+     },
+     {
+      "code": "risk_frost_heat_unassessed",
+      "params": {},
+      "default_text": "Crop frost and heat tolerance is unknown, so frost and heat risk is only flagged at generic levels."
+     },
+     {
+      "code": "risk_revenue_range",
+      "params": {
+       "bad_mad": 57543,
+       "avg_mad": 62165,
+       "good_mad": 67516
+      },
+      "default_text": "Revenue swings with the weather: about 57543 MAD/ha in a bad year, 62165 in an average year, 67516 in a good year (FAOSTAT 2015-2024 yields)."
+     }
+    ],
+    "confidence": "medium",
+    "score": {
+     "total": 81.61,
+     "by_priority": {
+      "save_water": 36.63,
+      "improve_soil": 100.0,
+      "extra_income": 100.0,
+      "reduce_erosion": 96.43,
+      "forage": 75.0
+     }
+    },
+    "rank": 1
+   },
+   "baseline": {
+    "id": "current_rotation_2",
+    "name": {
+     "code": "strategy_name_current",
+     "params": {
+      "crops": "barley"
+     },
+     "default_text": "Your current rotation: barley"
+    },
+    "is_current": true,
+    "seasons": [
+     {
+      "crop_id": "barley",
+      "sow_month": 11,
+      "harvest_month": 5
+     }
+    ],
+    "calendar": [
+     {
+      "year": 1,
+      "months": [
+       {
+        "month": 1,
+        "crop_id": "barley",
+        "status": "growing",
+        "stress_reasons": []
+       },
+       {
+        "month": 2,
+        "crop_id": "barley",
+        "status": "growing",
+        "stress_reasons": []
+       },
+       {
+        "month": 3,
+        "crop_id": "barley",
+        "status": "stress",
+        "stress_reasons": [
+         {
+          "code": "stress_water_deficit",
+          "params": {
+           "crop": "barley",
+           "need_mm": 110,
+           "rain_mm": 98
+          },
+          "default_text": "Rain (98 mm) is below the estimated water need of barley (110 mm)."
+         }
+        ]
+       },
+       {
+        "month": 4,
+        "crop_id": "barley",
+        "status": "stress",
+        "stress_reasons": [
+         {
+          "code": "stress_water_deficit",
+          "params": {
+           "crop": "barley",
+           "need_mm": 141,
+           "rain_mm": 65
+          },
+          "default_text": "Rain (65 mm) is below the estimated water need of barley (141 mm)."
+         }
+        ]
+       },
+       {
+        "month": 5,
+        "crop_id": "barley",
+        "status": "stress",
+        "stress_reasons": [
+         {
+          "code": "stress_water_deficit",
+          "params": {
+           "crop": "barley",
+           "need_mm": 191,
+           "rain_mm": 35
+          },
+          "default_text": "Rain (35 mm) is below the estimated water need of barley (191 mm)."
+         },
+         {
+          "code": "stress_heat_generic",
+          "params": {
+           "crop": "barley",
+           "heat_days": 3.3,
+           "threshold_c": 35,
+           "level": 1
+          },
+          "default_text": "Average days above 35 C this month (3.3) reach the generic warning level of 1; generic level, not crop-specific (barley)."
+         }
+        ]
+       },
+       {
+        "month": 6,
+        "crop_id": null,
+        "status": "bare",
+        "stress_reasons": []
+       },
+       {
+        "month": 7,
+        "crop_id": null,
+        "status": "bare",
+        "stress_reasons": []
+       },
+       {
+        "month": 8,
+        "crop_id": null,
+        "status": "bare",
+        "stress_reasons": []
+       },
+       {
+        "month": 9,
+        "crop_id": null,
+        "status": "bare",
+        "stress_reasons": []
+       },
+       {
+        "month": 10,
+        "crop_id": null,
+        "status": "bare",
+        "stress_reasons": []
+       },
+       {
+        "month": 11,
+        "crop_id": "barley",
+        "status": "growing",
+        "stress_reasons": []
+       },
+       {
+        "month": 12,
+        "crop_id": "barley",
+        "status": "growing",
+        "stress_reasons": []
+       }
+      ]
+     }
+    ],
+    "why": [
+     {
+      "rule_id": "family_break",
+      "effect": "penalty",
+      "points": -10.0,
+      "priority": "improve_soil",
+      "message": {
+       "code": "family_repeat",
+       "params": {
+        "from_crop": "barley",
+        "to_crop": "barley"
+       },
+       "default_text": "barley after barley: same crop family in consecutive seasons keeps pest and disease cycles going."
+      }
+     },
+     {
+      "rule_id": "deep_root_structure",
+      "effect": "bonus",
+      "points": 5.0,
+      "priority": "improve_soil",
+      "message": {
+       "code": "deep_root_present",
+       "params": {
+        "crops": "barley",
+        "years": 1
+       },
+       "default_text": "Deep-rooting crops (barley) in 1 season(s) help soil structure and water infiltration."
+      }
+     },
+     {
+      "rule_id": "bare_months_penalty",
+      "effect": "penalty",
+      "points": -10.0,
+      "priority": "reduce_erosion",
+      "message": {
+       "code": "bare_months",
+       "params": {
+        "count": 5,
+        "months": "6,7,8,9,10"
+       },
+       "default_text": "5 bare-field month(s) per rotation (months 6,7,8,9,10) leave the soil exposed to erosion."
+      }
+     },
+     {
+      "rule_id": "water_demand_match",
+      "effect": "bonus",
+      "points": 20.0,
+      "priority": "save_water",
+      "message": {
+       "code": "water_ok_months",
+       "params": {
+        "count": 4
+       },
+       "default_text": "4 growing month(s) where rainfall covers the crop's estimated water need."
+      }
+     },
+     {
+      "rule_id": "water_demand_match",
+      "effect": "penalty",
+      "points": -15.0,
+      "priority": "save_water",
+      "message": {
+       "code": "water_stress_months",
+       "params": {
+        "count": 3
+       },
+       "default_text": "3 growing month(s) where rainfall is below the crop's estimated water need."
+      }
+     },
+     {
+      "rule_id": "income_flag",
+      "effect": "neutral",
+      "points": 0.0,
+      "priority": "extra_income",
+      "message": {
+       "code": "income_flag_points",
+       "params": {
+        "levels": "barley:low"
+       },
+       "default_text": "Income potential from qualitative crop flags only (barley:low); there is no price data."
+      }
+     },
+     {
+      "rule_id": "forage_flag",
+      "effect": "bonus",
+      "points": 5.0,
+      "priority": "forage",
+      "message": {
+       "code": "forage_flag_points",
+       "params": {
+        "levels": "barley:medium"
+       },
+       "default_text": "Forage value from qualitative crop flags only (barley:medium); there is no price data."
+      }
+     }
+    ],
+    "evidence": [
+     {
+      "feature": "crops.barley.family",
+      "value": "poaceae",
+      "unit": "taxon",
+      "source": "botanical taxonomy"
+     },
+     {
+      "feature": "crops.barley.rooting_zr_min_m",
+      "value": 1.0,
+      "unit": "m",
+      "source": "FAO-56 Table 22, Barley 1.0-1.5 m"
+     },
+     {
+      "feature": "climate.monthly.precipitation",
+      "value": [
+       94.99,
+       86.29,
+       98.03,
+       64.92,
+       35.36,
+       9.62,
+       3.3,
+       7.7,
+       26.8,
+       66.57,
+       100.7,
+       84.7
+      ],
+      "unit": "mm/month",
+      "source": "NASA POWER"
+     },
+     {
+      "feature": "climate.monthly.et0",
+      "value": [
+       51.35,
+       63.29,
+       95.48,
+       123.02,
+       165.74,
+       199.23,
+       245.94,
+       237.67,
+       165.89,
+       122.86,
+       69.62,
+       51.83
+      ],
+      "unit": "mm/month",
+      "source": "NASA POWER"
+     },
+     {
+      "feature": "crops.barley.kc_mid",
+      "value": 1.15,
+      "unit": "FAO-56 Kc (-)",
+      "source": "FAO-56 Table 12, Barley"
+     },
+     {
+      "feature": "crops.barley.income_flag",
+      "value": "low",
+      "unit": "qualitative",
+      "source": "qualitative, approved by user 2026-11-14, no price data"
+     },
+     {
+      "feature": "crops.barley.forage_flag",
+      "value": "medium",
+      "unit": "qualitative",
+      "source": "qualitative, approved by user 2026-11-14, no price data"
+     },
+     {
+      "feature": "climate.monthly.frost_days",
+      "value": [
+       0.5,
+       0.6,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.05
+      ],
+      "unit": "days/month",
+      "months": [
+       5
+      ],
+      "source": "NASA POWER"
+     },
+     {
+      "feature": "climate.monthly.heat_days.35",
+      "value": [
+       0.0,
+       0.0,
+       0.0,
+       0.2,
+       3.3,
+       9.65,
+       23.75,
+       26.4,
+       9.15,
+       1.6,
+       0.0,
+       0.0
+      ],
+      "unit": "days/month",
+      "months": [
+       5
+      ],
+      "source": "NASA POWER"
+     },
+     {
+      "feature": "economics.revenue_range",
+      "value": [
+       1957,
+       5139,
+       8476
+      ],
+      "unit": "MAD/ha/year (bad, average, good year: min, mean, max yield 2015-2024)",
+      "source": "FAOSTAT Crops and livestock products (domain QCL), FAOSTAT Producer Prices (domain PP)"
+     }
+    ],
+    "benefits": [
+     {
+      "code": "benefit_deep_root_structure",
+      "params": {},
+      "default_text": "Deep roots improve soil structure and infiltration."
+     },
+     {
+      "code": "benefit_water_demand_match",
+      "params": {},
+      "default_text": "Crop water need is mostly met by rainfall in its growing months."
+     },
+     {
+      "code": "benefit_forage_flag",
+      "params": {},
+      "default_text": "Qualitatively favourable for forage (low confidence, no price data)."
+     }
+    ],
+    "information_gaps": [
+     {
+      "code": "gap_local_prices",
+      "params": {},
+      "default_text": "Local prices are not available, so income and forage are compared only from qualitative crop flags."
+     },
+     {
+      "code": "gap_water_stress_indicative",
+      "params": {},
+      "default_text": "Water stress is estimated from NASA model data (ET0 at the high end of typical Saiss values); treat it as indicative."
+     },
+     {
+      "code": "gap_frost_heat_tolerance_unknown",
+      "params": {
+       "crops": "barley"
+      },
+      "default_text": "Crop frost and heat tolerance unknown, needs local data: barley."
+     },
+     {
+      "code": "gap_frost_underestimated",
+      "params": {},
+      "default_text": "NASA frost days are likely underestimated for the Saiss (coarse grid); check frost risk locally."
+     },
+     {
+      "code": "gap_costs_unknown",
+      "params": {},
+      "default_text": "Production costs are unknown, so only gross revenue is shown, not profit; enter your costs to see profit."
+     },
+     {
+      "code": "gap_yield_national",
+      "params": {},
+      "default_text": "Prices and yields are FAOSTAT national averages for Morocco that mix irrigated and rainfed farms; they are not specific to your field."
+     }
+    ],
+    "risks_for_local_review": [
+     {
+      "code": "risk_local_review",
+      "params": {},
+      "default_text": "Check this option with a local agronomist or extension officer before acting; it is an option to discuss, not an order."
+     },
+     {
+      "code": "risk_water_stress_months",
+      "params": {
+       "months": "3,4,5"
+      },
+      "default_text": "Rainfall is below the estimated crop water need in months 3,4,5; check soil moisture and irrigation access locally."
+     },
+     {
+      "code": "risk_frost_heat_generic",
+      "params": {
+       "months": "5"
+      },
+      "default_text": "Frost or heat warning (generic level, not crop-specific) in growing months 5; check the crop's real tolerance locally."
+     },
+     {
+      "code": "risk_frost_heat_unassessed",
+      "params": {},
+      "default_text": "Crop frost and heat tolerance is unknown, so frost and heat risk is only flagged at generic levels."
+     },
+     {
+      "code": "risk_revenue_range",
+      "params": {
+       "bad_mad": 1957,
+       "avg_mad": 5139,
+       "good_mad": 8476
+      },
+      "default_text": "Revenue swings with the weather: about 1957 MAD/ha in a bad year, 5139 in an average year, 8476 in a good year (FAOSTAT 2015-2024 yields)."
+     }
+    ],
+    "confidence": "medium",
+    "score": {
+     "total": 37.27,
+     "by_priority": {
+      "save_water": 75.22,
+      "improve_soil": 0.0,
+      "extra_income": 11.13,
+      "reduce_erosion": 50.0,
+      "forage": 50.0
+     }
+    },
+    "rank": 2
+   },
+   "values": {
+    "water_deficit_mm_per_year": 622.99,
+    "revenue_mad_per_ha_year": 62165.28,
+    "revenue_range_mad_per_ha_year": {
+     "bad_year": 57543.04,
+     "average_year": 62165.28,
+     "good_year": 67516.4
+    },
+    "profit_mad_per_ha_year": null,
+    "baseline_revenue_mad_per_ha_year": 5139.28,
+    "baseline_water_deficit_mm_per_year": 243.57
+   }
+  }
+ ],
+ "totals": {
+  "area_ha": 5,
+  "gross_revenue_mad_per_year": 207194.28,
+  "revenue_range_mad_per_year": {
+   "bad_year": 183654.42,
+   "average_year": 207194.28,
+   "good_year": 233086.53
+  },
+  "profit_mad_per_year": null,
+  "irrigation_need_m3_per_year": 18689.62,
+  "baseline_gross_revenue_mad_per_year": 23060.51
+ },
+ "pareto": [
+  {
+   "revenue_mad_per_ha_year": 0.0,
+   "water_deficit_mm_per_year": 0.0,
+   "profit_mad_per_ha_year": null,
+   "scores": {
+    "extra_income": 0.0,
+    "save_water": 100.0
+   },
+   "crops": [
+    "fallow",
+    "fallow"
+   ]
+  },
+  {
+   "revenue_mad_per_ha_year": 38360.05,
+   "water_deficit_mm_per_year": 182.71,
+   "profit_mad_per_ha_year": null,
+   "scores": {
+    "extra_income": 83.07,
+    "save_water": 81.41
+   },
+   "crops": [
+    "fallow",
+    "potato > lentil"
+   ]
+  },
+  {
+   "revenue_mad_per_ha_year": 45272.07,
+   "water_deficit_mm_per_year": 372.83,
+   "profit_mad_per_ha_year": null,
+   "scores": {
+    "extra_income": 98.04,
+    "save_water": 62.07
+   },
+   "crops": [
+    "sunflower > lentil",
+    "sunflower > potato"
+   ]
+  },
+  {
+   "revenue_mad_per_ha_year": 46179.37,
+   "water_deficit_mm_per_year": 519.54,
+   "profit_mad_per_ha_year": null,
+   "scores": {
+    "extra_income": 100.0,
+    "save_water": 47.15
+   },
+   "crops": [
+    "olive_intercrop > olive_intercrop",
+    "sunflower > potato"
+   ]
+  },
+  {
+   "revenue_mad_per_ha_year": 46179.37,
+   "water_deficit_mm_per_year": 778.29,
+   "profit_mad_per_ha_year": null,
+   "scores": {
+    "extra_income": 100.0,
+    "save_water": 20.83
+   },
+   "crops": [
+    "olive_intercrop > olive_intercrop",
+    "potato > sunflower > vetch_oat_cover"
+   ]
+  }
+ ],
+ "information_gaps": [],
+ "notes": [
+  {
+   "code": "note_relative_scores",
+   "params": {},
+   "default_text": "Scores are relative comparisons among the options shown, not yield or income predictions."
+  },
+  {
+   "code": "note_local_expert",
+   "params": {},
+   "default_text": "Discuss any option with a local expert before acting."
+  },
+  {
+   "code": "note_optimiser",
+   "params": {},
+   "default_text": "The plan comes from an optimiser that maximises a weighted mix of your goals under sowing-window and non-overlap constraints; it is an option to discuss, not an order."
+  },
+  {
+   "code": "note_normalisation",
+   "params": {},
+   "default_text": "Each goal score is scaled 0-100 against all candidate rotations the engine evaluated."
+  },
+  {
+   "code": "note_soil_not_scored",
+   "params": {},
+   "default_text": "Soil data is shown for context but is not used by any scoring rule yet."
+  }
+ ]
+}

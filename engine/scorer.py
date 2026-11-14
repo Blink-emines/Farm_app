@@ -6,7 +6,7 @@ from .loaders import (DEFAULT_SOURCE, UNKNOWN, field as crop_field, load_crops, 
                       val, validators)
 from .messages import msg
 from .rules import RULES, Ctx
-from .season_calendar import build_calendar
+from .season_calendar import build_calendar, calendar_from_spans
 
 PRIORITIES = ["save_water", "improve_soil", "extra_income", "reduce_erosion", "forage"]
 LOWERING_GAPS = {"gap_kc_unknown", "gap_climate_month_missing", "gap_default_months"}
@@ -67,9 +67,15 @@ def _calendar_messages(calendar):
     return kinds
 
 
-def evaluate(strategy_id, is_current, crop_ids, seasons, defaults, crops, features, weights):
+def evaluate(strategy_id, is_current, crop_ids, seasons, defaults, crops, features, weights, plan=None):
+    """plan = {"length", "spans": [(start, end, crop)]} (from the optimiser) replaces the layout of `seasons`."""
     names = {s["id"]: s["name"] for s in features["sources"]}
-    calendar, seasons = build_calendar(seasons, crops, features, weights["warnings"])
+    if plan is None:
+        calendar, seasons = build_calendar(seasons, crops, features, weights["warnings"])
+    else:
+        calendar = calendar_from_spans(plan["spans"], plan["length"], crops, features, weights["warnings"])
+        seasons = [{"crop_id": c, "sow_month": s % 12 + 1, "harvest_month": e % 12 + 1}
+                   for s, e, c in sorted(plan["spans"])]
     ctx = Ctx(seasons, calendar, crops, features, weights, names)
     why, gaps, evidence = [], [], []
     for rule in RULES:

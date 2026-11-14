@@ -49,3 +49,24 @@ warnings:
   frost_days_min: 1
   heat_threshold_c: 35
   heat_days_min: 1
+
+# ---- Optimiser (approved by the lead 2026-11-14; the user may change any value) ----
+optimiser:
+  horizon_months: 24
+  # Sowing windows from the point's climate.
+  sowing_windows:
+    rain_to_et0_ratio: 0.5        # FAO AEZ (Kassam et al.): growing period starts when precipitation > 0.5 PET
+    window_months: 3              # assumption, approved by the lead: how many months a window stays open
+    spring_min_t2m_min_c: 5       # assumption, approved by the lead: generic level, not crop-specific
+    spring_max_frost_days: 1      # frost_days must be below this (same generic level as warnings)
+    fallback_margin_months: 1     # when no month qualifies: approved default month +/- this
+  # Hard minimum months between two sowings of the same family on a parcel (cyclic).
+  # Assumption, common rotation guidance, approved by the lead 2026-11-14. Perennials are exempt.
+  family_gap_months: {solanaceae: 24, fabaceae: 24, asteraceae: 24, poaceae: 12}
+  pareto_points: 6
+  solver_time_limit_s: 5
+  # Slider presets (0-5), approved by the lead.
+  profiles:
+    economic: {save_water: 1, improve_soil: 1, extra_income: 5, reduce_erosion: 0, forage: 1}
+    balanced: {save_water: 3, improve_soil: 3, extra_income: 3, reduce_erosion: 3, forage: 3}
+    ecological: {save_water: 4, improve_soil: 5, extra_income: 1, reduce_erosion: 4, forage: 1}

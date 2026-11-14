@@ -42,7 +42,7 @@ def test_valid_against_schema_and_period(monkeypatch, power_raw, soil_raw):
     install_fetcher(monkeypatch, power_raw, soil_raw)
     f = pipeline.get_features(33.96, -5.27)
     jsonschema.validate(f, SCHEMA)
-    assert f["location"] == {"latitude": 33.96, "longitude": -5.27, "elevation_m": 575.32, "region": "saiss"}
+    assert f["location"] == {"latitude": 33.96, "longitude": -5.27, "elevation_m": 575.32, "region": "morocco"}
     assert f["climate"]["period"] == {"start_year": 2023, "end_year": 2024}
     assert f["soil"]["status"] == "live" and f["soil"]["source"] == "soilgrids"
     assert {"climate_coarse_grid", "root_zone_wetness_model", "soil_model_estimate"} <= codes(f)
@@ -53,14 +53,14 @@ def test_coordinates_are_rounded(monkeypatch, power_raw, soil_raw):
     calls = install_fetcher(monkeypatch, power_raw, soil_raw)
     f = pipeline.get_features(33.9649, -5.2701)
     assert (f["location"]["latitude"], f["location"]["longitude"]) == (33.96, -5.27)
-    assert calls["power"] == 1
+    assert calls["power"] == 2   # one MERRA-2 cell + one radiation cell
 
 
 def test_second_call_uses_cache_and_never_repeats_requests(monkeypatch, power_raw, soil_raw):
     calls = install_fetcher(monkeypatch, power_raw, soil_raw)
     pipeline.get_features(33.96, -5.27)
     f2 = pipeline.get_features(33.96, -5.27)
-    assert calls == {"power": 1, "soil": 1}
+    assert calls == {"power": 2, "soil": 1}
     assert f2["soil"]["status"] == "cache"
     assert all(s["cache_status"] == "cache" for s in f2["sources"])
     jsonschema.validate(f2, SCHEMA)
@@ -85,6 +85,50 @@ def test_soil_down_and_no_fallback_is_unavailable_not_an_error(monkeypatch, powe
     assert f["soil"] == {"status": "unavailable", "source": None, "layers": []}
     assert "soil_unavailable" in codes(f)
     assert {s["id"] for s in f["sources"]} == {"nasa_power"}
+
+
+def test_nearby_points_share_nasa_cells(monkeypatch, power_raw, soil_raw):
+    calls = install_fetcher(monkeypatch, power_raw, soil_raw)
+    f1 = pipeline.get_features(33.96, -5.27)
+    f2 = pipeline.get_features(33.80, -5.10)      # same MERRA-2 and radiation cell
+    assert calls["power"] == 2
+    for name in ("t2m_mean", "precipitation", "frost_days", "root_zone_wetness", "solar_radiation"):
+        assert f2["climate"]["monthly"][name] == f1["climate"]["monthly"][name]   # same NASA cell values
+    # ET0 differs slightly: extraterrestrial radiation depends on the exact latitude
+    assert f2["climate"]["monthly"]["et0"]["values"] != f1["climate"]["monthly"]["et0"]["values"]
+    assert f2["location"]["latitude"] == 33.80
+    f3 = pipeline.get_features(34.30, -5.10)      # next MERRA-2 and radiation cell to the north
+    assert calls["power"] == 4                    # new MERRA cell (lat 34.5) and new radiation cell (34.5)
+    jsonschema.validate(f3, SCHEMA)
+
+
+def test_sea_point_is_outside_region_before_any_request(monkeypatch, power_raw, soil_raw):
+    calls = install_fetcher(monkeypatch, power_raw, soil_raw)
+    monkeypatch.setattr(pipeline.soil_raster, "available", lambda: True)
+
+    def no_land(lat, lon):
+        raise pipeline.soil_raster.NoLandPixel("sea")
+
+    monkeypatch.setattr(pipeline.soil_raster, "lookup", no_land)
+    with pytest.raises(OutsidePilotRegion):
+        pipeline.get_features(32.0, -10.5)
+    assert calls == {"power": 0, "soil": 0}
+
+
+def test_raster_soil_is_used_first_and_reports_nearest_pixel(monkeypatch, power_raw, soil_raw):
+    calls = install_fetcher(monkeypatch, power_raw, soil_raw)
+    layers = [{"depth": d, "clay_pct": 30.0, "sand_pct": 30.0, "silt_pct": 40.0, "soc_g_kg": 10.0, "ph_h2o": 8.0}
+              for d in ("0-5cm", "5-15cm", "15-30cm")]
+    monkeypatch.setattr(pipeline.soil_raster, "available", lambda: True)
+    monkeypatch.setattr(pipeline.soil_raster, "fetched_at", lambda: "2026-11-14T16:00:00Z")
+    monkeypatch.setattr(pipeline.soil_raster, "lookup", lambda lat, lon: (layers, True))
+    f = pipeline.get_features(33.96, -5.27)
+    jsonschema.validate(f, SCHEMA)
+    assert calls["soil"] == 0                      # REST never called
+    assert f["soil"]["status"] == "cache" and f["soil"]["layers"] == layers
+    assert {"soil_model_estimate", "soil_nearest_pixel"} <= codes(f)
+    src = next(s for s in f["sources"] if s["id"] == "soilgrids")
+    assert src["accessed_at"] == "2026-11-14T16:00:00Z" and src["cache_status"] == "cache"
 
 
 def test_nasa_down_and_no_cache_raises(monkeypatch, power_raw, soil_raw):

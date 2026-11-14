@@ -6,8 +6,10 @@ from pathlib import Path
 
 import jsonschema
 
-from . import climatology, nasa_power, ndvi, region, soilgrids
-from .errors import UpstreamUnavailable
+import rasterio.errors
+
+from . import climatology, nasa_power, ndvi, region, soil_raster, soilgrids
+from .errors import OutsidePilotRegion, UpstreamUnavailable
 
 SCHEMA_PATH = Path(__file__).resolve().parents[1] / "docs" / "contracts" / "features.schema.json"
 
@@ -37,6 +39,8 @@ GAP_MESSAGES = {
     "root_zone_wetness_model": "Root-zone wetness is a satellite/model estimate, not a measurement in your field.",
     "soil_model_estimate": "SoilGrids values are 250 m model estimates, not a soil test; check with a "
                            "local soil analysis.",
+    "soil_nearest_pixel": "There is no soil value exactly at this point (town, water or edge pixel); the nearest "
+                          "SoilGrids pixel within about 3 km was used.",
     "soil_fallback_used": "SoilGrids could not be reached, so soil values come from a saved response for "
                           "the default point (33.96, -5.27), not for this exact location.",
     "soil_unavailable": "No soil data could be obtained (SoilGrids unreachable and no saved copy).",
@@ -64,7 +68,24 @@ def _gap(code, affects):
 
 
 def _load_soil(latitude, longitude):
-    """Return (status, layers, source_or_None). Never raises for soil problems."""
+    """Return (status, layers, source_or_None, extra gap codes).
+
+    Order: local SoilGrids rasters, then the REST service (cached), then the saved fallback.
+    Raises OutsidePilotRegion when the rasters say there is no land pixel (sea).
+    Soil problems other than that never raise."""
+    if soil_raster.available():
+        try:
+            layers, nearest = soil_raster.lookup(latitude, longitude)
+        except soil_raster.NoLandPixel:
+            raise OutsidePilotRegion(
+                f"Point {latitude}, {longitude} has no SoilGrids land pixel (sea or outside the data).")
+        except (rasterio.errors.RasterioError, OSError):
+            pass  # damaged raster: use the REST service below
+        else:
+            src = _source("soilgrids", "ISRIC SoilGrids",
+                          "SoilGrids 2.0 mean, 250 m rasters from the official WCS, local copy; 0-5/5-15/15-30 cm",
+                          "https://maps.isric.org/", soil_raster.fetched_at(), "cache")
+            return "cache", layers, src, (["soil_nearest_pixel"] if nearest else [])
     attempts = []
     try:
         got = soilgrids.fetch(latitude, longitude)
@@ -83,8 +104,8 @@ def _load_soil(latitude, longitude):
             src = _source("soilgrids", "ISRIC SoilGrids",
                           "SoilGrids 2.0 point query, mean, 0-5/5-15/15-30 cm", soilgrids.ENDPOINT,
                           fetched_at, status)
-            return status, layers, src
-    return "unavailable", [], None
+            return status, layers, src, []
+    return "unavailable", [], None, []
 
 
 def _load_vegetation(latitude, longitude):
@@ -116,6 +137,8 @@ def get_features(latitude, longitude):
         raise ValueError("latitude and longitude must be finite numbers")
     region.check_in_pilot_region(lat, lon)
 
+    soil_status, layers, soil_source, soil_codes = _load_soil(lat, lon)   # sea points stop here
+
     df, elevation, fetched_at, power_status = nasa_power.fetch_daily(lat, lon)
     monthly = climatology.monthly_climatology(df, lat, elevation)
 
@@ -131,7 +154,6 @@ def get_features(latitude, longitude):
         for t in climatology.HEAT_THRESHOLDS
     }
 
-    soil_status, layers, soil_source = _load_soil(lat, lon)
     vegetation, ndvi_source, ndvi_codes = _load_vegetation(lat, lon)
     yearly = climatology.yearly_series(df, lat, elevation)
     yearly.update({
@@ -159,6 +181,7 @@ def get_features(latitude, longitude):
         gaps.append(_gap("soil_unavailable", ["soil"]))
     else:
         gaps.append(_gap("soil_model_estimate", ["soil"]))
+        gaps += [_gap(code, ["soil"]) for code in soil_codes]
         if soil_status == "fallback":
             gaps.append(_gap("soil_fallback_used", ["soil"]))
         if any(v is None for layer in layers for v in layer.values()):
@@ -170,7 +193,7 @@ def get_features(latitude, longitude):
         "schema_version": "1.0",
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "location": {"latitude": lat, "longitude": lon,
-                     "elevation_m": None if elevation is None else round(elevation, 2), "region": "saiss"},
+                     "elevation_m": None if elevation is None else round(elevation, 2), "region": region.REGION_NAME},
         "climate": {"period": {"start_year": nasa_power.START_YEAR, "end_year": nasa_power.END_YEAR},
                     "monthly": series},
         "yearly": yearly,

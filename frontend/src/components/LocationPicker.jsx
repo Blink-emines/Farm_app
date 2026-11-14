@@ -73,10 +73,9 @@ export default function LocationPicker({ lat, lon, onChange, onFeatures, childre
       <div className="map-hero">
         <div className="map" role="application" aria-label={t('ui.map_label')}>
           <MapContainer
-            bounds={bounds}
             maxBounds={bounds}
             maxBoundsViscosity={1}
-            minZoom={9}
+            minZoom={5}
             maxZoom={17}
             center={[lat, lon]}
             zoom={12}

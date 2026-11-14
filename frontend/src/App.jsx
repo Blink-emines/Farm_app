@@ -1,11 +1,13 @@
 import { useRef, useState } from 'react';
 import { LANGS, useI18n } from './i18n/index.jsx';
+import SettingsPanel, { GearButton } from './components/SettingsPanel.jsx';
 import { ApiError, USE_MOCK, getStrategies } from './api.js';
 import { DEFAULT_POINT, buildRequest } from './constants.js';
 import LocationPicker from './components/LocationPicker.jsx';
 import RotationInput from './components/RotationInput.jsx';
 import Priorities from './components/Priorities.jsx';
 import Results from './components/Results.jsx';
+import OptimiserFlow from './components/OptimiserFlow.jsx';
 import Landing from './components/Landing.jsx';
 import PrintReport from './components/PrintReport.jsx';
 import { BrandMark } from './components/icons.jsx';
@@ -45,6 +47,8 @@ export default function App() {
   const [features, setFeatures] = useState(null);
   const [step, setStep] = useState(1);
   const [started, setStarted] = useState(false);
+  const [mode, setMode] = useState('single');
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [status, setStatus] = useState({ state: 'idle' });
   const topRef = useRef(null);
   const patch = (p) => setForm((f) => ({ ...f, ...p }));
@@ -67,12 +71,15 @@ export default function App() {
   const head = (
     <header className="app-head" ref={topRef}>
       <span className="brand"><BrandMark />{t('ui.brand')}</span>
-      <div className="lang" role="group" aria-label={t('ui.language')}>
-        {LANGS.map((l) => (
-          <button key={l.id} type="button" lang={l.id} aria-pressed={lang === l.id} onClick={() => setLang(l.id)}>
-            {l.label}
-          </button>
-        ))}
+      <div className="head-actions">
+        <div className="lang" role="group" aria-label={t('ui.language')}>
+          {LANGS.map((l) => (
+            <button key={l.id} type="button" lang={l.id} aria-label={l.label} aria-pressed={lang === l.id} onClick={() => setLang(l.id)}>
+              {l.short}
+            </button>
+          ))}
+        </div>
+        <GearButton onClick={() => setSettingsOpen(true)} />
       </div>
     </header>
   );
@@ -82,15 +89,23 @@ export default function App() {
   return (
     <>
       <div className="screen-only">
+        {settingsOpen && <SettingsPanel onClose={() => setSettingsOpen(false)} />}
         {(USE_MOCK || features?._mockExtras) && <div className="mock-banner" role="alert">{t('ui.mock_banner')}</div>}
         {!started ? (
           <Landing head={head} onStart={() => setStarted(true)} />
         ) : (
         <>
         {head}
-
+        <nav className="modes" aria-label={t('ui.mode_label')}>
+          {['single', 'optimiser'].map((m) => (
+            <button key={m} type="button" aria-pressed={mode === m} onClick={() => setMode(m)}>{t(`ui.mode_${m}`)}</button>
+          ))}
+        </nav>
         <main>
-          {!showResults && (
+          {mode === 'optimiser' && (
+            <OptimiserFlow lat={form.lat} lon={form.lon} onLocation={(lat, lon) => patch({ lat, lon })} />
+          )}
+          {mode === 'single' && !showResults && (
             <div className="wizard">
               <h1>{t('ui.title')}</h1>
               <Progress step={step} />
@@ -136,7 +151,7 @@ export default function App() {
             </div>
           )}
 
-          {showResults && (
+          {mode === 'single' && showResults && (
             <section className="results-wrap" aria-labelledby="results-h">
               <div className="results-head">
                 <h2 id="results-h">{t('ui.results_title')}</h2>

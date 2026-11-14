@@ -1,6 +1,13 @@
 # Cache: commit only the default point (33.96, -5.27) so it works offline.
+# NASA POWER entries are keyed by grid cell: the default point sits in MERRA-2 cell 34.000/-5.000
+# and 1-degree radiation cell 33.500/-5.500.
 cache/*
 !cache/.gitkeep
+!cache/*_34.000_-5.000_*
+!cache/*_33.500_-5.500_*
 !cache/*_33.96_-5.27_*.json
+# SoilGrids rasters (large; rebuild with: python -m data.download_soil)
+soil_rasters/*
+!soil_rasters/.gitkeep
 __pycache__/
 .pytest_cache/

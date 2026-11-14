@@ -12,3 +12,16 @@ Updated after each milestone.
 | 2026-11-14 | agronomy-engine | rules, calendar (cross-year bug found by lead, fixed), scorer; weights, months, flags approved by user; 47 tests pass (lead re-ran) | done | none |
 | 2026-11-14 | fullstack-dev | backend/rotation endpoints (41 Django tests pass) + React app on mocks, FR/AR screenshots reviewed | done (stage 2) | next: real data, engine message translations, unslop |
 | 2026-11-14 | qa-docs | stage 3 part 1: integration tests against the real API | in progress | e2e waits for final UI |
+
+## Handoff (2026-11-14, end of session)
+
+Done: data (all Morocco: 821 NASA cells + 15 SoilGrids rasters, local), engine (rules + MILP optimiser, Pyomo/HiGHS), API (/api/features, /api/strategies, /api/optimize), web app (landing presentation, wizard, simple + advanced results, settings/dark mode, FR/AR/EN, optimiser flow). Brand: FR "Cycle Sûr", EN "Safe Cycle", AR "دورة آمنة".
+
+Next steps:
+1. Final QA pass: fix test_features_sample_has_no_sentinel_values (water_balance can be < -999 legitimately), run e2e (tests/e2e), write tests/report.md and docs/build-summary.md.
+2. Footer: real team names + contact (team SENIME, EMINES – UM6P).
+3. Design discussion with the user; native review of FR/AR/EN text.
+4. Deployment plan (explain only, never deploy without asking).
+Decided, don't revisit: NDVI only for the default point (demo); region = rectangle box.
+
+Run: backend `cd backend && .venv/bin/python manage.py runserver`; frontend `cd frontend && npm run dev` → http://localhost:3000.

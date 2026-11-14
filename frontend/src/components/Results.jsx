@@ -6,6 +6,8 @@ import StrategyDetail from './StrategyDetail.jsx';
 import ClimateDashboard from './ClimateDashboard.jsx';
 import Compare from './Compare.jsx';
 import SoilProfile from './SoilProfile.jsx';
+import SimpleResult from './SimpleResult.jsx';
+import { useSettings } from '../settings.jsx';
 import TimeMachine from './TimeMachine.jsx';
 import SpaceView from './SpaceView.jsx';
 import WhatIf from './WhatIf.jsx';
@@ -72,18 +74,21 @@ function CompactCard({ s, onOpen }) {
   );
 }
 
-const TABS = ['options', 'climate', 'history', 'space', 'soil', 'compare', 'whatif'];
+const TABS = ['simple', 'options', 'climate', 'history', 'space', 'soil', 'compare', 'whatif'];
 
 export default function Results({ data, features, form, onPrint }) {
   const { t, tm } = useI18n();
   const [openId, setOpenId] = useState(null);
-  const [tab, setTab] = useState('options');
+  const { advanced } = useSettings();
+  const [tab, setTab] = useState('simple');
   const climate = features?.climate?.monthly;
   const fs = data.features_summary;
   const [best, ...others] = data.strategies;
   const open = data.strategies.find((s) => s.id === openId);
   const main = data.notes.filter((n) => ['note_relative_scores', 'note_local_expert'].includes(n.code));
   const rest = data.notes.filter((n) => !main.includes(n));
+
+  if (!advanced) return <SimpleResult data={data} onPrint={onPrint} />;
 
   return (
     <div className="stack results">
@@ -101,6 +106,7 @@ export default function Results({ data, features, form, onPrint }) {
       </div>
 
       <div id="tab-panel" role="tabpanel" aria-labelledby={`tab-${tab}`} className="stack">
+        {tab === 'simple' && <SimpleResult data={data} onPrint={onPrint} />}
         {tab === 'options' && (
           <>
             {fs.soil_status === 'fallback' && <p className="notice">{t('ui.soil_fallback')}</p>}

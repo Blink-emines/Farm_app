@@ -141,7 +141,7 @@ def test_crops_yaml_every_value_has_source_and_no_invented_kc():
     for cid, fields in crops.items():
         for name, e in fields.items():
             assert "value" in e and e["source"], (cid, name)
-    assert crops["vetch_oat_cover"]["kc_mid"]["value"] == UNKNOWN
+    assert crops["vetch_oat_cover"]["kc_mid"]["source"].startswith("proxy")
     assert crops["fallow"]["kc_mid"]["value"] == UNKNOWN
     for cid, f in crops.items():
         for k in ("sow_month", "harvest_month"):

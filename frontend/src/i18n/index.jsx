@@ -1,12 +1,16 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import fr from './fr.js';
 import ar from './ar.js';
+import en from './en.js';
 
-const DICTS = { fr, ar };
+const DICTS = { fr, ar, en };
 export const LANGS = [
-  { id: 'fr', label: 'Français' },
-  { id: 'ar', label: 'العربية' },
+  { id: 'fr', label: 'Français', short: 'FR' },
+  { id: 'ar', label: 'العربية', short: 'AR' },
+  { id: 'en', label: 'English', short: 'EN' },
 ];
+const NUMBER_LOCALE = { fr: 'fr-FR', ar: 'fr-FR', en: 'en-US' }; // Latin digits in Arabic too
+const DATE_LOCALE = { fr: 'fr-FR', ar: 'ar-MA-u-nu-latn', en: 'en-GB' };
 
 const Ctx = createContext(null);
 
@@ -57,6 +61,7 @@ export function LangProvider({ children }) {
 
   useEffect(() => {
     document.documentElement.lang = lang;
+    document.title = DICTS[lang]['ui.brand'];
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
   }, [lang]);
 
@@ -64,6 +69,8 @@ export function LangProvider({ children }) {
     const dict = DICTS[lang];
     return {
       lang,
+      num: (n) => new Intl.NumberFormat(NUMBER_LOCALE[lang]).format(Math.round(n)).replace(/\s/g, '\u202f'),
+      date: (d) => d.toLocaleDateString(DATE_LOCALE[lang], { dateStyle: 'long' }),
       setLang(next) {
         setLangState(next);
         try { localStorage.setItem('lang', next); } catch { /* storage may be blocked */ }
@@ -75,6 +82,7 @@ export function LangProvider({ children }) {
       crop: (id) => dict[`crop.${id}`] ?? id,
       month: (n) => dict[`month.${n}`] ?? String(n),
       gap: (g) => dict[`gap.${g.code}`] ?? g.message,
+      seq: (s) => String(s).replace(/[a-z_]+/g, (w) => dict[`crop.${w}`] ?? w).replace(/ > /g, ' \u2192 '),
       feature: (path) => featureLabel(path, dict, (id) => dict[`crop.${id}`] ?? id),
       value: (v) => (typeof v === 'string' ? dict[`val.${v}`] ?? v : v),
       unit: (u) => dict[`unit.${u}`] ?? u,

@@ -1,0 +1,260 @@
+# Generated from the FAOSTAT bulk files on 2026-11-14 (not hand-typed). Every number has a source and year.
+status: editable default (FAOSTAT national values, Morocco); the farmer may override any value
+currency: MAD
+sources:
+  prices:
+    name: FAOSTAT Producer Prices (domain PP)
+    element: Producer Price (LCU/tonne)
+    unit: MAD per tonne
+    url: https://bulks-faostat.fao.org/production/Prices_E_All_Data_(Normalized).zip
+    accessed: '2026-11-14'
+    default_year: 2024
+  yields:
+    name: FAOSTAT Crops and livestock products (domain QCL)
+    element: Yield
+    unit: kg/ha converted to t/ha
+    url: https://bulks-faostat.fao.org/production/Production_Crops_Livestock_E_All_Data_(Normalized).zip
+    accessed: '2026-11-14'
+    years: 2015-2024
+notes:
+- National averages, not specific to the Saiss or to rainfed fields.
+- 'No Moroccan cost-of-production per hectare source was found: costs stay unknown, so profit is shown only when the farmer enters costs.'
+- olive_intercrop revenue is the olive crop only; the intercrop under the trees is not included.
+crops:
+  wheat:
+    price_mad_per_t:
+      value: 4337.5
+      source: FAOSTAT PP, Morocco, item 'Wheat' (code 15), Producer Price (LCU/tonne), 2024, flag A=official figure
+      editable: editable default
+      series_2019_2024:
+        '2019': 2340.0
+        '2020': 2570.0
+        '2021': 2800.0
+        '2022': 4056.5
+        '2023': 3909.6
+        '2024': 4337.5
+    yield_t_per_ha:
+      mean: 1.762
+      min: 0.9
+      max: 2.634
+      min_year: 2020
+      max_year: 2021
+      source: FAOSTAT QCL, Morocco, item 'Wheat', Yield, mean/min/max of 10 years 2015-2024
+      editable: editable default
+    cost_mad_per_ha:
+      value: unknown, needs local data
+      source: no Moroccan cost-of-production source found
+      editable: editable default
+  barley:
+    price_mad_per_t:
+      value: 4540.0
+      source: FAOSTAT PP, Morocco, item 'Barley' (code 44), Producer Price (LCU/tonne), 2024, flag A=official figure
+      editable: editable default
+      series_2019_2024:
+        '2019': 1995.0
+        '2020': 2350.0
+        '2021': 2600.0
+        '2022': 3770.0
+        '2023': 3465.0
+        '2024': 4540.0
+    yield_t_per_ha:
+      mean: 1.132
+      min: 0.431
+      max: 1.867
+      min_year: 2020
+      max_year: 2021
+      source: FAOSTAT QCL, Morocco, item 'Barley', Yield, mean/min/max of 10 years 2015-2024
+      editable: editable default
+    cost_mad_per_ha:
+      value: unknown, needs local data
+      source: no Moroccan cost-of-production source found
+      editable: editable default
+  chickpea:
+    price_mad_per_t:
+      value: 15409.0
+      source: FAOSTAT PP, Morocco, item 'Chick peas, dry' (code 191), Producer Price (LCU/tonne), 2024, flag A=official figure
+      editable: editable default
+      series_2019_2024:
+        '2019': 10628.0
+        '2020': 8041.1
+        '2021': 7615.0
+        '2022': 9266.0
+        '2023': 13800.0
+        '2024': 15409.0
+    yield_t_per_ha:
+      mean: 0.777
+      min: 0.418
+      max: 1.144
+      min_year: 2018
+      max_year: 2021
+      source: FAOSTAT QCL, Morocco, item 'Chick peas, dry', Yield, mean/min/max of 10 years 2015-2024
+      editable: editable default
+    cost_mad_per_ha:
+      value: unknown, needs local data
+      source: no Moroccan cost-of-production source found
+      editable: editable default
+  lentil:
+    price_mad_per_t:
+      value: 15247.0
+      source: FAOSTAT PP, Morocco, item 'Lentils, dry' (code 201), Producer Price (LCU/tonne), 2024, flag A=official figure
+      editable: editable default
+      series_2019_2024:
+        '2019': 7038.0
+        '2020': 6782.7
+        '2021': 8856.0
+        '2022': 8124.0
+        '2023': 13550.0
+        '2024': 15247.0
+    yield_t_per_ha:
+      mean: 0.569
+      min: 0.183
+      max: 1.099
+      min_year: 2023
+      max_year: 2015
+      source: FAOSTAT QCL, Morocco, item 'Lentils, dry', Yield, mean/min/max of 10 years 2015-2024
+      editable: editable default
+    cost_mad_per_ha:
+      value: unknown, needs local data
+      source: no Moroccan cost-of-production source found
+      editable: editable default
+  faba_bean:
+    price_mad_per_t:
+      value: 9920.0
+      source: FAOSTAT PP, Morocco, item 'Broad beans and horse beans, dry' (code 181), Producer Price (LCU/tonne), 2024, flag A=official figure
+      editable: editable default
+      series_2019_2024:
+        '2019': 4207.0
+        '2020': 4369.7
+        '2021': 5000.0
+        '2022': 6298.0
+        '2023': 8710.0
+        '2024': 9920.0
+    yield_t_per_ha:
+      mean: 0.652
+      min: 0.321
+      max: 1.25
+      min_year: 2016
+      max_year: 2021
+      source: FAOSTAT QCL, Morocco, item 'Broad beans and horse beans, dry', Yield, mean/min/max of 10 years 2015-2024
+      editable: editable default
+    cost_mad_per_ha:
+      value: unknown, needs local data
+      source: no Moroccan cost-of-production source found
+      editable: editable default
+  sunflower:
+    price_mad_per_t:
+      value: 11407.0
+      source: FAOSTAT PP, Morocco, item 'Sunflower seed' (code 267), Producer Price (LCU/tonne), 2024, flag A=official figure
+      editable: editable default
+      series_2019_2024:
+        '2019': 5564.0
+        '2020': 5700.0
+        '2021': 5833.0
+        '2022': 6482.0
+        '2023': 11185.0
+        '2024': 11407.0
+    yield_t_per_ha:
+      mean: 1.364
+      min: 0.795
+      max: 1.934
+      min_year: 2016
+      max_year: 2024
+      source: FAOSTAT QCL, Morocco, item 'Sunflower seed', Yield, mean/min/max of 10 years 2015-2024
+      editable: editable default
+    cost_mad_per_ha:
+      value: unknown, needs local data
+      source: no Moroccan cost-of-production source found
+      editable: editable default
+  potato:
+    price_mad_per_t:
+      value: 3856.2
+      source: FAOSTAT PP, Morocco, item 'Potatoes' (code 116), Producer Price (LCU/tonne), 2024, flag A=official figure
+      editable: editable default
+      series_2019_2024:
+        '2019': 2085.0
+        '2020': 2100.0
+        '2021': 2268.0
+        '2022': 2720.7
+        '2023': 3228.0
+        '2024': 3856.2
+    yield_t_per_ha:
+      mean: 30.909
+      min: 29.337
+      max: 32.819
+      min_year: 2016
+      max_year: 2022
+      source: FAOSTAT QCL, Morocco, item 'Potatoes', Yield, mean/min/max of 10 years 2015-2024
+      editable: editable default
+    cost_mad_per_ha:
+      value: unknown, needs local data
+      source: no Moroccan cost-of-production source found
+      editable: editable default
+  olive_intercrop:
+    price_mad_per_t:
+      value: 11100.0
+      source: FAOSTAT PP, Morocco, item 'Olives' (code 260), Producer Price (LCU/tonne), 2024, flag A=official figure
+      editable: editable default
+      series_2019_2024:
+        '2019': 4498.0
+        '2020': 5241.0
+        '2021': 5107.0
+        '2022': 6266.0
+        '2023': 8686.0
+        '2024': 11100.0
+    yield_t_per_ha:
+      mean: 1.296
+      min: 0.852
+      max: 1.781
+      min_year: 2023
+      max_year: 2019
+      source: FAOSTAT QCL, Morocco, item 'Olives', Yield, mean/min/max of 10 years 2015-2024
+      editable: editable default
+    cost_mad_per_ha:
+      value: unknown, needs local data
+      source: no Moroccan cost-of-production source found
+      editable: editable default
+  alfalfa:
+    price_mad_per_t:
+      value: unknown, needs local data
+      source: FAOSTAT Morocco has no producer price for lucerne/alfalfa
+      editable: editable default
+    yield_t_per_ha:
+      mean: unknown, needs local data
+      min: unknown, needs local data
+      max: unknown, needs local data
+      source: FAOSTAT Morocco has no producer price for lucerne/alfalfa
+      editable: editable default
+    cost_mad_per_ha:
+      value: unknown, needs local data
+      source: no Moroccan cost-of-production source found
+      editable: editable default
+  vetch_oat_cover:
+    price_mad_per_t:
+      value: unknown, needs local data
+      source: FAOSTAT Morocco has a vetch yield but no vetch producer price
+      editable: editable default
+    yield_t_per_ha:
+      mean: unknown, needs local data
+      min: unknown, needs local data
+      max: unknown, needs local data
+      source: FAOSTAT Morocco has a vetch yield but no vetch producer price
+      editable: editable default
+    cost_mad_per_ha:
+      value: unknown, needs local data
+      source: no Moroccan cost-of-production source found
+      editable: editable default
+  fallow:
+    price_mad_per_t:
+      value: 0
+      source: no crop
+      editable: editable default
+    yield_t_per_ha:
+      mean: unknown, needs local data
+      min: unknown, needs local data
+      max: unknown, needs local data
+      source: no crop
+      editable: editable default
+    cost_mad_per_ha:
+      value: unknown, needs local data
+      source: no Moroccan cost-of-production source found
+      editable: editable default

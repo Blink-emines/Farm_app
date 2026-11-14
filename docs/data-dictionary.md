@@ -8,13 +8,25 @@ contract is `docs/contracts/features.schema.json`.
 
 | Source | What we use | Link |
 |--------|-------------|------|
-| NASA POWER, daily point API, `community=AG` | 20 years (2005-2024) of daily weather for the point | https://power.larc.nasa.gov/docs/services/api/temporal/daily/ |
+| NASA POWER, daily point API, `community=AG` | 20 years (2005-2024) of daily weather for the point's grid cell | https://power.larc.nasa.gov/docs/services/api/temporal/daily/ |
+| NASA MODIS MOD13Q1 NDVI via the ORNL DAAC MODIS web service | Satellite greenness of the point, 250 m, every 16 days | https://modis.ornl.gov/rst/api/v1/ |
 | NASA POWER parameter list | Meaning of each parameter | https://power.larc.nasa.gov/parameters/ |
-| ISRIC SoilGrids 2.0, point query | Clay, sand, silt, organic carbon, pH at 3 depths | https://rest.isric.org/soilgrids/v2.0/docs |
+| ISRIC SoilGrids 2.0, official WCS (rasters) | Clay, sand, silt, organic carbon, pH at 3 depths, 250 m | https://maps.isric.org/ |
+| ISRIC SoilGrids 2.0, REST point query | Backup only, used when the local rasters are missing | https://rest.isric.org/soilgrids/v2.0/docs |
 | FAO Irrigation and Drainage Paper 56 (Allen et al., 1998) | Reference ET formula | https://www.fao.org/4/x0490e/x0490e00.htm |
+
+**Region: all of Morocco**, box latitude 20.70 to 35.95, longitude -17.20 to
+-0.95 (as defined by the user). A point outside the box, or inside it but over the
+sea (no SoilGrids land pixel), is rejected as `outside_pilot_region`. No political
+boundary file is used, so a point in Algeria or Mauritania that falls inside the
+box is accepted: the box is the definition.
 
 Coordinates are rounded to 2 decimals (about 1 km). Every raw response is saved
 in `data/cache/`, so an identical request is never sent twice.
+
+**Everything is pre-downloaded on the server** so farmers never trigger an outside
+request: NASA POWER cells with `python -m data.bulk_download`, SoilGrids rasters
+with `python -m data.download_soil`, NDVI per point with `python -m data.ndvi LAT LON`.
 
 ## 2. NASA POWER parameters (verified)
 
@@ -42,13 +54,49 @@ Notes:
   in the response header). We turn it into "no data" immediately; `-999` never
   reaches the output. A month with no valid data is `null`, never 0.
 - **Elevation** is the third coordinate of the response geometry (metres). It is
-  the elevation of the NASA grid cell, not of your field.
+  the mean elevation of the NASA grid cell, not of your field (for example 575 m
+  for the Saïss cell, 1700 m for a cell in the High Atlas).
+
+### NASA grid cells (verified by probing the live API)
+
+Two points in the same cell return identical numbers, and the numbers jump at the
+cell edge. Probing a line of points across the Saïss showed two grids:
+
+| Parameters | Grid (source) | Cell edges |
+|------------|---------------|------------|
+| `T2M`, `T2M_MAX`, `T2M_MIN`, `PRECTOTCORR`, `RH2M`, `WS2M`, `GWETROOT` | 0.5 deg latitude x 0.625 deg longitude (MERRA-2), about 55 x 58 km | latitude x.25 and x.75; longitude (k + 0.5) x 0.625 |
+| `ALLSKY_SFC_SW_DWN` | 1 x 1 degree (SYN1DEG), about 100 km | whole degrees |
+
+Cell centres are at multiples of 0.5 / 0.625 degrees (MERRA-2) and at x.5 (radiation).
+A point exactly on an edge belongs to the cell to the north or east. The cache is
+keyed by cell: the request is sent at the cell centre, so every point in the cell
+shares one file. Each point therefore needs two cache entries (a MERRA-2 cell and a
+radiation cell). The Saïss default point sits in MERRA-2 cell 34.0 N / -5.0 E and
+radiation cell 33.5 N / -5.5 E. Two points in the same cell still get slightly
+different ET0 because the sun geometry (extraterrestrial radiation) depends on the
+exact latitude.
+
+Bulk download: land cells are found from the SoilGrids clay raster (2 km blocks with
+any land pixel). Requests are sequential with a 0.5 s pause, resumable (cells already
+cached are skipped) and gzip-compressed (about 0.2 MB per MERRA-2 cell instead of 1 MB).
 
 ## 3. SoilGrids properties and unit conversion (verified)
 
 SoilGrids returns whole numbers in "mapped units" and tells us a `d_factor`.
-Value in conventional units = mapped value / `d_factor` (the code reads the
-factor from each response and checks the target unit).
+Value in conventional units = mapped value / `d_factor`.
+
+**Main path: local rasters.** `python -m data.download_soil` downloads 15 GeoTIFFs
+(5 properties x 3 depths, statistic `mean`, 250 m) for the Morocco box from the
+official ISRIC WCS (`maps.isric.org`, coverage `<property>_<depth>_mean`, native
+Interrupted Goode Homolosine grid, EPSG:152160). A point is looked up locally; the
+values were checked against the REST service at the default point (clay 361 =
+36.1 %). The WCS marks sea and other no-data pixels with 0 (no nodata flag is set),
+so 0 means "no data": in one layer it becomes `null`; if the pixel in the surface
+clay layer is empty the nearest valid pixel within about 3 km is used (SoilGrids masks built-up areas: the centres of Casablanca and Marrakech have no pixel of their own)
+(`soil_nearest_pixel`); if there is none the point is sea and is rejected.
+Rasters are large and not committed. **Backup path:** the REST point query (cached),
+then `data/fallback/saiss_soil.json`; the REST response reports its own `d_factor` and
+target unit, and the code checks them.
 
 | SoilGrids name | Mapped unit | d_factor | Conventional unit (features.json) | Example (0-5 cm, default point) |
 |----------------|-------------|----------|-----------------------------------|---------------------------------|
@@ -78,6 +126,31 @@ complete years 2005-2024.
 Sums and day counts are only used for months where every day has data; a year
 with a gap in that month is skipped for that month. Heat-day and frost-day
 averages over 20 years move in steps of 0.05 days.
+
+### Year-by-year values (`yearly`)
+
+From the same daily data, for each of the 20 years: annual rain (mm/year), annual
+ET0, water balance (rain minus ET0), frost days (daily minimum below 0 °C), days
+above 35 °C, and 12 monthly rain totals. A year with a missing day in the variable
+needed is `null`. Use it to see drought years: for the default point 2010 had about
+1340 mm of rain, 2023 about 310 mm.
+
+### Vegetation greenness (`vegetation`, NASA MODIS NDVI)
+
+Product: MOD13Q1, 250 m, 16-day composites, through the ORNL DAAC MODIS web service
+(`/MOD13Q1/subset`, no key). Verified from the service's band list: band
+`250m_16_days_NDVI`, scale factor 0.0001, valid range -2000 to 10000, fill value
+-3000; band `250m_16_days_pixel_reliability` (0 good, 1 marginal, 2 snow/ice, 3
+cloudy, -1 fill). We keep a value only if it is not the fill value, is inside the
+valid range, and its pixel reliability is 0 or 1; then NDVI = value x 0.0001. One
+pixel (the one containing the point) is used. The service allows 10 dates per
+request and takes about 1 minute per request, so a point needs 24 requests
+(12 date blocks x 2 bands) for 5 years. A composite counts for the month of its
+mid-point (start date + 8 days). `ndvi_monthly` is the average over **2020-2024**
+(5 years, not 20, because of the request count); `recent` is the monthly series of the
+last complete year (2024). Because the service is slow, `get_features` reads NDVI
+from the cache only; run `python -m data.ndvi LAT LON` once per point to download it.
+Without it, `vegetation.status` is `unavailable` and the gap `ndvi_not_cached` appears.
 
 ## 5. FAO-56 Penman-Monteith, as implemented (`data/et0.py`)
 
@@ -142,6 +215,16 @@ fraction of what the soil can hold, not millimetres of water, and it is an
 estimate from a model fed by satellites. A day of 0.5 does not mean your field
 is at 50 %: use it only to compare seasons and months.
 
+**NDVI (how green the field looks from space).** A satellite measures how much red
+and near-infrared light the ground reflects. Healthy green plants absorb red light
+and reflect near-infrared, so the ratio gives a number: close to 0 or below for bare
+soil, rock, water or snow, about 0.2 to 0.4 for sparse or dry vegetation, 0.6 to 0.9
+for dense green crops or forest. Through the year, a winter cereal field rises in
+winter and spring and falls when it dries and is harvested; a fallow field stays
+low. Clouds and haze are filtered out, and the pixel is 250 m wide, so it mixes the
+crop with anything else inside it (trees, tracks, bare patches). It shows how green
+the area looks, not the yield.
+
 **Satellite/model data versus ground data.** A weather station measures at one
 spot. NASA POWER combines satellite observations and weather models to estimate
 conditions for every grid cell of the Earth, about 50 km wide here. It is
@@ -160,10 +243,15 @@ its `code`. Messages below are the English `message` values the pipeline emits.
 |------|------|---------|-----------------|
 | `climate_coarse_grid` | always | `climate` | NASA POWER is satellite/model data on a coarse grid (about 50 km), so all fields in the same cell get the same climate. It is not a weather-station record. |
 | `root_zone_wetness_model` | always | `climate.monthly.root_zone_wetness` | Root-zone wetness is a satellite/model estimate, not a measurement in your field. |
-| `soil_model_estimate` | whenever soil data is present (live, cache or fallback) | `soil` | SoilGrids values are 250 m model estimates, not a soil test; check with a local soil analysis. |
+| `soil_model_estimate` | whenever soil data is present (raster, REST or fallback) | `soil` | SoilGrids values are 250 m model estimates, not a soil test; check with a local soil analysis. |
 | `soil_fallback_used` | SoilGrids unreachable, saved default-point response used | `soil` | SoilGrids could not be reached, so soil values come from a saved response for the default point (33.96, -5.27), not for this exact location. |
 | `soil_unavailable` | SoilGrids unreachable and no usable fallback (`soil.status` = `unavailable`, `layers` empty) | `soil` | No soil data could be obtained (SoilGrids unreachable and no saved copy). |
 | `soil_missing_values` | some soil property or depth is `null` | `soil.layers` | SoilGrids has no value for some soil properties or depths at this point. |
+| `soil_nearest_pixel` | no soil value exactly at the point; nearest valid SoilGrids pixel within about 3 km used | `soil` | There is no soil value exactly at this point (town, water or edge pixel); the nearest SoilGrids pixel within about 3 km was used. |
+| `ndvi_unavailable` | the MODIS service failed or no valid NDVI value exists (`vegetation.status` = `unavailable`, values null) | `vegetation` | Satellite greenness (NDVI) could not be obtained from the NASA MODIS service; NDVI values are empty (null). |
+| `ndvi_not_cached` | NDVI for this point has not been downloaded yet (`vegetation.status` = `unavailable`) | `vegetation` | Satellite greenness (NDVI) for this point has not been downloaded yet (the NASA MODIS service is slow), so NDVI values are empty (null). |
+| `ndvi_coarse_note` | whenever NDVI is present | `vegetation` | NDVI comes from a 250 m satellite pixel that may mix crops, trees and bare soil, with cloudy observations removed; it shows how green the area looks, not your exact field. |
+| `ndvi_short_period` | whenever NDVI is present (period shorter than 20 years) | `vegetation` | NDVI is averaged over only 5 years (2020-2024) because the NASA MODIS service is slow, so it is less stable than the 20-year climate values. |
 | `climate_missing_values` | some daily NASA values were missing (`-999`) | the affected `climate.monthly.*` paths | Some daily NASA POWER values were missing; affected months were averaged from fewer days or are empty (null). |
 
 Not a gap but worth knowing: if NASA POWER cannot be reached and the point is not
