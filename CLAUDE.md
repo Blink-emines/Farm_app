@@ -63,3 +63,15 @@ Run from `backend/` (first time: `python3 -m venv .venv`, then copy
 | Run tests                     | `.venv/bin/python manage.py test`                |
 | Create an admin login         | `.venv/bin/python manage.py createsuperuser`     |
 | Start the server (admin at http://127.0.0.1:8000/admin/) | `.venv/bin/python manage.py runserver` |
+
+### API endpoints
+
+All need the header `Authorization: Bearer <access token>` except the first three.
+
+| Endpoint                    | What it does                                        |
+|-----------------------------|-----------------------------------------------------|
+| `POST /api/register/`       | Sign up (`username`, `password`)                    |
+| `POST /api/token/`          | Log in → `access` + `refresh` tokens                |
+| `POST /api/token/refresh/`  | Swap a `refresh` token for a new `access` token     |
+| `/api/fields/`              | List / create / edit / delete your own fields       |
+| `GET /api/measurements/`    | Read weather measurements of your own fields        |
