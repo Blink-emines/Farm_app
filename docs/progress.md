@@ -18,7 +18,7 @@ Updated after each milestone.
 Done: data (all Morocco: 821 NASA cells + 15 SoilGrids rasters, local), engine (rules + MILP optimiser, Pyomo/HiGHS), API (/api/features, /api/strategies, /api/optimize), web app (landing presentation, wizard, simple + advanced results, settings/dark mode, FR/AR/EN, optimiser flow). Brand: FR "Cycle Sûr", EN "Safe Cycle", AR "دورة آمنة".
 
 Next steps:
-1. Final QA pass: fix test_features_sample_has_no_sentinel_values (water_balance can be < -999 legitimately), run e2e (tests/e2e), write tests/report.md and docs/build-summary.md.
+1. DONE: final QA pass (261 Python + 49 Django tests pass); tests/report.md and docs/build-summary.md written (commit b30c12f).
 2. Footer: real team names + contact (team SENIME, EMINES – UM6P).
 3. Design discussion with the user; native review of FR/AR/EN text.
 4. Deployment plan (explain only, never deploy without asking).
