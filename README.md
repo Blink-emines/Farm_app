@@ -95,6 +95,40 @@ npm run dev                               # app on http://localhost:3000
 
 See [`tests/report.md`](tests/report.md): 261 Python tests and 49 Django tests pass.
 
+## Deploy (Docker)
+
+On any server with Docker and Docker Compose:
+
+```bash
+git clone https://github.com/Blink-emines/Farm_app.git && cd Farm_app
+cp .env.example backend/.env
+# edit backend/.env:
+#   DJANGO_SECRET_KEY=<python -c "import secrets; print(secrets.token_urlsafe(50))">
+#   DJANGO_DEBUG=False
+#   DJANGO_ALLOWED_HOSTS=your-domain.com,your-server-ip
+docker compose up -d --build
+```
+
+The app is served on port 80: nginx serves the React build and forwards `/api` to
+Django (gunicorn).
+
+### Data files (required for points other than the default)
+
+The NASA weather cache (~130 MB) and the SoilGrids rasters (~330 MB) are too big for
+git. Either copy them from a teammate into `data/cache/` and `data/soil_rasters/`,
+or rebuild them (takes a long time):
+
+```bash
+python data/bulk_download.py
+python data/download_soil.py
+```
+
+Both folders are mounted into the container, so there's no need to rebuild after
+adding data.
+
+> Note: user accounts are stored in SQLite inside the container and are reset when
+> the backend image is rebuilt. Fine for a demo; use a real database for production.
+
 ## Limitations
 
 - NASA's grid is about 50 km wide, so it smooths out cold valleys and frost is underestimated.

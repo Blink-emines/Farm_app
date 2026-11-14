@@ -1,0 +1,20 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: deploy/backend.Dockerfile
+    env_file: backend/.env
+    volumes:
+      - ./data/cache:/app/data/cache
+      - ./data/soil_rasters:/app/data/soil_rasters
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: deploy/frontend.Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
