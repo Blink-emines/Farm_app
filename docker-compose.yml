@@ -3,6 +3,11 @@ services:
     build:
       context: .
       dockerfile: deploy/backend.Dockerfile
+    # All backend settings come from backend/.env, including DATABASE_URL
+    # (Supabase Postgres). Without DATABASE_URL the container falls back to a
+    # SQLite file inside the container, which is lost on rebuild.
+    # Do not repeat DATABASE_URL under "environment:" with ${DATABASE_URL}: Compose
+    # reads that from the root .env, not backend/.env, and would override it with "".
     env_file: backend/.env
     volumes:
       - ./data/cache:/app/data/cache

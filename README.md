@@ -106,8 +106,14 @@ cp .env.example backend/.env
 #   DJANGO_SECRET_KEY=<python -c "import secrets; print(secrets.token_urlsafe(50))">
 #   DJANGO_DEBUG=False
 #   DJANGO_ALLOWED_HOSTS=your-domain.com,your-server-ip
+#   DATABASE_URL=<Supabase session-pooler URI>   (see docs/supabase-setup.md)
 docker compose up -d --build
 ```
+
+The database is Supabase Postgres when `DATABASE_URL` is set in `backend/.env`;
+the container runs `migrate` on start, so tables and row-level security are
+created automatically. Without `DATABASE_URL` it uses SQLite inside the container,
+which is lost when the container is rebuilt, so always set it on a server.
 
 The app is served on port 80: nginx serves the React build and forwards `/api` to
 Django (gunicorn).

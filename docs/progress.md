@@ -12,6 +12,7 @@ Updated after each milestone.
 | 2026-11-14 | agronomy-engine | rules, calendar (cross-year bug found by lead, fixed), scorer; weights, months, flags approved by user; 47 tests pass (lead re-ran) | done | none |
 | 2026-11-14 | fullstack-dev | backend/rotation endpoints (41 Django tests pass) + React app on mocks, FR/AR screenshots reviewed | done (stage 2) | next: real data, engine message translations, unslop |
 | 2026-11-14 | qa-docs | stage 3 part 1: integration tests against the real API | in progress | e2e waits for final UI |
+| 2026-11-15 | lead | Supabase Postgres support: psycopg, DATABASE_URL in settings, RLS migration, docs/supabase-setup.md; 49 Django tests pass on SQLite and on Postgres 16; sign-up + field save checked on Postgres | done (code) | migrate on Supabase needs the user's DATABASE_URL; farms_result is never written and the web app has no login screen (scope decision) |
 
 ## Handoff (2026-11-14, end of session)
 

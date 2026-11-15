@@ -13,7 +13,9 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 import os
 import sys
 from pathlib import Path
+from urllib.parse import unquote, urlparse
 
+from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -97,12 +99,44 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+def _postgres_from_url(url):
+    """Turn postgresql://user:password@host:port/dbname into Django settings.
+
+    Parsed with the standard library so no extra package is needed. The user and
+    password are URL-decoded, so special characters in the password work if they
+    are percent-encoded in the URL.
+    """
+    parts = urlparse(url)
+    if parts.scheme not in ('postgres', 'postgresql'):
+        raise ImproperlyConfigured('DATABASE_URL must start with postgresql://')
+    return {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': unquote(parts.path.lstrip('/')) or 'postgres',
+        'USER': unquote(parts.username or ''),
+        'PASSWORD': unquote(parts.password or ''),
+        'HOST': parts.hostname or '',
+        'PORT': str(parts.port or 5432),
+        # Keep a connection open for 60 s instead of reconnecting on every request.
+        'CONN_MAX_AGE': 60,
+        'CONN_HEALTH_CHECKS': True,
+        # Supabase only accepts encrypted connections.
+        'OPTIONS': {'sslmode': 'require'},
     }
-}
+
+
+# DATABASE_URL set (Supabase session pooler) -> Postgres.
+# Not set -> local SQLite file, so tests and local dev work without Supabase.
+DATABASE_URL = os.environ.get('DATABASE_URL', '').strip()
+
+if DATABASE_URL:
+    DATABASES = {'default': _postgres_from_url(DATABASE_URL)}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation
