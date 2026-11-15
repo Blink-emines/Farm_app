@@ -387,6 +387,12 @@ export default function Landing({ head, onStart }) {
   const [touring, setTouring] = useState(false);
   const canTour = typeof window !== 'undefined' && !reduced();
 
+  // Always open at the top: stop the browser restoring an old scroll position.
+  useEffect(() => {
+    if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
+    window.scrollTo(0, 0);
+  }, []);
+
   // Which section is on screen, from the scroll position (sections taller than the screen still count).
   const currentIndex = () => {
     const y = window.innerHeight * 0.4;

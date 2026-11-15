@@ -758,3 +758,7 @@ div.chart-key ul { list-style: none; padding: 0; display: flex; flex-wrap: wrap;
 .dash-now { display: inline-flex; align-items: center; gap: 4px; color: var(--muted); font-size: 14px; margin-inline-start: auto; margin-inline-end: 12px; }
 
 .opt-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-l); padding: 16px; display: grid; gap: 16px; }
+
+/* Bigger logo on the landing page */
+.hero-s .brand { font-size: var(--text-l); gap: 12px; }
+.hero-s .brand svg { inline-size: 48px; block-size: 48px; }
