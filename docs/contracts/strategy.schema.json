@@ -87,6 +87,10 @@
         "allowed_crops": {
           "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/cropId" },
           "description": "Optional. Crops the farmer can get locally. Alternatives that use any other crop (fallow excepted) are not proposed. The current rotation is always scored."
+        },
+        "required_crop": {
+          "$ref": "#/$defs/cropId",
+          "description": "Optional. One crop that must appear in every proposed alternative. Candidates are the templates that contain it plus generated two-year rotations 'required then X' for every other allowed crop (or every crop when allowed_crops is absent), scored by the same rules."
         }
       }
     },
@@ -123,7 +127,8 @@
       "additionalProperties": false,
       "required": [
         "id", "name", "is_current", "rank", "score", "seasons", "calendar", "why",
-        "evidence", "benefits", "information_gaps", "risks_for_local_review", "confidence", "soil_steps"
+        "evidence", "benefits", "information_gaps", "risks_for_local_review", "confidence", "soil_steps",
+        "action_steps", "facts"
       ],
       "properties": {
         "id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
@@ -198,6 +203,53 @@
               "season_index": { "type": "integer", "minimum": 0 },
               "points": { "type": "number" },
               "rules": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        },
+        "action_steps": {
+          "type": "array",
+          "description": "What to do, in timeline order (rows start at the first sowing). Each step comes from the calendar and names the engine rule or module it comes from; message is the short reason.",
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["months", "action", "crop_id", "rule_id", "message"],
+            "properties": {
+              "months": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/month" } },
+              "action": { "enum": ["sow", "harvest", "watch_water", "cover_bare", "avoid"] },
+              "crop_id": { "anyOf": [{ "$ref": "#/$defs/cropId" }, { "type": "null" }] },
+              "rule_id": { "type": ["string", "null"] },
+              "message": { "$ref": "#/$defs/message" }
+            }
+          }
+        },
+        "facts": {
+          "type": "object", "additionalProperties": false,
+          "required": ["water_need_mm_per_year", "dry_months_per_year", "soil_points", "return"],
+          "properties": {
+            "water_need_mm_per_year": { "type": ["number", "null"], "description": "Sum of Kc_mid x ET0 over growing months per year (FAO-56); null if a value is unknown." },
+            "dry_months_per_year": { "type": "number" },
+            "soil_points": { "type": "number", "description": "Sum of soil_steps points (relative)." },
+            "return": {
+              "type": "object", "additionalProperties": false, "required": ["crops", "relative_to_current"],
+              "properties": {
+                "crops": {
+                  "type": "array",
+                  "items": {
+                    "type": "object", "additionalProperties": false, "required": ["crop_id", "yield_t_per_ha", "source"],
+                    "properties": {
+                      "crop_id": { "$ref": "#/$defs/cropId" },
+                      "yield_t_per_ha": {
+                        "anyOf": [{ "type": "null" }, {
+                          "type": "object", "additionalProperties": false, "required": ["min", "mean", "max"],
+                          "properties": { "min": { "type": "number" }, "mean": { "type": "number" }, "max": { "type": "number" } }
+                        }],
+                        "description": "Typical national range (estimate, not a prediction for the field); null when no reliable source."
+                      },
+                      "source": { "type": ["string", "null"] }
+                    }
+                  }
+                },
+                "relative_to_current": { "enum": ["current", "more", "similar", "less"], "description": "From the income_flag rule points compared with the current rotation (qualitative)." }
+              }
             }
           }
         }

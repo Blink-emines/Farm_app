@@ -215,6 +215,11 @@ def make_strategy(strategy_id, rank, total, is_current=False, seasons=None):
         "risks_for_local_review": [_msg("risk_example")],
         "confidence": "medium",
         "soil_steps": [{"season_index": i, "points": 0.0, "rules": []} for i in range(len(seasons))],
+        "action_steps": [{"months": [11], "action": "sow", "crop_id": "wheat", "rule_id": "season_calendar",
+                          "message": _msg("step_sow_why")}],
+        "facts": {"water_need_mm_per_year": 300, "dry_months_per_year": 1.0, "soil_points": 0.0,
+                  "return": {"crops": [{"crop_id": "wheat", "yield_t_per_ha": {"min": 0.9, "mean": 1.76, "max": 2.63},
+                                        "source": "FAOSTAT"}], "relative_to_current": "current"}},
     }
 
 

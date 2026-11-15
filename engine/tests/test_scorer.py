@@ -200,3 +200,60 @@ def test_too_few_local_crops_shows_all_alternatives_with_a_note(features_mock, r
 
 def test_without_allowed_crops_nothing_is_filtered(features_mock, request_default):
     assert "note_allowed_crops" not in [n["code"] for n in score(features_mock, request_default)["notes"]]
+
+
+STEP_SOURCES = {"season_calendar", "water_demand_match", "bare_months_penalty", "family_break"}
+
+
+def _with_current(request_default, seasons):
+    return dict(request_default, current_rotation={"seasons": seasons})
+
+
+def test_action_steps_follow_the_timeline(features_mock, request_default):
+    body = _with_current(request_default, [{"crop_id": "wheat"}, {"crop_id": "fallow"}])
+    cur = next(s for s in score(features_mock, body)["strategies"] if s["is_current"])
+    actions = [(st["action"], st["crop_id"]) for st in cur["action_steps"]]
+    assert actions[0] == ("sow", "wheat")
+    assert actions.index(("harvest", "wheat")) < actions.index(("cover_bare", "fallow"))
+    sow = next(st for st in cur["action_steps"] if st["action"] == "sow")
+    assert sow["months"] == [cur["calendar"][0]["months"][0]["month"]]  # sown at the start of year 1
+
+
+def test_every_action_step_names_its_source(features_mock, request_default):
+    for s in score(features_mock, request_default)["strategies"]:
+        assert s["action_steps"], s["id"]
+        for st in s["action_steps"]:
+            assert st["rule_id"] in STEP_SOURCES, st
+            assert st["message"]["code"] in messages.MESSAGES
+
+
+def test_same_family_twice_gives_an_avoid_step(features_mock, request_default):
+    cur = next(s for s in score(features_mock, request_default)["strategies"] if s["is_current"])  # wheat, wheat
+    assert any(st["action"] == "avoid" and st["rule_id"] == "family_break" for st in cur["action_steps"])
+
+
+def test_watch_water_steps_match_dry_months(features_mock, request_default):
+    for s in score(features_mock, request_default)["strategies"]:
+        dry = sum(1 for row in s["calendar"] for m in row["months"]
+                  if any(r["code"] == "stress_water_deficit" for r in m["stress_reasons"]))
+        watched = sum(len(st["months"]) for st in s["action_steps"] if st["action"] == "watch_water")
+        assert dry == watched, s["id"]
+
+
+def test_facts_use_faostat_ranges_and_say_when_there_is_none(features_mock, request_default):
+    body = _with_current(request_default, [{"crop_id": "wheat"}, {"crop_id": "alfalfa"}])
+    cur = next(s for s in score(features_mock, body)["strategies"] if s["is_current"])
+    by = {c["crop_id"]: c for c in cur["facts"]["return"]["crops"]}
+    assert by["wheat"]["yield_t_per_ha"]["min"] <= by["wheat"]["yield_t_per_ha"]["mean"] <= by["wheat"]["yield_t_per_ha"]["max"]
+    assert "FAOSTAT" in by["wheat"]["source"]
+    assert by["alfalfa"]["yield_t_per_ha"] is None and by["alfalfa"]["source"] is None
+    assert cur["facts"]["return"]["relative_to_current"] == "current"
+
+
+def test_required_crop_is_in_every_alternative(features_mock, request_default):
+    out = score(features_mock, dict(request_default, required_crop="lentil"))
+    assert len(out["strategies"]) >= 3
+    for s in out["strategies"]:
+        if not s["is_current"]:
+            assert "lentil" in [x["crop_id"] for x in s["seasons"]], s["id"]
+    assert "note_required_crop" in [n["code"] for n in out["notes"]]

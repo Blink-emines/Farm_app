@@ -6,7 +6,8 @@ from .loaders import (DEFAULT_SOURCE, UNKNOWN, field as crop_field, load_crops, 
                       val, validators)
 from .messages import msg
 from .rules import RULES, Ctx, soil_steps
-from .season_calendar import build_calendar, calendar_from_spans
+from .season_calendar import build_calendar, calendar_from_spans, water_need_mm
+from .action_steps import action_steps
 
 PRIORITIES = ["save_water", "improve_soil", "extra_income", "reduce_erosion", "forage"]
 LOWERING_GAPS = {"gap_kc_unknown", "gap_climate_month_missing", "gap_default_months"}
@@ -67,7 +68,43 @@ def _calendar_messages(calendar):
     return kinds
 
 
-def evaluate(strategy_id, is_current, crop_ids, seasons, defaults, crops, features, weights, plan=None):
+# No reliable yield source for these crops (olive yields are not the yield of a crop between olive trees).
+NO_YIELD_SOURCE = {"olive_intercrop"}
+
+
+def _num(v):
+    return isinstance(v, (int, float)) and not isinstance(v, bool)
+
+
+def _facts(ctx, econ, soil):
+    """Plain facts for the compare cards. return.relative_to_current is filled in by score()."""
+    years = ctx.n_years or 1
+    need, unknown = 0.0, False
+    for _, c in ctx.months():
+        if c["crop_id"] in (None, "fallow"):
+            continue
+        n = water_need_mm(ctx.crops, c["crop_id"], ctx.features, c["month"])
+        if n is None:
+            unknown = True
+        else:
+            need += n
+    dry = sum(1 for _, c in ctx.months() if any(r["code"] == "stress_water_deficit" for r in c["stress_reasons"]))
+    out = []
+    for cid in dict.fromkeys(ctx.ids):
+        if cid == "fallow":
+            continue
+        y = (econ.get("crops", {}).get(cid) or {}).get("yield_t_per_ha") or {}
+        ok = cid not in NO_YIELD_SOURCE and all(_num(y.get(k)) for k in ("min", "mean", "max"))
+        out.append({"crop_id": cid,
+                    "yield_t_per_ha": {k: round(y[k], 2) for k in ("min", "mean", "max")} if ok else None,
+                    "source": y.get("source") if ok else None})
+    return {"water_need_mm_per_year": None if unknown else round(need / years),
+            "dry_months_per_year": round(dry / years, 1),
+            "soil_points": round(sum(s["points"] for s in soil), 2),
+            "return": {"crops": out, "relative_to_current": "current"}}
+
+
+def evaluate(strategy_id, is_current, crop_ids, seasons, defaults, crops, features, weights, plan=None, econ=None):
     """plan = {"length", "spans": [(start, end, crop)]} (from the optimiser) replaces the layout of `seasons`."""
     names = {s["id"]: s["name"] for s in features["sources"]}
     if plan is None:
@@ -114,6 +151,10 @@ def evaluate(strategy_id, is_current, crop_ids, seasons, defaults, crops, featur
     for w in why:
         raw[w["priority"]] += w["points"]
     benefits = [msg("benefit_" + w["rule_id"]) for w in why if w["points"] > 0]
+    if econ is None:
+        from .optimize.objectives import load_economics
+        econ = load_economics()
+    facts = _facts(ctx, econ, soil_steps(ctx))
     gaps = _dedupe(gaps, lambda g: json.dumps(g, sort_keys=True))
     confidence = "low" if any(g["code"] in LOWERING_GAPS for g in gaps) else "medium"
     label = " > ".join(crop_ids)
@@ -124,7 +165,8 @@ def evaluate(strategy_id, is_current, crop_ids, seasons, defaults, crops, featur
         "evidence": _dedupe(evidence, lambda e: (e["feature"], tuple(e.get("months", [])))),
         "benefits": _dedupe(benefits, lambda b: b["code"]),
         "information_gaps": gaps, "risks_for_local_review": risks, "confidence": confidence,
-        "soil_steps": soil_steps(ctx), "_raw": raw,
+        "facts": facts, "soil_steps": soil_steps(ctx), "action_steps": action_steps(seasons, calendar, crops),
+        "_raw": raw,
     }
 
 
@@ -159,10 +201,26 @@ def score(features, request, crops=None, weights=None):
     req_seasons = request["current_rotation"]["seasons"]
     cur_ids = [s["crop_id"] for s in req_seasons]
     seasons, defaults = resolve_seasons(cur_ids, req_seasons, crops)
-    pool = [evaluate("current_rotation", True, cur_ids, seasons, defaults, crops, features, weights)]
+    from .optimize.objectives import load_economics
+    econ = load_economics()
+    pool = [evaluate("current_rotation", True, cur_ids, seasons, defaults, crops, features, weights, econ=econ)]
     candidates = [t for t in TEMPLATES if t["crops"] != cur_ids]  # the current one is shown once
     allowed_note = None
-    if "allowed_crops" in request:
+    required = request.get("required_crop")
+    if required:
+        # The crop must be in every alternative: templates that contain it, plus "required then X"
+        # for every other allowed crop (all crops when none are given), scored by the same rules.
+        partners = [c for c in (request.get("allowed_crops") or list(crops)) if c != required]
+        partners = list(dict.fromkeys(partners + ["fallow"]))
+        generated = [{"id": f"with_{required}_{x}", "crops": [required, x]} for x in partners]
+        seen, candidates = set(), []
+        for t in [t for t in TEMPLATES if required in t["crops"]] + generated:
+            key = tuple(t["crops"])
+            if key not in seen and t["crops"] != cur_ids:
+                seen.add(key)
+                candidates.append(t)
+        allowed_note = "note_required_crop"
+    elif "allowed_crops" in request:
         allowed = set(request["allowed_crops"]) | {"fallow"}
         local = [t for t in candidates if set(t["crops"]) <= allowed]
         # The response needs at least 2 alternatives; with too few local ones, show them all and say so.
@@ -172,8 +230,11 @@ def score(features, request, crops=None, weights=None):
         else:
             allowed_note = "note_allowed_crops_too_few"
     for t in candidates:
-        ts, td = resolve_seasons(t["crops"], None, crops)
-        pool.append(evaluate(t["id"], False, t["crops"], ts, td, crops, features, weights))
+        try:
+            ts, td = resolve_seasons(t["crops"], None, crops)
+        except MonthsUnknown:
+            continue  # a generated rotation with a crop whose months are unknown is not proposed
+        pool.append(evaluate(t["id"], False, t["crops"], ts, td, crops, features, weights, econ=econ))
 
     pw = _priority_weights(request["priorities"])
     _apply_scores(pool, pw)  # normalised over ALL candidates
@@ -184,8 +245,12 @@ def score(features, request, crops=None, weights=None):
             s.pop("_bp", None)
         _apply_scores(chosen, pw)
     chosen.sort(key=lambda s: (-s["score"]["total"], not s["is_current"], s["id"]))
+    cur_income = pool[0]["_raw"]["extra_income"]
     for rank, s in enumerate(chosen, 1):
         s["rank"] = rank
+        if not s["is_current"]:
+            d = s["_raw"]["extra_income"] - cur_income  # income_flag rule points (qualitative)
+            s["facts"]["return"]["relative_to_current"] = "more" if d > 0.5 else "less" if d < -0.5 else "similar"
         s.pop("_raw"), s.pop("_bp")
 
     notes = [msg("note_relative_scores"), msg("note_local_expert"), msg("note_normalisation")]
