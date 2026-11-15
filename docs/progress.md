@@ -26,3 +26,11 @@ Next steps:
 Decided, don't revisit: NDVI only for the default point (demo); region = rectangle box.
 
 Run: backend `cd backend && .venv/bin/python manage.py runserver`; frontend `cd frontend && npm run dev` → http://localhost:3000.
+
+## 2026-11-15 — login and saved plans (lead)
+Done: landing final section redesigned, faster guided tour, login/sign-up page (FR/AR/EN), location + plan saved per user (/api/results/). Tests: Django suite OK (incl. 8 new), 76 cross-layer, 8 e2e (now log in first).
+Next: point Django at Supabase Postgres (docs/supabase-setup.md). Optimiser-mode plans are not saved yet.
+
+## 2026-11-15 — Supabase migrated (lead)
+Done: branch supabase-postgres checked out, with the login/saved-plans work on top. psycopg installed; `migrate` ran on Supabase (Paris session pooler), including farms/0002: all 13 public tables have RLS on (the "not rowsecurity" check returns no rows). Django tests on SQLite: 57 OK. Live check on Supabase: register 201, login by email 200, POST /api/fields/ 201, POST /api/results/ 201; counts auth_user 1, farms_field 1, farms_result 1 (one test user, "check-…").
+Open: superuser not created yet (waiting for the user's credentials). The dev server on :8000 was started before DATABASE_URL was added: restart it to use Supabase. Reset the DB password (it was shared in chat) and update backend/.env.

@@ -1,8 +1,9 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from .models import Field, Measurement
+from .models import Field, Measurement, Result
 
 
 class FieldSerializer(serializers.ModelSerializer):
@@ -18,13 +19,35 @@ class MeasurementSerializer(serializers.ModelSerializer):
         fields = ['id', 'field', 'date', 'temperature', 'rainfall']
 
 
+class ResultSerializer(serializers.ModelSerializer):
+    """A saved plan: the request the farmer sent and the strategies they got back."""
+
+    class Meta:
+        model = Result
+        fields = ['id', 'field', 'created_at', 'data']
+        read_only_fields = ['created_at']
+
+    def validate_field(self, field):
+        # A plan can only be attached to one of your own fields.
+        if field.owner != self.context['request'].user:
+            raise serializers.ValidationError('Unknown field.')
+        return field
+
+
 class RegisterSerializer(serializers.ModelSerializer):
     # write_only: accepted on sign-up, never sent back in a response.
     password = serializers.CharField(write_only=True)
+    email = serializers.EmailField(required=False, allow_blank=True)
 
     class Meta:
         model = get_user_model()
-        fields = ['id', 'username', 'password']
+        fields = ['id', 'username', 'email', 'password']
+
+    def validate_email(self, email):
+        # Optional, but when given it must be unique so it can be used to log in.
+        if email and get_user_model().objects.filter(email__iexact=email).exists():
+            raise serializers.ValidationError('This email is already used.')
+        return email
 
     def validate(self, attrs):
         # Checked with the username so "too similar to the username" is caught.
@@ -34,3 +57,15 @@ class RegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # create_user stores a hash of the password, not the password itself.
         return get_user_model().objects.create_user(**validated_data)
+
+
+class LoginSerializer(TokenObtainPairSerializer):
+    """Log in with a username or an email address, plus the password."""
+
+    def validate(self, attrs):
+        ident = attrs.get(self.username_field, '')
+        if '@' in ident:
+            user = get_user_model().objects.filter(email__iexact=ident).first()
+            if user:
+                attrs[self.username_field] = user.get_username()
+        return super().validate(attrs)

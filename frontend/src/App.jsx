@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { LANGS, useI18n } from './i18n/index.jsx';
 import SettingsPanel, { GearButton } from './components/SettingsPanel.jsx';
-import { ApiError, USE_MOCK, getStrategies } from './api.js';
+import { ApiError, USE_MOCK, getStrategies, isLoggedIn, logout, savePlan } from './api.js';
 import { DEFAULT_POINT, buildRequest } from './constants.js';
 import LocationPicker from './components/LocationPicker.jsx';
 import RotationInput from './components/RotationInput.jsx';
@@ -9,6 +9,7 @@ import Priorities from './components/Priorities.jsx';
 import Results from './components/Results.jsx';
 import OptimiserFlow from './components/OptimiserFlow.jsx';
 import Landing from './components/Landing.jsx';
+import Auth from './components/Auth.jsx';
 import PrintReport from './components/PrintReport.jsx';
 import { BrandMark } from './components/icons.jsx';
 
@@ -47,6 +48,8 @@ export default function App() {
   const [features, setFeatures] = useState(null);
   const [step, setStep] = useState(1);
   const [started, setStarted] = useState(false);
+  const [authed, setAuthed] = useState(isLoggedIn);
+  const [saved, setSaved] = useState('');
   const [mode, setMode] = useState('single');
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [status, setStatus] = useState({ state: 'idle' });
@@ -59,10 +62,15 @@ export default function App() {
 
   async function compare() {
     setStatus({ state: 'loading' });
+    setSaved('');
     try {
-      const data = await getStrategies(buildRequest(form));
+      const request = buildRequest(form);
+      const data = await getStrategies(request);
       setStatus({ state: 'done', data, features });
       setTimeout(() => topRef.current?.scrollIntoView({ block: 'start' }), 0);
+      // Keep the location and the plan in the farmer's account. A failed save never hides the results.
+      savePlan(form.lat, form.lon, { request, strategies: data })
+        .then((r) => setSaved(r ? 'ok' : ''), () => setSaved('fail'));
     } catch (err) {
       setStatus({ state: 'error', code: err instanceof ApiError ? err.code : 'internal_error' });
     }
@@ -80,6 +88,11 @@ export default function App() {
           ))}
         </div>
         <GearButton onClick={() => setSettingsOpen(true)} />
+        {started && authed && !USE_MOCK && (
+          <button type="button" className="btn-text head-logout" onClick={() => { logout(); setAuthed(false); setStatus({ state: 'idle' }); }}>
+            {t('ui.auth_logout')}
+          </button>
+        )}
       </div>
     </header>
   );
@@ -93,6 +106,8 @@ export default function App() {
         {(USE_MOCK || features?._mockExtras) && <div className="mock-banner" role="alert">{t('ui.mock_banner')}</div>}
         {!started ? (
           <Landing head={head} onStart={() => setStarted(true)} />
+        ) : !authed ? (
+          <Auth head={head} onDone={() => setAuthed(true)} onBack={() => setStarted(false)} />
         ) : (
         <>
         {head}
@@ -159,6 +174,7 @@ export default function App() {
                   {t('ui.change_answers')}
                 </button>
               </div>
+              {saved && <p className={`notice${saved === 'fail' ? ' notice-error' : ''}`} role="status">{t(saved === 'ok' ? 'ui.auth_saved' : 'ui.auth_save_failed')}</p>}
               <Results data={status.data} features={status.features} form={form} onPrint={() => window.print()} />
             </section>
           )}

@@ -13,9 +13,11 @@ A skip is not a pass.
 Run: `backend/.venv/bin/python -m pytest tests/e2e -v`
 """
 
+import json
 import re
 import urllib.error
 import urllib.request
+import uuid
 
 import pytest
 from playwright.sync_api import expect, sync_playwright
@@ -27,6 +29,9 @@ TOUR_WAIT_MS = 25000  # the guided tour moves to the next section after a few se
 L = {
     "fr": {
         "analyse": "Analyser mon champ",
+        "identifier": "E-mail ou nom d’utilisateur",
+        "password": "Mot de passe",
+        "login": "Se connecter",
         "next": "Continuer",
         "compare": "Comparer les rotations",
         "lang_button": "Français",
@@ -50,6 +55,9 @@ L = {
     },
     "en": {
         "analyse": "Analyse my field",
+        "identifier": "Email or username",
+        "password": "Password",
+        "login": "Log in",
         "next": "Continue",
         "compare": "Compare rotations",
         "lang_button": "English",
@@ -73,6 +81,9 @@ L = {
     },
     "ar": {
         "analyse": "حلّل حقلي",
+        "identifier": "البريد الإلكتروني أو اسم المستخدم",
+        "password": "كلمة المرور",
+        "login": "تسجيل الدخول",
         "next": "متابعة",
         "compare": "قارن بين الدورات",
         "lang_button": "العربية",
@@ -108,6 +119,18 @@ def require_app():
 
 
 @pytest.fixture(scope="module")
+def account():
+    """A fresh user, created through the sign-up API (via the dev server proxy)."""
+    creds = {"username": f"e2e-{uuid.uuid4().hex[:8]}", "password": "correct-horse-9"}
+    req = urllib.request.Request(
+        APP + "/api/register/", data=json.dumps(creds).encode(),
+        headers={"Content-Type": "application/json"}, method="POST",
+    )
+    urllib.request.urlopen(req, timeout=10)
+    return creds
+
+
+@pytest.fixture(scope="module")
 def browser():
     with sync_playwright() as p:
         b = p.chromium.launch(headless=True)
@@ -132,10 +155,11 @@ def _switch_language(page, lang_code):
     expect(page.locator("html")).to_have_attribute("lang", lang_code)
 
 
-def _run_wizard(page, lang):
-    """Landing -> analyse -> place -> rotation -> goals -> results (simple view)."""
+def _run_wizard(page, lang, account):
+    """Landing -> analyse -> log in -> place -> rotation -> goals -> results (simple view)."""
     t = L[lang]
     page.get_by_role("button", name=t["analyse"]).first.click()
+    _log_in(page, t, account)
     page.get_by_role("button", name=t["next"]).first.click()  # place -> rotation
     page.get_by_role("button", name=t["next"]).first.click()  # rotation -> goals
     page.get_by_role("button", name=t["compare"]).click()      # goals -> results
@@ -169,21 +193,21 @@ def test_guided_tour_advances(page):
 # Wizard to simple results, in each language
 # ---------------------------------------------------------------------------
 
-def test_wizard_runs_to_simple_results_in_french(page):
-    _run_wizard(page, "fr")
+def test_wizard_runs_to_simple_results_in_french(page, account):
+    _run_wizard(page, "fr", account)
     expect(page.get_by_text(re.compile(r"conseiller agricole", re.I)).first).to_be_visible()
 
 
-def test_wizard_runs_to_simple_results_in_english(page):
+def test_wizard_runs_to_simple_results_in_english(page, account):
     _switch_language(page, "en")
-    _run_wizard(page, "en")
+    _run_wizard(page, "en", account)
     expect(page.get_by_text(re.compile(r"local (agricultural )?(advisor|expert)", re.I)).first).to_be_visible()
 
 
-def test_wizard_runs_to_simple_results_in_arabic_with_rtl(page):
+def test_wizard_runs_to_simple_results_in_arabic_with_rtl(page, account):
     _switch_language(page, "ar")
     expect(page.locator("html")).to_have_attribute("dir", "rtl")
-    _run_wizard(page, "ar")
+    _run_wizard(page, "ar", account)
     expect(page.locator("html")).to_have_attribute("dir", "rtl")
 
 
@@ -222,9 +246,16 @@ def test_settings_toggle_dark_mode_and_advanced_data(page):
 # Optimiser (several parcels) with Pareto chart
 # ---------------------------------------------------------------------------
 
-def test_optimiser_returns_plans_and_pareto_chart(page):
+def _log_in(page, t, account):
+    page.get_by_label(t["identifier"]).fill(account["username"])
+    page.get_by_label(t["password"]).fill(account["password"])
+    page.get_by_role("button", name=t["login"], exact=True).last.click()
+
+
+def test_optimiser_returns_plans_and_pareto_chart(page, account):
     t = L["fr"]
     page.get_by_role("button", name=t["analyse"]).first.click()
+    _log_in(page, t, account)
     page.get_by_role("button", name=t["optimiser_mode"]).click()
     expect(page.get_by_role("heading", name=t["optimiser_title"])).to_be_visible()
 

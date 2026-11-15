@@ -568,9 +568,10 @@ div.chart-key ul { list-style: none; padding: 0; display: flex; flex-wrap: wrap;
 .other-ideas button[aria-pressed="true"] { border-color: var(--primary); background: var(--primary-soft); }
 
 /* ---------- landing: final section, skeletons ---------- */
-.cta-brand { display: grid; justify-items: start; gap: 12px; margin-block-start: 24px; }
-.cta-name { font-size: 48px; font-weight: 600; line-height: 1; color: #fff; }
-@media (min-width: 900px) { .cta-name { font-size: 80px; } }
+.cta-grid { display: grid; gap: 40px; align-items: center; }
+.s-cta { min-height: auto; padding-block: 48px; }
+.cta-copy { display: grid; gap: 20px; }
+@media (min-width: 900px) { .cta-grid { grid-template-columns: 1.15fr 1fr; gap: 48px; } .s-cta .team-inner { justify-items: center; text-align: center; margin-block-start: 0; } }
 .team-inner { justify-items: start; display: grid; gap: 4px; margin-block-start: 24px; }
 .team-stack { display: grid; gap: 4px; }
 .s-cta .team-word, .s-cta .team-label { color: #fff; }
@@ -592,4 +593,16 @@ div.chart-key ul { list-style: none; padding: 0; display: flex; flex-wrap: wrap;
 .crop-line li { min-inline-size: 0; flex: 1 1 0; font-size: var(--text-s); }
 .crop-line li.then { flex: none; font-size: 28px; display: block; }
 
-.cta-translit { color: #e8f1e6; font-size: var(--text-m); }
+
+/* ---------- login / sign up ---------- */
+.auth-main { display: grid; place-items: center; padding: 32px 16px 64px; }
+.auth-card { inline-size: 100%; max-inline-size: 440px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-l); padding: 32px 24px; display: grid; gap: 16px; justify-items: start; }
+.auth-card h1 { font-size: var(--text-l); }
+.auth-sub, .auth-hint, .auth-privacy { color: var(--muted); font-size: var(--text-s); }
+.auth-tabs { display: flex; inline-size: 100%; border: 2px solid var(--line); border-radius: 999px; padding: 4px; gap: 4px; }
+.auth-tabs button { flex: 1; min-block-size: 44px; border: 0; border-radius: 999px; background: none; color: var(--ink); font-weight: 600; }
+.auth-tabs button[aria-pressed="true"] { background: var(--primary-soft); color: var(--primary-dark); }
+.auth-form { display: grid; gap: 14px; inline-size: 100%; }
+.auth-form .btn-primary { inline-size: 100%; }
+.auth-form input[type="email"], .auth-form input[type="password"] { min-block-size: 48px; padding-inline: 12px; color: var(--ink); background: var(--field); border: 2px solid var(--line); border-radius: var(--r-s); inline-size: 100%; }
+.head-logout { min-block-size: 44px; padding-inline: 8px; }

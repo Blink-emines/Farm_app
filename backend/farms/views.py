@@ -1,7 +1,7 @@
-from rest_framework import generics, permissions, viewsets
+from rest_framework import generics, mixins, permissions, viewsets
 
-from .models import Field, Measurement
-from .serializers import FieldSerializer, MeasurementSerializer, RegisterSerializer
+from .models import Field, Measurement, Result
+from .serializers import FieldSerializer, MeasurementSerializer, RegisterSerializer, ResultSerializer
 
 
 class RegisterView(generics.CreateAPIView):
@@ -31,3 +31,14 @@ class MeasurementViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         return Measurement.objects.filter(field__owner=self.request.user)
+
+
+class ResultViewSet(
+    mixins.CreateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+):
+    """Save and read back the logged-in user's plans. Saved plans are not edited."""
+
+    serializer_class = ResultSerializer
+
+    def get_queryset(self):
+        return Result.objects.filter(field__owner=self.request.user).order_by('-created_at')

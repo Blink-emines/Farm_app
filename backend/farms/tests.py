@@ -263,3 +263,65 @@ class IsolationTests(APITestCase):
         url = f'/api/measurements/{self.measurement_a.id}/'
         self.assertEqual(self.client.delete(url).status_code, 405)
         self.assertEqual(Measurement.objects.count(), 2)
+
+    def test_i_can_save_a_plan_on_my_field_and_read_it_back(self):
+        plan = {'request': {'lat': 33.5}, 'strategies': []}
+        response = self.client.post(
+            '/api/results/', {'field': self.field_a.id, 'data': plan}, format='json'
+        )
+        self.assertEqual(response.status_code, 201)
+        listed = self.client.get('/api/results/').data
+        self.assertEqual([r['data'] for r in listed], [plan])
+
+    def test_i_cannot_save_a_plan_on_another_users_field(self):
+        response = self.client.post(
+            '/api/results/', {'field': self.field_b.id, 'data': {}}, format='json'
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Result.objects.count(), 0)
+
+    def test_result_list_shows_only_my_plans(self):
+        Result.objects.create(field=self.field_b, data={'b': 1})
+        mine = Result.objects.create(field=self.field_a, data={'a': 1})
+        response = self.client.get('/api/results/')
+        self.assertEqual([r['id'] for r in response.data], [mine.id])
+        self.assertEqual(self.client.get(f'/api/results/{mine.id - 1}/').status_code, 404)
+
+    def test_saved_plans_cannot_be_edited(self):
+        mine = Result.objects.create(field=self.field_a, data={'a': 1})
+        url = f'/api/results/{mine.id}/'
+        self.assertEqual(self.client.patch(url, {'data': {}}, format='json').status_code, 405)
+        self.assertEqual(self.client.delete(url).status_code, 405)
+
+
+class EmailLoginTests(APITestCase):
+    def test_register_with_email_then_log_in_with_email_or_username(self):
+        response = self.client.post(
+            '/api/register/',
+            {'username': 'amina', 'email': 'Amina@example.com', 'password': 'correct-horse-9'},
+        )
+        self.assertEqual(response.status_code, 201)
+        for ident in ('amina', 'amina@example.com'):
+            login = self.client.post('/api/token/', {'username': ident, 'password': 'correct-horse-9'})
+            self.assertEqual(login.status_code, 200, ident)
+            self.assertIn('access', login.data)
+
+    def test_email_is_optional_on_register(self):
+        response = self.client.post(
+            '/api/register/', {'username': 'omar', 'password': 'correct-horse-9'}
+        )
+        self.assertEqual(response.status_code, 201)
+
+    def test_register_rejects_a_taken_email(self):
+        User.objects.create_user(username='x', email='a@example.com', password='correct-horse-9')
+        response = self.client.post(
+            '/api/register/',
+            {'username': 'y', 'email': 'A@example.com', 'password': 'correct-horse-9'},
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('email', response.data)
+
+    def test_wrong_password_with_email_is_refused(self):
+        User.objects.create_user(username='x', email='a@example.com', password='correct-horse-9')
+        login = self.client.post('/api/token/', {'username': 'a@example.com', 'password': 'nope'})
+        self.assertEqual(login.status_code, 401)

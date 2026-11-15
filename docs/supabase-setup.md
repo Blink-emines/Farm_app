@@ -47,7 +47,7 @@ Then open **Table Editor**:
 |---|---|---|
 | `auth_user` | the account (username, email, hashed password) | yes, via `POST /api/register/` |
 | `farms_field` | the field location (latitude, longitude), linked to the user | yes, via `POST /api/fields/` (JWT) |
-| `farms_result` | a saved plan, linked to the field | **not yet**: no endpoint writes it, and the web app has no login screen |
+| `farms_result` | a saved plan (request + strategies), linked to the field | yes, via `POST /api/results/` (JWT), after each comparison in the web app |
 
 ## Security
 

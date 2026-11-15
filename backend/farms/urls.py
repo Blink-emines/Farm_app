@@ -6,6 +6,7 @@ from . import views
 router = DefaultRouter()
 router.register('fields', views.FieldViewSet, basename='field')
 router.register('measurements', views.MeasurementViewSet, basename='measurement')
+router.register('results', views.ResultViewSet, basename='result')
 
 urlpatterns = [
     path('register/', views.RegisterView.as_view(), name='register'),

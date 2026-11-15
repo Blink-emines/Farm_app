@@ -381,7 +381,7 @@ const Play = () => <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="
 const Pause = () => <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 3h4v14H5zM11 3h4v14h-4z" fill="currentColor" /></svg>;
 
 export default function Landing({ head, onStart }) {
-  const { t, lang } = useI18n();
+  const { t } = useI18n();
   const facts = useFacts();
   const [active, setActive] = useState('hero');
   const [touring, setTouring] = useState(false);
@@ -428,7 +428,7 @@ export default function Landing({ head, onStart }) {
       go(SECTIONS[next]);
     };
     step();
-    const id = setInterval(step, 4500);
+    const id = setInterval(step, 2500);
     return () => { clearInterval(id); events.forEach((ev) => window.removeEventListener(ev, stop)); };
   }, [touring]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -459,15 +459,12 @@ export default function Landing({ head, onStart }) {
       <Section id="impact" className="s-soft" label={t('ui.l_nav_impact')}><Impact facts={facts} /></Section>
       <Section id="features" label={t('ui.l_nav_features')}><Features /></Section>
       <Section id="cta" className="s-cta" label={t('ui.l_nav_cta')}>
-        <div className="wrap cta-copy">
-          <Reveal as="h2">{t('ui.l_cta_title')}</Reveal>
-          <Reveal as="p" className="lead" delay={80}>{t('ui.l_cta_sub')}</Reveal>
-          <Reveal delay={160}><button type="button" className="btn btn-primary btn-big" onClick={onStart}>{t('ui.analyse')}</button></Reveal>
-          <Reveal className="cta-brand" delay={240}>
-            <BrandMark size={128} />
-            <span className="cta-name">{t('ui.brand')}</span>
-            {lang === 'ar' && <span className="cta-translit" dir="ltr">Dawrat Amina</span>}
-          </Reveal>
+        <div className="wrap cta-grid">
+          <div className="cta-copy">
+            <Reveal as="h2">{t('ui.l_cta_title')}</Reveal>
+            <Reveal as="p" className="lead" delay={80}>{t('ui.l_cta_sub')}</Reveal>
+            <Reveal delay={160}><button type="button" className="btn btn-primary btn-big" onClick={onStart}>{t('ui.analyse')}</button></Reveal>
+          </div>
           <TeamBand />
         </div>
       </Section>
