@@ -19,7 +19,7 @@ export default function OptimiseTab({ farm, features, fieldId, onField, st, set,
   const nowName = (c) => (c === 'fallow' ? t('ui.optab_bare') : crop(c));
   const [page, setPage] = useState(0);
   const [missing, setMissing] = useState(false);
-  useEffect(() => { setPage(0); setMissing(false); }, [fieldId]); // a new field starts at step 1
+  useEffect(() => { setMissing(false); }, [fieldId]); // switching field keeps the page you are on
   const id = PAGES[page];
   const next = () => {
     if (id === 'now' && !st.current) { setMissing(true); return; }

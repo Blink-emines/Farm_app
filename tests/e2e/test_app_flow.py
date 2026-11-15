@@ -374,23 +374,23 @@ def test_each_field_keeps_its_own_answers(page):
     page.get_by_role("tab", name=t["view_optimise"]).click()
     card = page.locator(".opt-card")
     nxt = lambda: page.get_by_role("button", name=t["next"]).click()
-    to_plant = lambda: (nxt(), nxt())
+    back = lambda: page.get_by_role("button", name="Back").click()
+    f1 = lambda: page.get_by_role("radio", name="Field 1 · 1 ha").click()
+    f2 = lambda: page.get_by_role("radio", name="Field 2 · 2 ha").click()
     card.get_by_role("radio", name="Wheat").click()
-    to_plant()
-    card.get_by_role("button", name="Lentil").click()
-    page.get_by_role("radio", name="Field 2 · 2 ha").click()  # a new field starts at step 1
+    f2()  # switching field stays on the same page
     expect(card.get_by_role("radio", name="Wheat")).to_have_attribute("aria-checked", "false")
     card.get_by_role("radio", name="Nothing (bare field)").click()
-    to_plant()
-    expect(card.get_by_role("button", name="Lentil")).to_have_attribute("aria-pressed", "false")
+    nxt(); nxt()  # page 3: what to plant
     card.get_by_role("button", name="Barley").click()
-    page.get_by_role("radio", name="Field 1 · 1 ha").click()
-    expect(card.get_by_role("radio", name="Wheat")).to_have_attribute("aria-checked", "true")
-    to_plant()
-    expect(card.get_by_role("button", name="Lentil")).to_have_attribute("aria-pressed", "true")
+    f1()
     expect(card.get_by_role("button", name="Barley")).to_have_attribute("aria-pressed", "false")
-    page.get_by_role("radio", name="Field 2 · 2 ha").click()
-    expect(card.get_by_role("radio", name="Nothing (bare field)")).to_have_attribute("aria-checked", "true")
+    card.get_by_role("button", name="Lentil").click()
+    f2()
+    expect(card.get_by_role("button", name="Barley")).to_have_attribute("aria-pressed", "true")
+    expect(card.get_by_role("button", name="Lentil")).to_have_attribute("aria-pressed", "false")
+    f1(); back(); back()  # page 1 again: field 1 still has wheat
+    expect(card.get_by_role("radio", name="Wheat")).to_have_attribute("aria-checked", "true")
 
 
 def test_one_chosen_crop_is_in_every_option_and_the_plan_has_steps(page):
