@@ -762,3 +762,4 @@ div.chart-key ul { list-style: none; padding: 0; display: flex; flex-wrap: wrap;
 /* Bigger logo on the landing page */
 .hero-s .brand { font-size: var(--text-l); gap: 12px; }
 .hero-s .brand svg { inline-size: 48px; block-size: 48px; }
+.report-steps { border-collapse: collapse; width: 100%; } .report-steps td { border-block-end: 1px solid #ccc; padding: 6px 8px; vertical-align: top; } .report-steps td:first-child { white-space: nowrap; font-weight: 600; }

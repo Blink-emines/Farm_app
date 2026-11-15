@@ -43,7 +43,7 @@ export function verdicts(s) {
 }
 
 // Which year each step falls in: walk the timeline once, in order.
-function withYears(s) {
+export function withYears(s) {
   const months = flatMonths(s);
   let at = 0;
   return s.action_steps.map((st) => {
@@ -54,7 +54,7 @@ function withYears(s) {
   });
 }
 
-const actionKey = (st) => (st.action === 'cover_bare' && st.crop_id === 'fallow' ? 'act_cover_fallow' : `act_${st.action}`);
+export const actionKey = (st) => (st.action === 'cover_bare' && st.crop_id === 'fallow' ? 'act_cover_fallow' : `act_${st.action}`);
 const DONT = new Set(['avoid', 'cover_bare']);
 
 export function stepClips(st) {

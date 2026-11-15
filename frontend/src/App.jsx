@@ -10,7 +10,6 @@ import Auth from './components/Auth.jsx';
 import FarmSetup from './components/FarmSetup.jsx';
 import Dashboard from './components/Dashboard.jsx';
 import OptimiseTab from './components/OptimiseTab.jsx';
-import PrintReport from './components/PrintReport.jsx';
 import { BrandMark } from './components/icons.jsx';
 
 const BALANCED = { save_water: 3, improve_soil: 3, extra_income: 3, reduce_erosion: 3, forage: 3 };
@@ -187,9 +186,6 @@ export default function App() {
         </>
         )}
       </div>
-      {showResults && (
-        <div className="print-only"><PrintReport form={form} data={status.data} features={status.features} /></div>
-      )}
     </>
   );
 }
