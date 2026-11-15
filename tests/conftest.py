@@ -214,6 +214,7 @@ def make_strategy(strategy_id, rank, total, is_current=False, seasons=None):
         "information_gaps": [],
         "risks_for_local_review": [_msg("risk_example")],
         "confidence": "medium",
+        "soil_steps": [{"season_index": i, "points": 0.0, "rules": []} for i in range(len(seasons))],
     }
 
 

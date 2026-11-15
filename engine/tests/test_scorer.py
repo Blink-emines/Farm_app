@@ -166,3 +166,31 @@ def test_current_wheat_fallow_on_real_sample():
     assert sum(c["status"] == "bare" for c in cells) == 16
     bare = next(w for w in cur["why"] if w["rule_id"] == "bare_months_penalty")
     assert bare["message"]["params"]["count"] == 16
+
+
+def test_soil_steps_add_up_to_the_improve_soil_points(features_mock, request_default):
+    for s in score(features_mock, request_default)["strategies"]:
+        soil_why = sum(w["points"] for w in s["why"] if w["priority"] == "improve_soil")
+        assert len(s["soil_steps"]) == len(s["seasons"])
+        assert abs(sum(st["points"] for st in s["soil_steps"]) - soil_why) < 0.05, s["id"]
+
+
+def test_soil_step_credits_the_legume_after_the_cereal(features_mock, request_default):
+    body = dict(request_default, current_rotation={"seasons": [{"crop_id": "wheat"}, {"crop_id": "chickpea"}]})
+    cur = next(s for s in score(features_mock, body)["strategies"] if s["is_current"])
+    chick = next(st for st in cur["soil_steps"] if cur["seasons"][st["season_index"]]["crop_id"] == "chickpea")
+    assert "n_credit_legume_after_cereal" in chick["rules"] and chick["points"] > 0
+
+
+def test_allowed_crops_filters_alternatives_but_keeps_current(features_mock, request_default):
+    body = dict(request_default, allowed_crops=["wheat", "chickpea"])
+    out = score(features_mock, body)
+    for s in out["strategies"]:
+        if not s["is_current"]:
+            assert {x["crop_id"] for x in s["seasons"]} <= {"wheat", "chickpea", "fallow"}, s["id"]
+    assert any(s["is_current"] for s in out["strategies"])
+    assert "note_allowed_crops" in [n["code"] for n in out["notes"]]
+
+
+def test_without_allowed_crops_nothing_is_filtered(features_mock, request_default):
+    assert "note_allowed_crops" not in [n["code"] for n in score(features_mock, request_default)["notes"]]

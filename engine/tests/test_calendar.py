@@ -11,9 +11,28 @@ def test_twelve_months_per_year(make_ctx):
     assert len(ctx.calendar) == 2 and all(len(r["months"]) == 12 for r in ctx.calendar)
 
 
+def test_rows_start_at_first_sowing(make_ctx):
+    # Bug fixed 2026-11-15: rows used to start in January, so wheat sown in November of year 1
+    # was harvested in "year 2" and year 1 began with the end of the previous cycle.
+    ctx = make_ctx(["wheat", "chickpea"])
+    row1 = ctx.calendar[0]["months"]
+    assert row1[0]["month"] == 11
+    assert [c["crop_id"] for c in row1[:8]] == ["wheat"] * 8  # November to June
+    assert "chickpea" not in [c["crop_id"] for c in row1]
+    assert "wheat" not in [c["crop_id"] for c in ctx.calendar[1]["months"]]
+
+
 def test_crop_wraps_across_new_year(make_ctx):
-    ctx = make_ctx(["wheat", "chickpea"])  # wheat sown in autumn of year 1 grows into year 2
-    assert ctx.calendar[1]["months"][0]["crop_id"] == "wheat"
+    ctx = make_ctx(["wheat", "chickpea"])  # wheat sown in November grows through January in the same row
+    months = [c["month"] for c in ctx.calendar[0]["months"]]
+    assert months[:3] == [11, 12, 1] and ctx.calendar[0]["months"][2]["crop_id"] == "wheat"
+
+
+def test_wheat_harvest_month_is_not_bare_in_its_own_year(make_ctx):
+    row1 = make_ctx(["wheat", "fallow"]).calendar[0]["months"]
+    june = next(c for c in row1 if c["month"] == 6)
+    may = next(c for c in row1 if c["month"] == 5)
+    assert june["crop_id"] == "wheat" and may["crop_id"] == "wheat"
 
 
 def test_bare_months_detected(make_ctx):
@@ -21,8 +40,8 @@ def test_bare_months_detected(make_ctx):
 
 
 def test_fallow_is_bare_but_named(make_ctx):
-    row = make_ctx(["wheat", "fallow"]).calendar[1]["months"]
-    assert all(c["status"] == "bare" and c["crop_id"] == "fallow" for c in row[6:])
+    row = make_ctx(["wheat", "fallow"]).calendar[0]["months"]
+    assert all(c["status"] == "bare" and c["crop_id"] == "fallow" for c in row[8:])  # July to October
 
 
 def test_water_stress_month(make_ctx):
@@ -70,10 +89,10 @@ def test_wheat_chickpea_march_after_wheat_harvest(make_ctx):
     ctx = make_ctx(["wheat", "chickpea"])
     sp = {s["crop_id"]: s for s in ctx.seasons}
     assert sp["chickpea"]["sow_month"] == 3
-    # steady state: sown in the first March after the wheat harvest (row 1 is filled by the previous cycle)
-    assert _crop_months(ctx, "chickpea") == [(1, m) for m in (3, 4, 5, 6, 7)]
-    assert [m for y, m in _crop_months(ctx, "wheat") if y == 1] == [11, 12]
-    assert [m for y, m in _crop_months(ctx, "wheat") if y == 2] == [1, 2, 3, 4, 5, 6]
+    # farming years: wheat fills year 1 (November-June), chickpea is sown the next March, in year 2
+    assert [m for y, m in _crop_months(ctx, "wheat") if y == 1] == [11, 12, 1, 2, 3, 4, 5, 6]
+    assert [y for y, _ in _crop_months(ctx, "wheat")] == [1] * 8
+    assert _crop_months(ctx, "chickpea") == [(2, m) for m in (3, 4, 5, 6, 7)]
 
 
 def test_wheat_chickpea_no_month_has_two_crops(make_ctx):
@@ -97,9 +116,9 @@ def test_perennial_only_rotation(make_ctx):
         assert all(c["crop_id"] == crop and c["status"] != "bare" for c in ctx.calendar[0]["months"])
 
 
-def test_rows_start_in_january(make_ctx):
+def test_rows_start_at_the_first_sowing_month(make_ctx):
     for row in make_ctx(["wheat", "chickpea"]).calendar:
-        assert [c["month"] for c in row["months"]] == list(range(1, 13))
+        assert [c["month"] for c in row["months"]] == [11, 12] + list(range(1, 11))
 
 
 def _all_layouts(crops, weights):
@@ -119,5 +138,4 @@ def test_property_seasons_never_overlap(crops, weights):
             assert b0 > a1, crop_ids
         assert spans[-1][1] < spans[0][0] + lay["length"], crop_ids  # next cycle starts after the last harvest
         assert lay["length"] % 12 == 0
-        occupied = sum(1 for x in lay["slots"] if x is not None)
-        assert occupied == sum(e - s + 1 for s, e, _ in spans), crop_ids
+        assert sum(e - s + 1 for s, e, _ in spans) <= lay["length"], crop_ids

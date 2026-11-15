@@ -201,5 +201,32 @@ def forage_flag(ctx):
     return _flag_rule(ctx, "forage_flag", "forage_flag", "forage_flag_points")
 
 
+def soil_steps(ctx):
+    """improve_soil points per season (same logic and weights as the three soil rules above),
+    for drawing a relative soil trend. Not a nitrogen or organic-matter measurement."""
+    ids, n = ctx.ids, ctx.n_years
+    steps = [{"season_index": i, "points": 0.0, "rules": []} for i in range(len(ids))]
+
+    def add(i, rule_id, points):
+        steps[i]["points"] += points
+        if rule_id not in steps[i]["rules"]:
+            steps[i]["rules"].append(rule_id)
+
+    wn, wf, wd = ctx.w("n_credit_legume_after_cereal"), ctx.w("family_break"), ctx.w("deep_root_structure")
+    for i, cur in enumerate(ids):
+        prev = ids[i - 1]  # cyclic, as in the rules
+        if val(ctx.crops, prev, "cereal") and val(ctx.crops, cur, "legume"):
+            add(i, "n_credit_legume_after_cereal", wn["points_per_transition"] / n)
+        fp, fc = families(ctx.crops, prev), families(ctx.crops, cur)
+        if fp and fc and not (prev == cur and val(ctx.crops, cur, "perennial")):
+            key = "points_per_same_family_repeat" if fp & fc else "points_per_family_change"
+            add(i, "family_break", wf[key] / n)
+        if cur != "fallow" and rooting_class(ctx.crops, cur, ctx.weights) == "deep":
+            add(i, "deep_root_structure", wd["points_per_deep_crop_year"] / n)
+    for st in steps:
+        st["points"] = round(st["points"], 2)
+    return steps
+
+
 RULES = [n_credit_legume_after_cereal, family_break, deep_root_structure, bare_months_penalty,
          cover_fills_bare, water_demand_match, income_flag, forage_flag]

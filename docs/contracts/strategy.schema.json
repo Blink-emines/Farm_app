@@ -83,7 +83,11 @@
             }
           }
         },
-        "priorities": { "$ref": "#/$defs/priorities" }
+        "priorities": { "$ref": "#/$defs/priorities" },
+        "allowed_crops": {
+          "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/cropId" },
+          "description": "Optional. Crops the farmer can get locally. Alternatives that use any other crop (fallow excepted) are not proposed. The current rotation is always scored."
+        }
       }
     },
     "calendarMonth": {
@@ -119,7 +123,7 @@
       "additionalProperties": false,
       "required": [
         "id", "name", "is_current", "rank", "score", "seasons", "calendar", "why",
-        "evidence", "benefits", "information_gaps", "risks_for_local_review", "confidence"
+        "evidence", "benefits", "information_gaps", "risks_for_local_review", "confidence", "soil_steps"
       ],
       "properties": {
         "id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
@@ -184,7 +188,19 @@
         "benefits": { "type": "array", "items": { "$ref": "#/$defs/message" } },
         "information_gaps": { "type": "array", "items": { "$ref": "#/$defs/message" } },
         "risks_for_local_review": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/message" } },
-        "confidence": { "enum": ["low", "medium", "high"] }
+        "confidence": { "enum": ["low", "medium", "high"] },
+        "soil_steps": {
+          "type": "array",
+          "description": "Points of the improve_soil rules (legume after cereal, family break, deep roots) attributed to each season, in the order of seasons. For drawing a relative soil trend only: not a measurement of nitrogen or organic matter. Their sum equals the improve_soil points in why (up to rounding).",
+          "items": {
+            "type": "object", "additionalProperties": false, "required": ["season_index", "points", "rules"],
+            "properties": {
+              "season_index": { "type": "integer", "minimum": 0 },
+              "points": { "type": "number" },
+              "rules": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        }
       }
     },
     "StrategyResponse": {

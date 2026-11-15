@@ -16,7 +16,8 @@ def layout(seasons, crops):
     harvest and harvested at the first occurrence of its harvest month after sowing.
     Fallow and perennials take a 12-month slot starting the month after the previous harvest.
     The cycle repeats; its length is rounded up to whole years.
-    Returns {spans: [(start, end, crop)], slots, length, t0, seasons}."""
+    Returns {spans: [(start, end, crop)], length, t0, seasons}. Month states come only from
+    calendar_from_spans, so there is one timeline."""
     spans, out, prev_end = [], [], None
     for s in seasons:
         cid = s["crop_id"]
@@ -36,11 +37,7 @@ def layout(seasons, crops):
     next_start = prev_end + 1 if first_whole else _after(prev_end, first["sow_month"])
     t0 = spans[0][0]
     length = -(-(next_start - t0) // 12) * 12
-    slots = [None] * length
-    for start, end, cid in spans:
-        for a in range(start, end + 1):
-            slots[(a - t0) % length] = cid
-    return {"spans": spans, "slots": slots, "length": length, "t0": t0, "seasons": out}
+    return {"spans": spans, "length": length, "t0": t0, "seasons": out}
 
 
 def _monthly(features, name, m):
@@ -75,16 +72,22 @@ def month_stress(crops, crop, features, m, warnings):
 
 def calendar_from_spans(spans, length, crops, features, warnings):
     """Rows of 12 months from spans (start, end, crop) on a cyclic axis of `length` months
-    (absolute index 0 = January of row 1; indexes wrap modulo `length`)."""
+    (absolute index 0 = January; indexes wrap modulo `length`).
+
+    Each row is a farming year that starts at the first sowing (e.g. November to October),
+    so a crop's whole season sits in its own year. The single source of month states."""
     slots = [None] * length
     for start, end, cid in spans:
         for a in range(start, end + 1):
             slots[a % length] = cid
+    t0 = min(start for start, _, _ in spans) if spans else 0
     rows = []
     for y in range(length // 12):
         months = []
-        for m in range(1, 13):
-            crop = slots[(12 * y + m - 1) % length]
+        for k in range(12):
+            a = t0 + 12 * y + k
+            m = a % 12 + 1
+            crop = slots[a % length]
             if crop is None:
                 months.append({"month": m, "crop_id": None, "status": "bare", "stress_reasons": []})
             elif crop == "fallow":

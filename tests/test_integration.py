@@ -114,9 +114,12 @@ def test_calendar_rows_match_the_season_windows(wheat_fallow):
     for s in wheat_fallow["strategies"]:
         owner, cycle = _occupancy(s["seasons"])
         assert len(s["calendar"]) == len(s["seasons"]), s["id"]
+        # Rows are farming years starting at the first sowing month (e.g. November to October).
+        t0 = s["seasons"][0]["sow_month"] - 1
         for row in s["calendar"]:
+            assert row["months"][0]["month"] == t0 + 1, s["id"]
             for month in row["months"]:
-                index = (MONTHS_TOTAL * (row["year"] - 1) + month["month"] - 1) % cycle
+                index = (t0 + MONTHS_TOTAL * (row["year"] - 1) + (month["month"] - 1 - t0) % MONTHS_TOTAL) % cycle
                 expected = owner.get(index)
                 assert month["crop_id"] == expected, (
                     f"{s['id']} year {row['year']} month {month['month']}: "

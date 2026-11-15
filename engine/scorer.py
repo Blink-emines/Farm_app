@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from .loaders import (DEFAULT_SOURCE, UNKNOWN, field as crop_field, load_crops, load_weights,
                       val, validators)
 from .messages import msg
-from .rules import RULES, Ctx
+from .rules import RULES, Ctx, soil_steps
 from .season_calendar import build_calendar, calendar_from_spans
 
 PRIORITIES = ["save_water", "improve_soil", "extra_income", "reduce_erosion", "forage"]
@@ -124,7 +124,7 @@ def evaluate(strategy_id, is_current, crop_ids, seasons, defaults, crops, featur
         "evidence": _dedupe(evidence, lambda e: (e["feature"], tuple(e.get("months", [])))),
         "benefits": _dedupe(benefits, lambda b: b["code"]),
         "information_gaps": gaps, "risks_for_local_review": risks, "confidence": confidence,
-        "_raw": raw,
+        "soil_steps": soil_steps(ctx), "_raw": raw,
     }
 
 
@@ -160,9 +160,14 @@ def score(features, request, crops=None, weights=None):
     cur_ids = [s["crop_id"] for s in req_seasons]
     seasons, defaults = resolve_seasons(cur_ids, req_seasons, crops)
     pool = [evaluate("current_rotation", True, cur_ids, seasons, defaults, crops, features, weights)]
+    allowed = set(request.get("allowed_crops") or []) | {"fallow"}
+    filtered = False
     for t in TEMPLATES:
         if t["crops"] == cur_ids:
             continue  # identical to the farmer's rotation: shown once, as the current one
+        if "allowed_crops" in request and not set(t["crops"]) <= allowed:
+            filtered = True  # uses a crop the farmer cannot get locally
+            continue
         ts, td = resolve_seasons(t["crops"], None, crops)
         pool.append(evaluate(t["id"], False, t["crops"], ts, td, crops, features, weights))
 
@@ -181,6 +186,8 @@ def score(features, request, crops=None, weights=None):
 
     notes = [msg("note_relative_scores"), msg("note_local_expert"), msg("note_normalisation")]
     notes.append(msg("note_soil_not_scored"))
+    if filtered:
+        notes.append(msg("note_allowed_crops"))
     period = features["climate"]["period"]
     response = {
         "schema_version": "1.0",
