@@ -361,3 +361,12 @@ How to fix one: edit the value of that key in `frontend/src/i18n/ar.js`, or writ
 - زرع / حصد (sow / harvest), الزريعة (seed), الصّابة (harvest, yield), المردودية (return)
 - دابا (now), شنو / كيفاش / فين / شحال (what / how / where / how much)
 - Month names: Moroccan forms (يناير … دجنبر), unchanged.
+
+## 3. Added later (optimise wizard step names)
+
+| Key | Darija now | Your correction |
+|---|---|---|
+| `ui.optab_step_now` | دابا | |
+| `ui.optab_step_soil` | التربة | |
+| `ui.optab_step_plant` | شنو تزرع | |
+| `ui.optab_step_goals` | شنو مهم | |

@@ -180,7 +180,9 @@ def _run_wizard(page, lang, account):
     page.get_by_role("button", name=t["analyse"]).first.click()
     _log_in(page, t, account)
     page.get_by_role("tab", name=t["view_optimise"]).click()
-    page.locator(".opt-step").first.get_by_role("radio").first.click()  # what is on the field now
+    page.locator(".opt-step").first.get_by_role("radio").first.click()  # page 1: what is on the field now
+    for _ in range(3):  # soil, what to plant, goals
+        page.get_by_role("button", name=t["next"]).click()
     page.get_by_role("button", name=t["opt_run"]).click()
     expect(page.get_by_role("heading", name=t["results"])).to_be_visible(timeout=60000)
 
@@ -370,30 +372,38 @@ def test_unknown_soil_is_shown_from_the_map_not_as_i_dont_know(page):
 def test_each_field_keeps_its_own_answers(page):
     t = _open_optimise(page, _farm_user())
     page.get_by_role("tab", name=t["view_optimise"]).click()
-    now = page.locator(".opt-step").nth(0)
-    plant = page.locator(".opt-step").nth(2)
-    now.get_by_role("radio", name="Wheat").click()
-    plant.get_by_role("button", name="Lentil").click()
-    page.get_by_role("radio", name="Field 2 · 2 ha").click()
-    expect(now.get_by_role("radio", name="Wheat")).to_have_attribute("aria-checked", "false")
-    expect(plant.get_by_role("button", name="Lentil")).to_have_attribute("aria-pressed", "false")
-    now.get_by_role("radio", name="Nothing (bare field)").click()
-    plant.get_by_role("button", name="Barley").click()
+    card = page.locator(".opt-card")
+    nxt = lambda: page.get_by_role("button", name=t["next"]).click()
+    to_plant = lambda: (nxt(), nxt())
+    card.get_by_role("radio", name="Wheat").click()
+    to_plant()
+    card.get_by_role("button", name="Lentil").click()
+    page.get_by_role("radio", name="Field 2 · 2 ha").click()  # a new field starts at step 1
+    expect(card.get_by_role("radio", name="Wheat")).to_have_attribute("aria-checked", "false")
+    card.get_by_role("radio", name="Nothing (bare field)").click()
+    to_plant()
+    expect(card.get_by_role("button", name="Lentil")).to_have_attribute("aria-pressed", "false")
+    card.get_by_role("button", name="Barley").click()
     page.get_by_role("radio", name="Field 1 · 1 ha").click()
-    expect(now.get_by_role("radio", name="Wheat")).to_have_attribute("aria-checked", "true")
-    expect(plant.get_by_role("button", name="Lentil")).to_have_attribute("aria-pressed", "true")
-    expect(plant.get_by_role("button", name="Barley")).to_have_attribute("aria-pressed", "false")
+    expect(card.get_by_role("radio", name="Wheat")).to_have_attribute("aria-checked", "true")
+    to_plant()
+    expect(card.get_by_role("button", name="Lentil")).to_have_attribute("aria-pressed", "true")
+    expect(card.get_by_role("button", name="Barley")).to_have_attribute("aria-pressed", "false")
     page.get_by_role("radio", name="Field 2 · 2 ha").click()
-    expect(now.get_by_role("radio", name="Nothing (bare field)")).to_have_attribute("aria-checked", "true")
-    expect(plant.get_by_role("button", name="Barley")).to_have_attribute("aria-pressed", "true")
+    expect(card.get_by_role("radio", name="Nothing (bare field)")).to_have_attribute("aria-checked", "true")
 
 
 def test_one_chosen_crop_is_in_every_option_and_the_plan_has_steps(page):
     t = _open_optimise(page, _farm_user(fields=1))
     page.get_by_role("tab", name=t["view_optimise"]).click()
     expect(page.get_by_role("button", name="Add a year")).to_have_count(0)  # one year only
-    page.locator(".opt-step").nth(0).get_by_role("radio", name="Wheat").click()
-    page.locator(".opt-step").nth(2).get_by_role("button", name="Lentil").click()
+    page.get_by_role("button", name=t["next"]).click()
+    expect(page.get_by_role("alert")).to_be_visible()  # page 1 needs an answer
+    page.locator(".opt-card").get_by_role("radio", name="Wheat").click()
+    page.get_by_role("button", name=t["next"]).click()
+    page.get_by_role("button", name=t["next"]).click()
+    page.locator(".opt-card").get_by_role("button", name="Lentil").click()
+    page.get_by_role("button", name=t["next"]).click()
     page.get_by_role("button", name=t["opt_run"]).click()
     # Item 8: a month-by-month action plan, each step tied to a named rule, no Play button.
     steps = page.locator(".act-step")

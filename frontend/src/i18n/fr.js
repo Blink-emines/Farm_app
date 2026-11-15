@@ -625,5 +625,9 @@ export default {
   'step_fallow_why': "Un champ au repos est un sol nu ; une culture de couverture le protégerait.",
   'step_avoid_family_why': "La même famille de cultures garde ses ravageurs et maladies dans le sol.",
   'note_required_crop': "Chaque option contient la culture choisie ; le calcul a choisi ce qui va autour.",
-  'step_perennial_why': "Cette culture reste dans le champ toute l’année : on l’installe une fois, on ne la sème pas à chaque saison."
+  'step_perennial_why': "Cette culture reste dans le champ toute l’année : on l’installe une fois, on ne la sème pas à chaque saison.",
+  'ui.optab_step_now': "Maintenant",
+  'ui.optab_step_soil': "Sol",
+  'ui.optab_step_plant': "À planter",
+  'ui.optab_step_goals': "Objectifs"
 };

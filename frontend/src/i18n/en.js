@@ -645,5 +645,9 @@ export default {
   "step_fallow_why": "A field left to rest is bare soil; a cover crop would protect it.",
   "step_avoid_family_why": "The same crop family again keeps its pests and diseases in the soil.",
   "note_required_crop": "Every alternative includes the crop you chose; the engine picked what goes around it.",
-  "step_perennial_why": "This crop stays in the field all year: it is set up once, not sown every season."
+  "step_perennial_why": "This crop stays in the field all year: it is set up once, not sown every season.",
+  "ui.optab_step_now": "Now",
+  "ui.optab_step_soil": "Soil",
+  "ui.optab_step_plant": "To plant",
+  "ui.optab_step_goals": "Goals"
 };

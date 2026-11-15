@@ -13,6 +13,17 @@ import OptimiseTab from './components/OptimiseTab.jsx';
 import PrintReport from './components/PrintReport.jsx';
 import { BrandMark } from './components/icons.jsx';
 
+// Looping sky behind the landing page and the app. Still frame when the phone asks for less motion.
+function Sky() {
+  const still = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  return (
+    <div className="sky" aria-hidden="true">
+      <video src="/sky.mp4" autoPlay={!still} muted loop playsInline preload="auto" />
+      <div className="sky-wash" />
+    </div>
+  );
+}
+
 const BALANCED = { save_water: 3, improve_soil: 3, extra_income: 3, reduce_erosion: 3, forage: 3 };
 
 // One field's answers in the optimisation tab, starting from what is saved on the field.
@@ -126,6 +137,7 @@ export default function App() {
   return (
     <>
       <div className="screen-only">
+        <Sky />
         {settingsOpen && <SettingsPanel onClose={() => setSettingsOpen(false)} />}
         {(USE_MOCK || features?._mockExtras) && <div className="mock-banner" role="alert">{t('ui.mock_banner')}</div>}
         {!started ? (
