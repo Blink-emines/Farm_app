@@ -3,11 +3,50 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 
+class Farm(models.Model):
+    """The farm a user describes in the setup wizard: where it is, its soil, what can be grown."""
+
+    SOIL_TYPES = [
+        ('clay', 'Heavy clay (tirs)'),
+        ('loam', 'Balanced soil'),
+        ('sandy', 'Sandy (rmel)'),
+        ('red', 'Red soil (hamri)'),
+        ('stony', 'Stony or chalky'),
+        ('unknown', 'Not known'),
+    ]
+
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='farms'
+    )
+    name = models.CharField(max_length=100)
+    latitude = models.FloatField(
+        validators=[MinValueValidator(-90), MaxValueValidator(90)]
+    )
+    longitude = models.FloatField(
+        validators=[MinValueValidator(-180), MaxValueValidator(180)]
+    )
+    # Declared by the farmer. Not used by the scorer (it uses SoilGrids); kept for later.
+    soil_type = models.CharField(max_length=10, choices=SOIL_TYPES, default='unknown')
+    # Crop ids (engine/crops.yaml) the farmer can grow and buy seed for locally.
+    crops = models.JSONField(default=list)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+
+
 class Field(models.Model):
     """A piece of farmland that belongs to exactly one user."""
 
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='fields'
+    )
+    # Set when the field was created by the farm setup wizard.
+    farm = models.ForeignKey(
+        Farm, on_delete=models.CASCADE, related_name='parcels', null=True, blank=True
+    )
+    area_ha = models.FloatField(
+        null=True, blank=True, validators=[MinValueValidator(0.01), MaxValueValidator(10000)]
     )
     name = models.CharField(max_length=100)
     latitude = models.FloatField(

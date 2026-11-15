@@ -1,7 +1,7 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { LANGS, useI18n } from './i18n/index.jsx';
 import SettingsPanel, { GearButton } from './components/SettingsPanel.jsx';
-import { ApiError, USE_MOCK, getStrategies, isLoggedIn, logout, savePlan } from './api.js';
+import { ApiError, USE_MOCK, getFarms, getStrategies, isLoggedIn, logout, savePlan } from './api.js';
 import { DEFAULT_POINT, buildRequest } from './constants.js';
 import LocationPicker from './components/LocationPicker.jsx';
 import RotationInput from './components/RotationInput.jsx';
@@ -10,6 +10,7 @@ import Results from './components/Results.jsx';
 import OptimiserFlow from './components/OptimiserFlow.jsx';
 import Landing from './components/Landing.jsx';
 import Auth from './components/Auth.jsx';
+import FarmSetup from './components/FarmSetup.jsx';
 import PrintReport from './components/PrintReport.jsx';
 import { BrandMark } from './components/icons.jsx';
 
@@ -50,6 +51,9 @@ export default function App() {
   const [started, setStarted] = useState(false);
   const [authed, setAuthed] = useState(isLoggedIn);
   const [saved, setSaved] = useState('');
+  // undefined: not loaded yet, null: no farm yet (show the setup wizard), 'error': could not load.
+  const [farm, setFarm] = useState(undefined);
+  const [farmTry, setFarmTry] = useState(0);
   const [mode, setMode] = useState('single');
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [status, setStatus] = useState({ state: 'idle' });
@@ -59,6 +63,23 @@ export default function App() {
     setStep(n);
     topRef.current?.scrollIntoView({ block: 'start' });
   };
+
+  // After login, look for the user's farm. Without one, the farm setup wizard comes first.
+  useEffect(() => {
+    if (!started || !authed) return undefined;
+    let stale = false;
+    setFarm(undefined);
+    getFarms().then(
+      (farms) => {
+        if (stale) return;
+        const f = farms[0] ?? null;
+        setFarm(f);
+        if (f) setForm((cur) => ({ ...cur, lat: f.latitude, lon: f.longitude }));
+      },
+      (err) => { if (stale) return; if (err.code === 'auth') setAuthed(false); else setFarm('error'); },
+    );
+    return () => { stale = true; };
+  }, [started, authed, farmTry]);
 
   async function compare() {
     setStatus({ state: 'loading' });
@@ -108,6 +129,20 @@ export default function App() {
           <Landing head={head} onStart={() => setStarted(true)} />
         ) : !authed ? (
           <Auth head={head} onDone={() => setAuthed(true)} onBack={() => setStarted(false)} />
+        ) : farm === undefined || farm === 'error' ? (
+          <>
+            {head}
+            <main className="wizard">
+              {farm === 'error' ? (
+                <>
+                  <p className="notice notice-error" role="alert">{t('ui.farm_load_error')}</p>
+                  <button type="button" className="btn btn-primary" onClick={() => setFarmTry((n) => n + 1)}>{t('ui.retry')}</button>
+                </>
+              ) : <p className="help" role="status">{t('ui.farm_loading')}</p>}
+            </main>
+          </>
+        ) : farm === null ? (
+          <FarmSetup head={head} onDone={(f) => { setFarm(f); patch({ lat: f.latitude, lon: f.longitude }); }} />
         ) : (
         <>
         {head}

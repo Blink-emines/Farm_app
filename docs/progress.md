@@ -34,3 +34,7 @@ Next: point Django at Supabase Postgres (docs/supabase-setup.md). Optimiser-mode
 ## 2026-11-15 — Supabase migrated (lead)
 Done: branch supabase-postgres checked out, with the login/saved-plans work on top. psycopg installed; `migrate` ran on Supabase (Paris session pooler), including farms/0002: all 13 public tables have RLS on (the "not rowsecurity" check returns no rows). Django tests on SQLite: 57 OK. Live check on Supabase: register 201, login by email 200, POST /api/fields/ 201, POST /api/results/ 201; counts auth_user 1, farms_field 1, farms_result 1 (one test user, "check-…").
 Open: superuser not created yet (waiting for the user's credentials). The dev server on :8000 was started before DATABASE_URL was added: restart it to use Supabase. Reset the DB password (it was shared in chat) and update backend/.env.
+
+## 2026-11-15 — farm setup wizard (lead, branch farm-setup)
+Done: 5-step farm wizard (FR/AR/EN, RTL), /api/farms/, migrations 0003-0004 (applied to local SQLite only). Tests: Django 66 OK (9 new), 76 cross-layer; wizard checked end to end in a browser (GPS simulated) on SQLite.
+Waiting: approval to run `migrate` on Supabase (adds farms_farm table + 2 nullable columns on farms_field); e2e suite runs through :8000, which now uses Supabase, so it needs that migration first. Second wizard: waiting for the user's spec. Soil names (Tirs, Rmel, Hamri) need a native check.

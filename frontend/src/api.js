@@ -132,3 +132,15 @@ export async function savePlan(lat, lon, plan) {
     ?? await authed('/api/fields/', { method: 'POST', body: { name: `${lat.toFixed(4)}, ${lon.toFixed(4)}`, latitude: lat, longitude: lon } });
   return authed('/api/results/', { method: 'POST', body: { field: field.id, data: plan } });
 }
+
+// ---------- farm setup wizard ----------
+export async function getFarms() {
+  if (USE_MOCK) return [];
+  return authed('/api/farms/');
+}
+
+// farm: { name, latitude, longitude, soil_type, crops: [ids], parcels: [{ name, area_ha }] }
+export async function createFarm(farm) {
+  if (USE_MOCK) return { id: 0, ...farm };
+  return authed('/api/farms/', { method: 'POST', body: farm });
+}

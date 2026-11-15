@@ -1,11 +1,16 @@
 from django.contrib import admin
 
-from .models import Field, Measurement, Result
+from .models import Farm, Field, Measurement, Result
+
+
+@admin.register(Farm)
+class FarmAdmin(admin.ModelAdmin):
+    list_display = ('name', 'owner', 'soil_type', 'latitude', 'longitude', 'created_at')
 
 
 @admin.register(Field)
 class FieldAdmin(admin.ModelAdmin):
-    list_display = ('name', 'owner', 'latitude', 'longitude')
+    list_display = ('name', 'owner', 'farm', 'area_ha', 'latitude', 'longitude')
 
 
 @admin.register(Measurement)

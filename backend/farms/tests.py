@@ -6,7 +6,7 @@ from django.db import IntegrityError, transaction
 from django.test import TestCase
 from rest_framework.test import APITestCase
 
-from .models import Field, Measurement, Result
+from .models import Farm, Field, Measurement, Result
 
 User = get_user_model()
 
@@ -325,3 +325,61 @@ class EmailLoginTests(APITestCase):
         User.objects.create_user(username='x', email='a@example.com', password='correct-horse-9')
         login = self.client.post('/api/token/', {'username': 'a@example.com', 'password': 'nope'})
         self.assertEqual(login.status_code, 401)
+
+
+class FarmTests(APITestCase):
+    """The setup wizard: a farm with its fields, soil, location and local crops."""
+
+    def setUp(self):
+        self.me = User.objects.create_user(username='me', password='correct-horse-9')
+        self.other = User.objects.create_user(username='other', password='correct-horse-9')
+        token = self.client.post(
+            '/api/token/', {'username': 'me', 'password': 'correct-horse-9'}
+        ).data['access']
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
+
+    def farm(self, **over):
+        body = {
+            'name': 'Ferme Amina', 'latitude': 33.96, 'longitude': -5.27, 'soil_type': 'red',
+            'crops': ['wheat', 'chickpea'],
+            'parcels': [{'name': 'Field 1', 'area_ha': 2.5}, {'name': 'Field 2', 'area_ha': 0.75}],
+        }
+        body.update(over)
+        return self.client.post('/api/farms/', body, format='json')
+
+    def test_create_farm_with_its_fields(self):
+        response = self.farm()
+        self.assertEqual(response.status_code, 201, response.data)
+        self.assertEqual([p['area_ha'] for p in response.data['parcels']], [2.5, 0.75])
+        fields = Field.objects.filter(owner=self.me, farm__isnull=False)
+        self.assertEqual(fields.count(), 2)
+        self.assertTrue(all(f.latitude == 33.96 and f.longitude == -5.27 for f in fields))
+
+    def test_farm_list_shows_only_my_farms(self):
+        Farm.objects.create(owner=self.other, name='Not mine', latitude=34, longitude=-6)
+        self.farm()
+        names = [f['name'] for f in self.client.get('/api/farms/').data]
+        self.assertEqual(names, ['Ferme Amina'])
+
+    def test_unknown_crop_is_rejected(self):
+        self.assertEqual(self.farm(crops=['banana']).status_code, 400)
+
+    def test_fallow_is_not_a_market_crop(self):
+        self.assertEqual(self.farm(crops=['fallow']).status_code, 400)
+
+    def test_at_least_one_crop(self):
+        self.assertEqual(self.farm(crops=[]).status_code, 400)
+
+    def test_at_least_one_field_with_a_positive_size(self):
+        self.assertEqual(self.farm(parcels=[]).status_code, 400)
+        self.assertEqual(self.farm(parcels=[{'name': 'F', 'area_ha': 0}]).status_code, 400)
+        self.assertEqual(Farm.objects.count(), 0)
+
+    def test_unknown_soil_type_is_rejected(self):
+        self.assertEqual(self.farm(soil_type='lava').status_code, 400)
+
+    def test_soil_may_be_not_known(self):
+        self.assertEqual(self.farm(soil_type='unknown').status_code, 201)
+
+    def test_duplicate_crops_are_kept_once(self):
+        self.assertEqual(self.farm(crops=['wheat', 'wheat']).data['crops'], ['wheat'])

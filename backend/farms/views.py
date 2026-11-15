@@ -1,7 +1,9 @@
 from rest_framework import generics, mixins, permissions, viewsets
 
-from .models import Field, Measurement, Result
-from .serializers import FieldSerializer, MeasurementSerializer, RegisterSerializer, ResultSerializer
+from .models import Farm, Field, Measurement, Result
+from .serializers import (
+    FarmSerializer, FieldSerializer, MeasurementSerializer, RegisterSerializer, ResultSerializer,
+)
 
 
 class RegisterView(generics.CreateAPIView):
@@ -42,3 +44,17 @@ class ResultViewSet(
 
     def get_queryset(self):
         return Result.objects.filter(field__owner=self.request.user).order_by('-created_at')
+
+
+class FarmViewSet(
+    mixins.CreateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+):
+    """Create (with its fields) and read the logged-in user's farms."""
+
+    serializer_class = FarmSerializer
+
+    def get_queryset(self):
+        return Farm.objects.filter(owner=self.request.user).prefetch_related('parcels').order_by('created_at')
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)

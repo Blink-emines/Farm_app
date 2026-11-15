@@ -3,7 +3,12 @@ from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from .models import Field, Measurement, Result
+from engine.loaders import load_crops
+
+from .models import Farm, Field, Measurement, Result
+
+# Crops a farmer can say are available locally (every engine crop except fallow).
+MARKET_CROPS = [c for c in load_crops() if c != 'fallow']
 
 
 class FieldSerializer(serializers.ModelSerializer):
@@ -11,6 +16,47 @@ class FieldSerializer(serializers.ModelSerializer):
         model = Field
         # No 'owner': the server sets it from the login token, never the client.
         fields = ['id', 'name', 'latitude', 'longitude']
+
+
+class ParcelSerializer(serializers.ModelSerializer):
+    """One field of a farm, as entered in the setup wizard."""
+
+    area_ha = serializers.FloatField(min_value=0.01, max_value=10000)
+
+    class Meta:
+        model = Field
+        fields = ['id', 'name', 'area_ha']
+
+
+class FarmSerializer(serializers.ModelSerializer):
+    parcels = ParcelSerializer(many=True)
+    crops = serializers.ListField(
+        child=serializers.ChoiceField(choices=MARKET_CROPS), allow_empty=False, max_length=len(MARKET_CROPS)
+    )
+
+    class Meta:
+        model = Farm
+        # No 'owner': the server sets it from the login token, never the client.
+        fields = ['id', 'name', 'latitude', 'longitude', 'soil_type', 'crops', 'parcels', 'created_at']
+        read_only_fields = ['created_at']
+
+    def validate_parcels(self, parcels):
+        if not 1 <= len(parcels) <= 50:
+            raise serializers.ValidationError('A farm has between 1 and 50 fields.')
+        return parcels
+
+    def validate_crops(self, crops):
+        return list(dict.fromkeys(crops))  # drop duplicates, keep order
+
+    def create(self, validated_data):
+        parcels = validated_data.pop('parcels')
+        farm = Farm.objects.create(**validated_data)
+        # Each field sits at the farm's GPS point until the farmer places it more precisely.
+        for parcel in parcels:
+            Field.objects.create(
+                owner=farm.owner, farm=farm, latitude=farm.latitude, longitude=farm.longitude, **parcel
+            )
+        return farm
 
 
 class MeasurementSerializer(serializers.ModelSerializer):

@@ -118,15 +118,30 @@ def require_app():
         pytest.skip(f"frontend not reachable at {APP}: {exc}")
 
 
+def _post(path, body, token=None):
+    headers = {"Content-Type": "application/json"}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    req = urllib.request.Request(APP + path, data=json.dumps(body).encode(), headers=headers, method="POST")
+    with urllib.request.urlopen(req, timeout=10) as res:
+        return json.loads(res.read())
+
+
+def _new_user():
+    creds = {"username": f"e2e-{uuid.uuid4().hex[:8]}", "password": "correct-horse-9"}
+    _post("/api/register/", creds)
+    return creds
+
+
 @pytest.fixture(scope="module")
 def account():
-    """A fresh user, created through the sign-up API (via the dev server proxy)."""
-    creds = {"username": f"e2e-{uuid.uuid4().hex[:8]}", "password": "correct-horse-9"}
-    req = urllib.request.Request(
-        APP + "/api/register/", data=json.dumps(creds).encode(),
-        headers={"Content-Type": "application/json"}, method="POST",
-    )
-    urllib.request.urlopen(req, timeout=10)
+    """A fresh user who has already set up a farm, created through the API (via the dev server proxy)."""
+    creds = _new_user()
+    token = _post("/api/token/", creds)["access"]
+    _post("/api/farms/", {
+        "name": "E2E farm", "latitude": 33.96, "longitude": -5.27, "soil_type": "unknown",
+        "crops": ["wheat"], "parcels": [{"name": "Field 1", "area_ha": 1}],
+    }, token)
     return creds
 
 
@@ -275,3 +290,39 @@ def test_optimiser_returns_plans_and_pareto_chart(page, account):
     expect(chart).to_be_visible(timeout=90000)
     picker = page.get_by_role("group", name=t["pareto_pick"])
     assert picker.get_by_role("button").count() >= 2
+
+
+# ---------------------------------------------------------------------------
+# Farm setup wizard (first time after sign-up)
+# ---------------------------------------------------------------------------
+
+def test_farm_setup_wizard_with_gps(browser):
+    ctx = browser.new_context(
+        viewport={"width": 390, "height": 844},
+        geolocation={"latitude": 33.93, "longitude": -5.22, "accuracy": 20},
+        permissions=["geolocation"],
+    )
+    page = ctx.new_page()
+    page.goto(APP + "/")
+    _switch_language(page, "en")
+    t = L["en"]
+    page.get_by_role("button", name=t["analyse"]).first.click()
+    _log_in(page, t, _new_user())
+
+    expect(page.get_by_role("heading", name="What is the name of your farm?")).to_be_visible()
+    page.get_by_label("Farm name").fill("Ferme Ait Ali")
+    page.get_by_role("button", name=t["next"]).click()
+    page.get_by_role("button", name="One field more").click()
+    page.get_by_label("Field 1: size").fill("2,5")
+    page.get_by_label("Field 2: size").fill("1")
+    page.get_by_role("button", name=t["next"]).click()
+    page.get_by_role("radio", name="Red soil (Hamri)").click()
+    page.get_by_role("button", name=t["next"]).click()
+    page.get_by_role("button", name="Use my location").click()
+    expect(page.get_by_text("Position found")).to_be_visible()
+    page.get_by_role("button", name=t["next"]).click()
+    page.get_by_role("button", name="Wheat").click()
+    page.get_by_role("button", name="Save my farm").click()
+    # Then the existing analysis wizard, already placed at the farm.
+    expect(page.get_by_text("33.93").first).to_be_visible(timeout=15000)
+    ctx.close()
