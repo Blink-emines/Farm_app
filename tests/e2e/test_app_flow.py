@@ -39,9 +39,10 @@ L = {
         "settings_open": "Ouvrir les réglages",
         "settings_title": "Réglages",
         "dark": "Mode sombre",
-        "advanced": "Données avancées",
         "close": "Fermer",
-        "optimiser_mode": "Plusieurs parcelles",
+        "view_optimise": "Optimisation",
+        "opt_run": "Voir mon plan",
+        "all_fields": "Planifier tous mes champs ensemble (avancé)",
         "optimiser_title": "Optimiser mes parcelles",
         "add_parcel": "Ajouter une parcelle",
         "profile_balanced": "Équilibré",
@@ -65,9 +66,10 @@ L = {
         "settings_open": "Open settings",
         "settings_title": "Settings",
         "dark": "Dark mode",
-        "advanced": "Advanced data",
         "close": "Close",
-        "optimiser_mode": "Several parcels",
+        "view_optimise": "Optimisation",
+        "opt_run": "Show my plan",
+        "all_fields": "Plan all my fields together (advanced)",
         "optimiser_title": "Optimise my parcels",
         "add_parcel": "Add a parcel",
         "profile_balanced": "Balanced",
@@ -91,9 +93,10 @@ L = {
         "settings_open": "فتح الإعدادات",
         "settings_title": "الإعدادات",
         "dark": "الوضع الداكن",
-        "advanced": "بيانات متقدمة",
         "close": "إغلاق",
-        "optimiser_mode": "عدة قطع",
+        "view_optimise": "التحسين",
+        "opt_run": "أرني خطتي",
+        "all_fields": "خطط لكل حقولي معا (متقدم)",
         "optimiser_title": "",  # filled below from the dictionary when needed
         "add_parcel": "",
         "profile_balanced": "",
@@ -171,13 +174,12 @@ def _switch_language(page, lang_code):
 
 
 def _run_wizard(page, lang, account):
-    """Landing -> analyse -> log in -> place -> rotation -> goals -> results (simple view)."""
+    """Landing -> analyse -> log in -> My farm -> Optimisation tab -> Show my plan -> results."""
     t = L[lang]
     page.get_by_role("button", name=t["analyse"]).first.click()
     _log_in(page, t, account)
-    page.get_by_role("button", name=t["next"]).first.click()  # place -> rotation
-    page.get_by_role("button", name=t["next"]).first.click()  # rotation -> goals
-    page.get_by_role("button", name=t["compare"]).click()      # goals -> results
+    page.get_by_role("tab", name=t["view_optimise"]).click()
+    page.get_by_role("button", name=t["opt_run"]).click()
     expect(page.get_by_role("heading", name=t["results"])).to_be_visible(timeout=60000)
 
 
@@ -217,6 +219,12 @@ def test_wizard_runs_to_simple_results_in_english(page, account):
     _switch_language(page, "en")
     _run_wizard(page, "en", account)
     expect(page.get_by_text(re.compile(r"local (agricultural )?(advisor|expert)", re.I)).first).to_be_visible()
+    # New results screen: three tabs, the field picture, three verdicts, compare strips.
+    expect(page.get_by_role("tab")).to_have_count(5)  # My farm, Optimisation + My plan, Compare, Details
+    expect(page.get_by_role("img", name=re.compile("Life of your field"))).to_be_visible()
+    expect(page.locator(".verdict")).to_have_count(3)
+    page.get_by_role("tab", name="Compare").click()
+    assert page.locator(".cmp-row").count() >= 3
 
 
 def test_wizard_runs_to_simple_results_in_arabic_with_rtl(page, account):
@@ -238,7 +246,7 @@ def test_brand_name_follows_language(page):
 # Settings panel
 # ---------------------------------------------------------------------------
 
-def test_settings_toggle_dark_mode_and_advanced_data(page):
+def test_settings_toggle_dark_mode(page):
     t = L["fr"]
     page.get_by_role("button", name=t["settings_open"]).click()
     dialog = page.get_by_role("dialog", name=t["settings_title"])
@@ -248,11 +256,6 @@ def test_settings_toggle_dark_mode_and_advanced_data(page):
     before = dark.get_attribute("aria-checked")
     dark.click()
     expect(dark).not_to_have_attribute("aria-checked", before)
-
-    adv = dialog.get_by_role("switch", name=t["advanced"])
-    adv_before = adv.get_attribute("aria-checked")
-    adv.click()
-    expect(adv).not_to_have_attribute("aria-checked", adv_before)
 
     dialog.get_by_role("button", name=t["close"]).click()
 
@@ -271,7 +274,8 @@ def test_optimiser_returns_plans_and_pareto_chart(page, account):
     t = L["fr"]
     page.get_by_role("button", name=t["analyse"]).first.click()
     _log_in(page, t, account)
-    page.get_by_role("button", name=t["optimiser_mode"]).click()
+    page.get_by_role("tab", name=t["view_optimise"]).click()
+    page.get_by_role("button", name=t["all_fields"]).click()
     expect(page.get_by_role("heading", name=t["optimiser_title"])).to_be_visible()
 
     # the first parcel is open by default: set its area first
@@ -318,11 +322,13 @@ def test_farm_setup_wizard_with_gps(browser):
     page.get_by_role("button", name=t["next"]).click()
     page.get_by_role("radio", name="Red soil (Hamri)").click()
     page.get_by_role("button", name=t["next"]).click()
-    page.get_by_role("button", name="Use my location").click()
-    expect(page.get_by_text("Position found")).to_be_visible()
-    page.get_by_role("button", name=t["next"]).click()
-    page.get_by_role("button", name="Wheat").click()
+    # Place: the map comes first; saving without placing the farm is refused.
     page.get_by_role("button", name="Save my farm").click()
-    # Then the existing analysis wizard, already placed at the farm.
-    expect(page.get_by_text("33.93").first).to_be_visible(timeout=15000)
+    expect(page.get_by_role("alert")).to_contain_text("Tap the map")
+    page.get_by_role("button", name="Use my location").click()  # secondary option
+    expect(page.get_by_text("Position found")).to_be_visible()
+    page.get_by_role("button", name="Save my farm").click()
+    # Then the "My farm" dashboard.
+    expect(page.get_by_role("heading", name="Ferme Ait Ali")).to_be_visible(timeout=15000)
+    expect(page.get_by_text("33.93").first).to_be_visible()
     ctx.close()

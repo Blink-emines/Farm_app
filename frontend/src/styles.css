@@ -627,3 +627,92 @@ div.chart-key ul { list-style: none; padding: 0; display: flex; flex-wrap: wrap;
 .soil-card span { color: var(--muted); }
 .soil-art { inline-size: 100%; block-size: auto; aspect-ratio: 3 / 2; border-radius: var(--r-s); display: block; }
 .gps-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-block-size: 64px; font-size: var(--text-m); justify-self: start; }
+
+/* ---------- farm setup: GPS as a secondary option under the map ---------- */
+.gps-box { display: grid; gap: 8px; justify-items: start; }
+.gps-box .gps-btn { min-block-size: 52px; font-size: var(--text-s); }
+
+/* ---------- two tabs after setup ---------- */
+.chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { min-block-size: 48px; padding-inline: 16px; border-radius: 999px; border: 2px solid var(--line); background: var(--surface); color: var(--ink); font-weight: 500; }
+.chip[aria-checked="true"], .chip[aria-selected="true"] { border-color: var(--primary); background: var(--primary-soft); color: var(--primary-dark); font-weight: 600; }
+
+/* ---------- My farm dashboard ---------- */
+.dash { max-inline-size: 64rem; margin-inline: auto; inline-size: 100%; }
+.dash-head h1 { margin-block-end: 4px; }
+.dash-grid { display: grid; gap: 12px; }
+@media (min-width: 760px) { .dash-grid { grid-template-columns: 1.4fr 1fr; } .dash-map { grid-row: span 2; } }
+.dash-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-l); padding: 16px; display: grid; gap: 12px; align-content: start; }
+.dash-card h2 { font-size: var(--text-m); }
+.dash-map-box { block-size: 220px; border-radius: var(--r-m); overflow: hidden; }
+@media (min-width: 760px) { .dash-map-box { block-size: 300px; } }
+.dash-fields { list-style: none; padding: 0; display: grid; gap: 4px; }
+.dash-fields li { display: flex; justify-content: space-between; gap: 8px; padding-block: 8px; border-block-end: 1px solid var(--line); }
+.dash-fields li:last-child { border-block-end: 0; }
+.dash-soil .soil-art { max-inline-size: 180px; }
+.dash-crops { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.dash-crops li { display: flex; align-items: center; gap: 8px; padding: 4px 12px 4px 8px; border-radius: 999px; background: var(--primary-soft); font-weight: 500; }
+.dash-ind { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+@media (min-width: 760px) { .dash-ind { grid-template-columns: repeat(4, 1fr); } }
+.dash-ind li { display: grid; gap: 2px; }
+.dash-ind b { font-size: 28px; line-height: 1.1; font-variant-numeric: tabular-nums; color: var(--primary-dark); }
+.dash-ind span { font-size: 14px; color: var(--muted); }
+.dash-cta { justify-self: start; }
+
+/* ---------- Life of your field ---------- */
+.field-life { inline-size: 100%; }
+.field-life svg { display: block; overflow: visible; }
+.fl-band { font-size: 13px; font-weight: 600; fill: var(--muted); }
+.fl-rain rect { fill: var(--water); opacity: 0.75; }
+.fl-crop { fill: var(--soil-growing); }
+.fl-bare { fill: var(--amber); opacity: 0.55; }
+.fl-name { font-size: 12px; font-weight: 600; fill: #fff; }
+.fl-name.on-bare { fill: var(--amber-ink); }
+.fl-dot { fill: var(--alert-line); stroke: var(--surface); stroke-width: 1.5; }
+.fl-hit { fill: transparent; cursor: pointer; }
+.fl-dots g { outline: none; }
+.fl-dots g:focus-visible .fl-dot, .fl-dots g.is-marked .fl-dot { stroke: var(--ink); stroke-width: 2.5; }
+.fl-zero { stroke: var(--line); stroke-dasharray: 3 3; }
+.fl-soil-line { fill: none; stroke: var(--clay); stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
+.fl-year-line { stroke: var(--line); stroke-width: 1.5; stroke-dasharray: 4 4; }
+.fl-cursor { fill: var(--ink); opacity: 0.1; }
+.fl-month { font-size: 11px; fill: var(--muted); }
+.fl-yearlabel { font-size: 12px; font-weight: 600; fill: var(--ink); }
+.is-compact .fl-yearlabel { font-size: 11px; fill: var(--muted); }
+.life { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-l); padding: 16px; }
+.life-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.play-btn, .listen-btn { display: inline-flex; align-items: center; gap: 8px; min-block-size: 48px; padding-inline: 20px; }
+.life-caption { min-block-size: 3em; font-size: var(--text-s); }
+.life-caption.is-dry { border-inline-start: 4px solid var(--alert-line); padding-inline-start: 12px; }
+.life-key { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 14px; color: var(--muted); }
+.life-key li { display: flex; align-items: center; gap: 8px; }
+.life-key i { display: inline-block; inline-size: 16px; block-size: 12px; border-radius: 4px; }
+.k-crop { background: var(--soil-growing); } .k-bare { background: var(--amber); opacity: 0.55; }
+.k-dot { inline-size: 12px !important; block-size: 12px !important; border-radius: 50% !important; background: var(--alert-line); }
+.k-soil { block-size: 3px !important; background: var(--clay); }
+.life-risk { display: flex; gap: 8px; align-items: flex-start; color: var(--bad-text); }
+.life-risk svg { inline-size: 22px; block-size: 22px; flex: none; }
+.advice-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.plan-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* ---------- verdict tiles ---------- */
+.verdicts { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.verdict { border-radius: var(--r-m); padding: 12px 8px; display: grid; gap: 4px; justify-items: center; text-align: center; }
+.verdict svg { inline-size: 30px; block-size: 30px; }
+.verdict .v-name { font-size: 14px; font-weight: 500; }
+.verdict strong { font-size: 15px; line-height: 1.25; }
+.v-good { background: #d7f0dc; color: #14532d; }
+.v-caution { background: #fde9bf; color: #5b3b00; }
+.v-risk { background: #f9d6cc; color: #7a2410; }
+:root[data-theme="dark"] .v-good { background: #1f4a2f; color: #bff0d0; }
+:root[data-theme="dark"] .v-caution { background: #4a3b12; color: #f6d27a; }
+:root[data-theme="dark"] .v-risk { background: #5a2418; color: #ffc2b0; }
+
+/* ---------- Compare: stacked strips ---------- */
+.cmp-row { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-l); padding: 16px; display: grid; gap: 8px; }
+.cmp-row.is-selected { border-color: var(--primary); }
+.cmp-head { display: grid; gap: 2px; }
+.cmp-head h3 { font-size: var(--text-m); }
+.cmp-facts { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; font-size: 14px; color: var(--muted); }
+.cmp-badge { padding: 4px 12px; border-radius: 999px; background: var(--primary-soft); color: var(--primary-dark); font-weight: 600; }
+.cmp-row .btn { justify-self: start; }

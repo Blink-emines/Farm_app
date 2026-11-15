@@ -13,8 +13,9 @@ export const inBox = (lat, lon) =>
   lat >= BOX.south && lat <= BOX.north && lon >= BOX.west && lon <= BOX.east;
 
 // Build the StrategyRequest. Empty months are left out so the engine fills them.
+// form.allowedCrops (optional): crops the farmer can get; empty = no filter.
 export function buildRequest(form) {
-  return {
+  const req = {
     latitude: form.lat,
     longitude: form.lon,
     current_rotation: {
@@ -28,6 +29,8 @@ export function buildRequest(form) {
     },
     priorities: form.priorities,
   };
+  if (form.allowedCrops?.length) req.allowed_crops = form.allowedCrops;
+  return req;
 }
 
 // Slider presets, same as engine/weights.yaml (optimiser.profiles).

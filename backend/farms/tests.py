@@ -367,8 +367,26 @@ class FarmTests(APITestCase):
     def test_fallow_is_not_a_market_crop(self):
         self.assertEqual(self.farm(crops=['fallow']).status_code, 400)
 
-    def test_at_least_one_crop(self):
-        self.assertEqual(self.farm(crops=[]).status_code, 400)
+    def test_crops_are_optional_at_setup(self):
+        body = self.farm(crops=[]).data
+        self.assertEqual(body['crops'], [])
+        self.assertEqual(self.farm(crops=None).status_code, 400)
+
+    def test_crops_can_be_saved_later(self):
+        farm_id = self.farm(crops=[]).data['id']
+        response = self.client.patch(f'/api/farms/{farm_id}/', {'crops': ['lentil']}, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Farm.objects.get(id=farm_id).crops, ['lentil'])
+
+    def test_fields_cannot_be_replaced_by_an_edit(self):
+        farm_id = self.farm().data['id']
+        response = self.client.patch(f'/api/farms/{farm_id}/', {'parcels': []}, format='json')
+        self.assertEqual(response.status_code, 400)
+
+    def test_i_cannot_edit_another_users_farm(self):
+        other = Farm.objects.create(owner=self.other, name='Not mine', latitude=34, longitude=-6)
+        response = self.client.patch(f'/api/farms/{other.id}/', {'crops': ['wheat']}, format='json')
+        self.assertEqual(response.status_code, 404)
 
     def test_at_least_one_field_with_a_positive_size(self):
         self.assertEqual(self.farm(parcels=[]).status_code, 400)

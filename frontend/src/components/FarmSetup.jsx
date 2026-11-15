@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { useI18n } from '../i18n/index.jsx';
-import { CROPS, DEFAULT_POINT, inBox } from '../constants.js';
+import { DEFAULT_POINT, inBox } from '../constants.js';
 import { createFarm } from '../api.js';
 import LocationPicker from './LocationPicker.jsx';
-import { CropIcon, PinIcon } from './icons.jsx';
+import { PinIcon } from './icons.jsx';
 
-const STEPS = ['name', 'fields', 'soil', 'location', 'crops'];
+// Crops are chosen later, in the optimisation tab.
+const STEPS = ['name', 'fields', 'soil', 'location'];
 const SOILS = ['clay', 'loam', 'sandy', 'red', 'stony', 'unknown'];
-const MARKET_CROPS = CROPS.filter((c) => c !== 'fallow');
 const MAX_FIELDS = 20;
 
 // Small drawings of each soil, so the farmer picks by look rather than by name.
@@ -62,24 +62,24 @@ const SOIL_ART = {
   ),
 };
 
-function SoilArt({ id }) {
+export function SoilArt({ id }) {
   return <svg className="soil-art" viewBox="0 0 120 80" aria-hidden="true" focusable="false">{SOIL_ART[id]}</svg>;
 }
 
 const toNumber = (text) => Number(String(text).replace(',', '.'));
 const validSize = (text) => String(text).trim() !== '' && toNumber(text) > 0 && toNumber(text) <= 10000;
 
-// First wizard after sign-up: describe the farm once (name, fields, soil, GPS position, local crops).
+// First wizard after sign-up: describe the farm once (name, fields, soil, place).
 export default function FarmSetup({ head, onDone }) {
-  const { t, crop } = useI18n();
+  const { t } = useI18n();
   const [step, setStep] = useState(0);
   const [name, setName] = useState('');
   const [sizes, setSizes] = useState(['']);
   const [soil, setSoil] = useState('');
-  const [point, setPoint] = useState(null);
+  // The map shows a starting point; the farmer must tap the map or use GPS before going on.
+  const [point, setPoint] = useState({ ...DEFAULT_POINT });
+  const [placed, setPlaced] = useState(false);
   const [geo, setGeo] = useState({ state: 'idle' });
-  const [useMap, setUseMap] = useState(false);
-  const [crops, setCrops] = useState([]);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
   const alertRef = useRef(null);
@@ -100,6 +100,7 @@ export default function FarmSetup({ head, onDone }) {
         if (!inBox(coords.latitude, coords.longitude)) { setGeo({ state: 'outside' }); return; }
         const r = (x) => Math.round(x * 10000) / 10000;
         setPoint({ lat: r(coords.latitude), lon: r(coords.longitude) });
+        setPlaced(true);
         setGeo({ state: 'ok', accuracy: Math.round(coords.accuracy) });
         setError('');
       },
@@ -108,16 +109,13 @@ export default function FarmSetup({ head, onDone }) {
     );
   }
 
-  const openMap = () => { setUseMap(true); setPoint((p) => p ?? { ...DEFAULT_POINT }); setError(''); };
-
   // The message to show if the current step is not filled in yet.
   const problem = () => {
     const id = STEPS[step];
     if (id === 'name' && !name.trim()) return 'ui.farm_err_name';
     if (id === 'fields' && !sizes.every(validSize)) return 'ui.farm_err_size';
     if (id === 'soil' && !soil) return 'ui.farm_err_soil';
-    if (id === 'location' && !point) return 'ui.farm_err_location';
-    if (id === 'crops' && !crops.length) return 'ui.farm_err_crops';
+    if (id === 'location' && !placed) return 'ui.farm_err_location';
     return '';
   };
 
@@ -133,7 +131,6 @@ export default function FarmSetup({ head, onDone }) {
         latitude: point.lat,
         longitude: point.lon,
         soil_type: soil,
-        crops,
         parcels: sizes.map((s, i) => ({ name: t('ui.farm_field_name', { n: i + 1 }), area_ha: toNumber(s) })),
       });
       onDone(farm);
@@ -144,7 +141,6 @@ export default function FarmSetup({ head, onDone }) {
   }
 
   const back = () => { setError(''); setStep(step - 1); };
-  const toggleCrop = (c) => setCrops((cs) => (cs.includes(c) ? cs.filter((x) => x !== c) : [...cs, c]));
   const id = STEPS[step];
   const geoMsg = { asking: 'ui.farm_gps_asking', denied: 'ui.farm_gps_denied', unavailable: 'ui.farm_gps_unavailable', outside: 'ui.farm_gps_outside' }[geo.state];
 
@@ -213,33 +209,16 @@ export default function FarmSetup({ head, onDone }) {
 
             {id === 'location' && (
               <>
-                <button type="button" className="btn btn-primary gps-btn" onClick={locate} disabled={geo.state === 'asking'}>
-                  <PinIcon size={24} />{t('ui.farm_gps_button')}
-                </button>
-                {geoMsg && <p className={`notice${geo.state === 'asking' ? '' : ' notice-error'}`} role="status">{t(geoMsg)}</p>}
-                {geo.state === 'ok' && <p className="notice" role="status">{t('ui.farm_gps_ok', { m: geo.accuracy })}</p>}
-                {(geo.state === 'ok' || useMap) && point ? (
-                  <>
-                    <p className="help">{t('ui.farm_gps_check')}</p>
-                    <LocationPicker lat={point.lat} lon={point.lon} onChange={(lat, lon) => setPoint({ lat, lon })} onFeatures={() => {}} />
-                  </>
-                ) : (
-                  <button type="button" className="btn-text" onClick={openMap}>{t('ui.farm_use_map')}</button>
-                )}
-              </>
-            )}
-
-            {id === 'crops' && (
-              <>
-                <div className="crop-grid">
-                  {MARKET_CROPS.map((c) => (
-                    <button key={c} type="button" aria-pressed={crops.includes(c)} className="crop-card" onClick={() => { toggleCrop(c); setError(''); }}>
-                      <CropIcon id={c} size={44} />
-                      <span>{crop(c)}</span>
+                <LocationPicker lat={point.lat} lon={point.lon} onChange={(lat, lon) => { setPoint({ lat, lon }); setPlaced(true); setError(''); }} onFeatures={() => {}}>
+                  <div className="gps-box">
+                    <p className="help">{t('ui.farm_gps_or')}</p>
+                    <button type="button" className="btn btn-quiet gps-btn" onClick={locate} disabled={geo.state === 'asking'}>
+                      <PinIcon size={22} />{t('ui.farm_gps_button')}
                     </button>
-                  ))}
-                </div>
-                <p className="help" aria-live="polite">{t('ui.farm_crops_count', { n: crops.length })}</p>
+                    {geoMsg && <p className={`notice${geo.state === 'asking' ? '' : ' notice-error'}`} role="status">{t(geoMsg)}</p>}
+                    {geo.state === 'ok' && <p className="notice" role="status">{t('ui.farm_gps_ok', { m: geo.accuracy })} {t('ui.farm_gps_check')}</p>}
+                  </div>
+                </LocationPicker>
               </>
             )}
 

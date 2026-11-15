@@ -192,5 +192,11 @@ def test_allowed_crops_filters_alternatives_but_keeps_current(features_mock, req
     assert "note_allowed_crops" in [n["code"] for n in out["notes"]]
 
 
+def test_too_few_local_crops_shows_all_alternatives_with_a_note(features_mock, request_default):
+    out = score(features_mock, dict(request_default, allowed_crops=["wheat"]))  # was a 500: < 3 strategies
+    assert len(out["strategies"]) >= 3
+    assert "note_allowed_crops_too_few" in [n["code"] for n in out["notes"]]
+
+
 def test_without_allowed_crops_nothing_is_filtered(features_mock, request_default):
     assert "note_allowed_crops" not in [n["code"] for n in score(features_mock, request_default)["notes"]]

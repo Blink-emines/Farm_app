@@ -47,9 +47,10 @@ class ResultViewSet(
 
 
 class FarmViewSet(
-    mixins.CreateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+    mixins.CreateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin,
+    viewsets.GenericViewSet,
 ):
-    """Create (with its fields) and read the logged-in user's farms."""
+    """Create (with its fields), read and edit (name, soil, crops, place) the logged-in user's farms."""
 
     serializer_class = FarmSerializer
 

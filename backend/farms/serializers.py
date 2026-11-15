@@ -30,8 +30,9 @@ class ParcelSerializer(serializers.ModelSerializer):
 
 class FarmSerializer(serializers.ModelSerializer):
     parcels = ParcelSerializer(many=True)
+    # Chosen later, in the optimisation tab; empty until then.
     crops = serializers.ListField(
-        child=serializers.ChoiceField(choices=MARKET_CROPS), allow_empty=False, max_length=len(MARKET_CROPS)
+        child=serializers.ChoiceField(choices=MARKET_CROPS), required=False, max_length=len(MARKET_CROPS)
     )
 
     class Meta:
@@ -57,6 +58,12 @@ class FarmSerializer(serializers.ModelSerializer):
                 owner=farm.owner, farm=farm, latitude=farm.latitude, longitude=farm.longitude, **parcel
             )
         return farm
+
+    def update(self, farm, validated_data):
+        # Fields are created with the farm; editing them here is not supported yet.
+        if 'parcels' in validated_data:
+            raise serializers.ValidationError({'parcels': 'Fields cannot be changed here.'})
+        return super().update(farm, validated_data)
 
 
 class MeasurementSerializer(serializers.ModelSerializer):

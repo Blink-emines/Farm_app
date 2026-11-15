@@ -124,13 +124,18 @@ async function authed(url, options = {}) {
   return res.json();
 }
 
-// Saves the field location (reused if already saved) and the plan the farmer just received.
-export async function savePlan(lat, lon, plan) {
+// Saves the plan the farmer just received on one of their fields. Without fieldId, the field at
+// this location is reused or created.
+export async function savePlan(lat, lon, plan, fieldId) {
   if (USE_MOCK) return null;
-  const fields = await authed('/api/fields/');
-  const field = fields.find((f) => f.latitude === lat && f.longitude === lon)
-    ?? await authed('/api/fields/', { method: 'POST', body: { name: `${lat.toFixed(4)}, ${lon.toFixed(4)}`, latitude: lat, longitude: lon } });
-  return authed('/api/results/', { method: 'POST', body: { field: field.id, data: plan } });
+  let id = fieldId;
+  if (id == null) {
+    const fields = await authed('/api/fields/');
+    const field = fields.find((f) => f.latitude === lat && f.longitude === lon)
+      ?? await authed('/api/fields/', { method: 'POST', body: { name: `${lat.toFixed(4)}, ${lon.toFixed(4)}`, latitude: lat, longitude: lon } });
+    id = field.id;
+  }
+  return authed('/api/results/', { method: 'POST', body: { field: id, data: plan } });
 }
 
 // ---------- farm setup wizard ----------
@@ -141,6 +146,12 @@ export async function getFarms() {
 
 // farm: { name, latitude, longitude, soil_type, crops: [ids], parcels: [{ name, area_ha }] }
 export async function createFarm(farm) {
-  if (USE_MOCK) return { id: 0, ...farm };
+  if (USE_MOCK) return { id: 0, crops: [], ...farm, parcels: farm.parcels.map((p, i) => ({ id: i, ...p })) };
   return authed('/api/farms/', { method: 'POST', body: farm });
+}
+
+// changes: e.g. { crops: ['wheat', 'lentil'] }
+export async function updateFarm(id, changes) {
+  if (USE_MOCK) return null;
+  return authed(`/api/farms/${id}/`, { method: 'PATCH', body: changes });
 }

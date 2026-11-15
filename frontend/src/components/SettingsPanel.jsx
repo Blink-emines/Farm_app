@@ -32,7 +32,7 @@ export function GearButton({ onClick }) {
 
 export default function SettingsPanel({ onClose }) {
   const { t, lang, setLang } = useI18n();
-  const { dark, setDark, advanced, setAdvanced } = useSettings();
+  const { dark, setDark } = useSettings();
   const closeRef = useRef(null);
   useEffect(() => {
     const previous = document.activeElement;
@@ -58,7 +58,6 @@ export default function SettingsPanel({ onClose }) {
             </div>
           </div>
           <Switch checked={dark} onChange={setDark} label="set_dark" help="set_dark_help" />
-          <Switch checked={advanced} onChange={setAdvanced} label="set_adv" help="set_adv_help" />
         </div>
       </div>
     </div>

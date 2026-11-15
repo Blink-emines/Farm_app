@@ -1,16 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { LANGS, useI18n } from './i18n/index.jsx';
 import SettingsPanel, { GearButton } from './components/SettingsPanel.jsx';
-import { ApiError, USE_MOCK, getFarms, getStrategies, isLoggedIn, logout, savePlan } from './api.js';
+import { ApiError, USE_MOCK, getFarms, getFeatures, getStrategies, isLoggedIn, logout, savePlan, updateFarm } from './api.js';
 import { DEFAULT_POINT, buildRequest } from './constants.js';
-import LocationPicker from './components/LocationPicker.jsx';
-import RotationInput from './components/RotationInput.jsx';
-import Priorities from './components/Priorities.jsx';
 import Results from './components/Results.jsx';
 import OptimiserFlow from './components/OptimiserFlow.jsx';
 import Landing from './components/Landing.jsx';
 import Auth from './components/Auth.jsx';
 import FarmSetup from './components/FarmSetup.jsx';
+import Dashboard from './components/Dashboard.jsx';
+import OptimiseTab from './components/OptimiseTab.jsx';
 import PrintReport from './components/PrintReport.jsx';
 import { BrandMark } from './components/icons.jsx';
 
@@ -22,46 +21,36 @@ const initial = {
     { crop_id: 'fallow', sow_month: '', harvest_month: '' },
   ],
   priorities: { save_water: 3, improve_soil: 3, extra_income: 3, reduce_erosion: 3, forage: 3 },
+  allowedCrops: [],
 };
 
-const STEPS = [1, 2, 3];
-
-function Progress({ step }) {
-  const { t } = useI18n();
-  return (
-    <nav className="progress" aria-label={t('ui.step_of', { n: step, total: 3 })}>
-      <p className="progress-text">{t('ui.step_of', { n: step, total: 3 })}</p>
-      <ol>
-        {STEPS.map((n) => (
-          <li key={n} className={n < step ? 'done' : n === step ? 'now' : ''} aria-current={n === step ? 'step' : undefined}>
-            <span className="progress-bar" />
-            <span className="progress-name">{t(`ui.step_name_${n}`)}</span>
-          </li>
-        ))}
-      </ol>
-    </nav>
-  );
-}
+const VIEWS = ['farm', 'optimise'];
 
 export default function App() {
-  const { t, gap, lang, setLang } = useI18n();
+  const { t, lang, setLang } = useI18n();
   const [form, setForm] = useState(initial);
   const [features, setFeatures] = useState(null);
-  const [step, setStep] = useState(1);
   const [started, setStarted] = useState(false);
   const [authed, setAuthed] = useState(isLoggedIn);
   const [saved, setSaved] = useState('');
   // undefined: not loaded yet, null: no farm yet (show the setup wizard), 'error': could not load.
   const [farm, setFarm] = useState(undefined);
   const [farmTry, setFarmTry] = useState(0);
-  const [mode, setMode] = useState('single');
+  const [view, setView] = useState('farm');
+  const [fieldId, setFieldId] = useState(null);
+  const [allFields, setAllFields] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [status, setStatus] = useState({ state: 'idle' });
   const topRef = useRef(null);
   const patch = (p) => setForm((f) => ({ ...f, ...p }));
-  const go = (n) => {
-    setStep(n);
-    topRef.current?.scrollIntoView({ block: 'start' });
+  const toTop = () => topRef.current?.scrollIntoView({ block: 'start' });
+
+  // Put a loaded or new farm in place: its point, its first field, its crops.
+  const applyFarm = (f) => {
+    setFarm(f);
+    if (!f) return;
+    setForm((cur) => ({ ...cur, lat: f.latitude, lon: f.longitude, allowedCrops: f.crops ?? [] }));
+    setFieldId(f.parcels?.[0]?.id ?? null);
   };
 
   // After login, look for the user's farm. Without one, the farm setup wizard comes first.
@@ -70,16 +59,20 @@ export default function App() {
     let stale = false;
     setFarm(undefined);
     getFarms().then(
-      (farms) => {
-        if (stale) return;
-        const f = farms[0] ?? null;
-        setFarm(f);
-        if (f) setForm((cur) => ({ ...cur, lat: f.latitude, lon: f.longitude }));
-      },
+      (farms) => { if (!stale) applyFarm(farms[0] ?? null); },
       (err) => { if (stale) return; if (err.code === 'auth') setAuthed(false); else setFarm('error'); },
     );
     return () => { stale = true; };
-  }, [started, authed, farmTry]);
+  }, [started, authed, farmTry]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Climate and soil for the farm's point (dashboard indicators and result pictures).
+  useEffect(() => {
+    if (!farm || farm === 'error') return undefined;
+    let stale = false;
+    setFeatures(null);
+    getFeatures(farm.latitude, farm.longitude).then((f) => { if (!stale) setFeatures(f); }, () => {});
+    return () => { stale = true; };
+  }, [farm]);
 
   async function compare() {
     setStatus({ state: 'loading' });
@@ -88,9 +81,13 @@ export default function App() {
       const request = buildRequest(form);
       const data = await getStrategies(request);
       setStatus({ state: 'done', data, features });
-      setTimeout(() => topRef.current?.scrollIntoView({ block: 'start' }), 0);
-      // Keep the location and the plan in the farmer's account. A failed save never hides the results.
-      savePlan(form.lat, form.lon, { request, strategies: data })
+      setTimeout(toTop, 0);
+      // Remember the crops the farmer can get, and keep the plan in their account.
+      // A failed save never hides the results.
+      if (JSON.stringify(form.allowedCrops) !== JSON.stringify(farm.crops ?? [])) {
+        updateFarm(farm.id, { crops: form.allowedCrops }).then(() => setFarm((f) => ({ ...f, crops: form.allowedCrops })), () => {});
+      }
+      savePlan(form.lat, form.lon, { request, strategies: data }, fieldId)
         .then((r) => setSaved(r ? 'ok' : ''), () => setSaved('fail'));
     } catch (err) {
       setStatus({ state: 'error', code: err instanceof ApiError ? err.code : 'internal_error' });
@@ -110,14 +107,13 @@ export default function App() {
         </div>
         <GearButton onClick={() => setSettingsOpen(true)} />
         {started && authed && !USE_MOCK && (
-          <button type="button" className="btn-text head-logout" onClick={() => { logout(); setAuthed(false); setStatus({ state: 'idle' }); }}>
+          <button type="button" className="btn-text head-logout" onClick={() => { logout(); setAuthed(false); setStatus({ state: 'idle' }); setView('farm'); }}>
             {t('ui.auth_logout')}
           </button>
         )}
       </div>
     </header>
   );
-  const gaps = features?.data_gaps ?? [];
   const showResults = status.state === 'done';
 
   return (
@@ -142,70 +138,35 @@ export default function App() {
             </main>
           </>
         ) : farm === null ? (
-          <FarmSetup head={head} onDone={(f) => { setFarm(f); patch({ lat: f.latitude, lon: f.longitude }); }} />
+          <FarmSetup head={head} onDone={applyFarm} />
         ) : (
         <>
         {head}
-        <nav className="modes" aria-label={t('ui.mode_label')}>
-          {['single', 'optimiser'].map((m) => (
-            <button key={m} type="button" aria-pressed={mode === m} onClick={() => setMode(m)}>{t(`ui.mode_${m}`)}</button>
+        <nav className="modes" role="tablist" aria-label={t('ui.views_label')}>
+          {VIEWS.map((v) => (
+            <button key={v} type="button" role="tab" aria-selected={view === v} aria-pressed={view === v} onClick={() => { setView(v); setAllFields(false); }}>{t(`ui.view_${v}`)}</button>
           ))}
         </nav>
         <main>
-          {mode === 'optimiser' && (
-            <OptimiserFlow lat={form.lat} lon={form.lon} onLocation={(lat, lon) => patch({ lat, lon })} />
+          {view === 'farm' && <Dashboard farm={farm} features={features} onOptimise={() => { setView('optimise'); toTop(); }} />}
+          {view === 'optimise' && allFields && (
+            <>
+              <button type="button" className="btn-text" onClick={() => setAllFields(false)}>{t('ui.back')}</button>
+              <OptimiserFlow lat={form.lat} lon={form.lon} onLocation={(lat, lon) => patch({ lat, lon })} />
+            </>
           )}
-          {mode === 'single' && !showResults && (
-            <div className="wizard">
-              <h1>{t('ui.title')}</h1>
-              <Progress step={step} />
-
-              {step === 1 && (
-                <section className="step-body" aria-labelledby="step-h">
-                  <h2 id="step-h">{t('ui.step_place')}</h2>
-                  <LocationPicker lat={form.lat} lon={form.lon} onChange={(lat, lon) => patch({ lat, lon })} onFeatures={setFeatures}>
-                    {gaps.length > 0 && (
-                      <details className="limits" open={gaps.some((g) => g.code.startsWith('soil_'))}>
-                        <summary>{t('ui.data_gaps')} ({gaps.length})</summary>
-                        <ul>{gaps.map((g) => <li key={g.code}>{gap(g)}</li>)}</ul>
-                      </details>
-                    )}
-                  </LocationPicker>
-                </section>
-              )}
-              {step === 2 && (
-                <section className="step-body" aria-labelledby="step-h">
-                  <h2 id="step-h">{t('ui.step_rotation')}</h2>
-                  <RotationInput seasons={form.seasons} onChange={(seasons) => patch({ seasons })} />
-                </section>
-              )}
-              {step === 3 && (
-                <section className="step-body" aria-labelledby="step-h">
-                  <h2 id="step-h">{t('ui.step_goals')}</h2>
-                  <Priorities values={form.priorities} onChange={(priorities) => patch({ priorities })} />
-                </section>
-              )}
-
-              {status.state === 'error' && <p className="notice notice-error" role="alert">{t(`err.${status.code}`)}</p>}
-
-              <div className="wizard-nav">
-                {step > 1 && <button type="button" className="btn btn-quiet" onClick={() => go(step - 1)}>{t('ui.back')}</button>}
-                {step < 3 ? (
-                  <button type="button" className="btn btn-primary" onClick={() => go(step + 1)}>{t('ui.next')}</button>
-                ) : (
-                  <button type="button" className="btn btn-primary" disabled={status.state === 'loading'} onClick={compare}>
-                    {status.state === 'loading' ? t('ui.loading') : t('ui.compare')}
-                  </button>
-                )}
-              </div>
-            </div>
+          {view === 'optimise' && !allFields && !showResults && (
+            <OptimiseTab
+              farm={farm} form={form} patch={patch} fieldId={fieldId} onField={setFieldId}
+              loading={status.state === 'loading'} error={status.state === 'error' ? status.code : null}
+              onRun={compare} onAllFields={() => setAllFields(true)}
+            />
           )}
-
-          {mode === 'single' && showResults && (
+          {view === 'optimise' && !allFields && showResults && (
             <section className="results-wrap" aria-labelledby="results-h">
               <div className="results-head">
                 <h2 id="results-h">{t('ui.results_title')}</h2>
-                <button type="button" className="btn btn-quiet" onClick={() => { setStatus({ state: 'idle' }); go(1); }}>
+                <button type="button" className="btn btn-quiet" onClick={() => { setStatus({ state: 'idle' }); toTop(); }}>
                   {t('ui.change_answers')}
                 </button>
               </div>

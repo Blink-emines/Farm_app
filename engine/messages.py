@@ -56,6 +56,7 @@ MESSAGES = {
     "note_local_expert": ([], "Discuss any option with a local expert before acting."),
     "note_soil_not_scored": ([], "Soil data is shown for context but is not used by any scoring rule yet."),
     "note_allowed_crops": ([], "Only alternatives that use crops you can get locally are shown."),
+    "note_allowed_crops_too_few": ([], "Too few alternatives use only the crops you can get, so all alternatives are shown."),
     "note_optimiser": ([], "The plan comes from an optimiser that maximises a weighted mix of your goals under sowing-window and non-overlap constraints; it is an option to discuss, not an order."),
     "note_normalisation": ([], "Each goal score is scaled 0-100 against all candidate rotations the engine evaluated."),
 }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import L from 'leaflet';
-import { MapContainer, Marker, useMapEvents } from 'react-leaflet';
+import { MapContainer, Marker, useMap, useMapEvents } from 'react-leaflet';
 import { SatelliteTiles, StreetTiles } from './tiles.jsx';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -18,6 +18,15 @@ const icon = L.icon({
   iconAnchor: [12, 41],
 });
 const bounds = [[BOX.south, BOX.west], [BOX.north, BOX.east]];
+
+// Brings the map to the point when it changes from outside (e.g. a GPS fix far away).
+function FollowPoint({ lat, lon }) {
+  const map = useMap();
+  useEffect(() => {
+    if (!map.getBounds().contains([lat, lon])) map.setView([lat, lon], Math.max(map.getZoom(), 15));
+  }, [map, lat, lon]);
+  return null;
+}
 
 function ClickToPick({ onPick }) {
   useMapEvents({ click: (e) => onPick(e.latlng.lat, e.latlng.lng) });
@@ -83,6 +92,7 @@ export default function LocationPicker({ lat, lon, onChange, onFeatures, childre
           >
             {layer === 'sat' ? <SatelliteTiles key="sat" /> : <StreetTiles key="osm" />}
             <ClickToPick onPick={pick} />
+            <FollowPoint lat={lat} lon={lon} />
             <Marker position={[lat, lon]} icon={icon} />
           </MapContainer>
         </div>

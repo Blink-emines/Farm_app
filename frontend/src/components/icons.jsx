@@ -92,6 +92,11 @@ const CROPS = {
   ),
 };
 
+// The drawing alone (48x48 units), for use inside another SVG.
+export function CropShape({ id }) {
+  return CROPS[id] ?? null;
+}
+
 export function CropIcon({ id, size = 48 }) {
   return (
     <svg className="icon" width={size} height={size} viewBox="0 0 48 48" aria-hidden="true" focusable="false">
