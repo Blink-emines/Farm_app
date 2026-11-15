@@ -137,7 +137,7 @@ export default function App() {
   return (
     <>
       <div className="screen-only">
-        <Sky />
+        {started && <Sky />}
         {settingsOpen && <SettingsPanel onClose={() => setSettingsOpen(false)} />}
         {(USE_MOCK || features?._mockExtras) && <div className="mock-banner" role="alert">{t('ui.mock_banner')}</div>}
         {!started ? (

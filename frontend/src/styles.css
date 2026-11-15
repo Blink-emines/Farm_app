@@ -361,7 +361,7 @@ div.chart-key ul { list-style: none; padding: 0; display: flex; flex-wrap: wrap;
 /* ---------- landing: scroll-driven presentation ---------- */
 .story { scroll-behavior: auto; }
 .s { min-height: 100svh; display: grid; align-content: center; padding-block: 72px; position: relative; }
-.s-soft { background: transparent; }
+.s-soft { background: var(--primary-soft); }
 .wrap { inline-size: 100%; max-inline-size: 72rem; margin-inline: auto; padding-inline: 16px; display: grid; gap: 24px; }
 .s h2 { font-size: 32px; line-height: 1.15; max-inline-size: 20ch; }
 .s h3 { font-size: var(--text-m); }
@@ -775,7 +775,7 @@ div.chart-key ul { list-style: none; padding: 0; display: flex; flex-wrap: wrap;
   --glass-shadow-hover: 0 12px 36px rgba(0, 0, 0, 0.45);
   --glass-inset: inset 0 1px 0 rgba(255, 255, 255, 0.14), inset 0 0 14px 4px rgba(255, 255, 255, 0.04);
 }
-.dash-card, .life, .cmp-card, .auth-card, .advice, .impact-card, .feat, .flow-steps li, .act-step, .opt-card,
+.dash-card, .life, .cmp-card, .auth-card, .advice, .act-step, .opt-card,
 .soil-card, .crop-card, .verdicts, .expert-big, .wizard .step-body, .where-panel .point-card {
   background: var(--glass-bg);
   backdrop-filter: blur(22px) saturate(1.2);
@@ -786,15 +786,15 @@ div.chart-key ul { list-style: none; padding: 0; display: flex; flex-wrap: wrap;
 .soil-card, .crop-card, .act-step { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); } /* lighter on many small cards */
 .crop-card[aria-pressed="true"], .crop-card[aria-checked="true"], .soil-card[aria-checked="true"] { background: var(--primary-soft); border-color: var(--primary); }
 /* Slight hover lift (not on the landing steps, which already animate in). */
-.dash-card, .life, .cmp-card, .auth-card, .advice, .impact-card, .feat, .act-step, .opt-card, .soil-card, .crop-card {
+.dash-card, .life, .cmp-card, .auth-card, .advice, .act-step, .opt-card, .soil-card, .crop-card {
   transition: transform 200ms ease-out, box-shadow 200ms ease-out, border-color 120ms, background-color 120ms;
 }
 @media (hover: hover) {
-  .dash-card:hover, .life:hover, .cmp-card:hover, .auth-card:hover, .advice:hover, .impact-card:hover, .feat:hover,
+  .dash-card:hover, .life:hover, .cmp-card:hover, .auth-card:hover, .advice:hover,
   .act-step:hover, .opt-card:hover, .soil-card:hover, .crop-card:hover { transform: translateY(-2px); box-shadow: var(--glass-shadow-hover), var(--glass-inset); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .dash-card:hover, .life:hover, .cmp-card:hover, .auth-card:hover, .advice:hover, .impact-card:hover, .feat:hover,
+  .dash-card:hover, .life:hover, .cmp-card:hover, .auth-card:hover, .advice:hover,
   .act-step:hover, .opt-card:hover, .soil-card:hover, .crop-card:hover { transform: none; }
 }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
