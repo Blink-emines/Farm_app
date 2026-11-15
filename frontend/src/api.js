@@ -155,3 +155,22 @@ export async function updateField(id, changes) {
   if (USE_MOCK) return null;
   return authed(`/api/fields/${id}/`, { method: 'PATCH', body: changes });
 }
+
+// Spoken text from the server (OpenAI text-to-speech, cached there). Returns an object URL for an
+// mp3, or null when the service is unavailable (no key, offline, mock mode) so other voices are used.
+export async function speechAudio(text, lang) {
+  if (USE_MOCK) return null;
+  const tokens = readTokens();
+  if (!tokens) return null;
+  try {
+    const res = await fetch('/api/tts/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${tokens.access}` },
+      body: JSON.stringify({ text, lang }),
+    });
+    if (!res.ok || !(res.headers.get('content-type') || '').startsWith('audio/')) return null;
+    return URL.createObjectURL(await res.blob());
+  } catch {
+    return null;
+  }
+}

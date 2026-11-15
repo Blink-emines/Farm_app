@@ -11,5 +11,6 @@ router.register('farms', views.FarmViewSet, basename='farm')
 
 urlpatterns = [
     path('register/', views.RegisterView.as_view(), name='register'),
+    path('tts/', views.TTSView.as_view(), name='tts'),
     *router.urls,
 ]

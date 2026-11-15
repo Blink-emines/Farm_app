@@ -105,12 +105,13 @@ export default function MyPlan({ strategy: s, features, soil, onCompare, onPrint
   const where = m ? (m.crop_id === null ? t('ui.life_bare') : name(m.crop_id)) : '';
 
   const summary = crops.map(name).join(' → ');
+  // Read as one text (server voice): each step on its own lines, like a spoken script.
   const planText = [
     `${t('ui.plan_summary')} ${crops.map(name).join(` ${t('ui.s_then')} `)}.`,
-    ...steps.map((st) => `${range(st)}: ${action(st)}.`),
-    ...vs.map((v) => `${t(`ui.v_${v.id}`)}: ${t(`ui.${v.key}`)}.`),
+    ...steps.map((st) => `${range(st)}\n${action(st)}\n${tm(st.message)}`),
+    vs.map((v) => `${t(`ui.v_${v.id}`)}: ${t(`ui.${v.key}`)}.`).join('\n'),
     t('ui.talk_expert'),
-  ].join(' ');
+  ].join('\n\n');
   const planClips = [
     'plan_intro', ...crops.flatMap((c, i) => (i ? ['then', `crop_${c}`] : [`crop_${c}`])),
     ...steps.flatMap((st) => stepClips(st).slice(0, -1)),

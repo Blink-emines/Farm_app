@@ -417,3 +417,49 @@ class FarmTests(APITestCase):
         self.assertEqual(self.client.patch(url, {'current_crop': 'banana'}, format='json').status_code, 400)
         self.assertEqual(self.client.patch(url, {'soil_type': 'lava'}, format='json').status_code, 400)
         self.assertEqual(self.client.patch(url, {'crops': ['fallow']}, format='json').status_code, 400)
+
+
+class TTSTests(APITestCase):
+    def setUp(self):
+        User.objects.create_user(username='t', password='correct-horse-9')
+        token = self.client.post('/api/token/', {'username': 't', 'password': 'correct-horse-9'}).data['access']
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
+        import shutil, tempfile
+        from django.test import override_settings
+        self.tmp = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmp)
+        self.settings_cm = override_settings(BASE_DIR=__import__('pathlib').Path(self.tmp))
+        self.settings_cm.enable()
+        self.addCleanup(self.settings_cm.disable)
+
+    def _fake_openai(self):
+        from unittest import mock
+        client = mock.MagicMock()
+        stream = client.return_value.audio.speech.with_streaming_response.create.return_value.__enter__.return_value
+        stream.stream_to_file.side_effect = lambda p: open(p, 'wb').write(b'ID3fake')
+        return mock.patch('openai.OpenAI', client), client
+
+    def test_needs_login(self):
+        self.client.credentials()
+        self.assertEqual(self.client.post('/api/tts/', {'text': 'x', 'lang': 'fr'}, format='json').status_code, 401)
+
+    def test_without_key_it_says_unavailable(self):
+        from unittest import mock
+        with mock.patch.dict('os.environ', {'OPENAI_API_KEY': ''}):
+            r = self.client.post('/api/tts/', {'text': 'Semer le blé', 'lang': 'fr'}, format='json')
+        self.assertEqual(r.status_code, 503)
+
+    def test_bad_language_or_empty_text_is_refused(self):
+        self.assertEqual(self.client.post('/api/tts/', {'text': 'x', 'lang': 'de'}, format='json').status_code, 400)
+        self.assertEqual(self.client.post('/api/tts/', {'text': '  ', 'lang': 'ar'}, format='json').status_code, 400)
+
+    def test_audio_is_generated_once_then_cached(self):
+        from unittest import mock
+        patcher, client = self._fake_openai()
+        with patcher, mock.patch.dict('os.environ', {'OPENAI_API_KEY': 'sk-test'}):
+            for _ in range(2):
+                r = self.client.post('/api/tts/', {'text': 'زرع القمح', 'lang': 'ar'}, format='json')
+                self.assertEqual(r.status_code, 200)
+                self.assertEqual(r['Content-Type'], 'audio/mpeg')
+                self.assertEqual(b''.join(r.streaming_content), b'ID3fake')
+        self.assertEqual(client.return_value.audio.speech.with_streaming_response.create.call_count, 1)
