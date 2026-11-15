@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { LANGS, useI18n } from './i18n/index.jsx';
 import SettingsPanel, { GearButton } from './components/SettingsPanel.jsx';
-import { ApiError, USE_MOCK, getFarms, getFeatures, getStrategies, isLoggedIn, logout, savePlan, updateFarm } from './api.js';
-import { DEFAULT_POINT, buildRequest } from './constants.js';
+import { ApiError, USE_MOCK, getFarms, getFeatures, getStrategies, isLoggedIn, logout, savePlan, updateField } from './api.js';
+import { DEFAULT_POINT, buildFieldRequest } from './constants.js';
 import Results from './components/Results.jsx';
 import OptimiserFlow from './components/OptimiserFlow.jsx';
 import Landing from './components/Landing.jsx';
@@ -13,22 +13,23 @@ import OptimiseTab from './components/OptimiseTab.jsx';
 import PrintReport from './components/PrintReport.jsx';
 import { BrandMark } from './components/icons.jsx';
 
-const initial = {
-  lat: DEFAULT_POINT.lat,
-  lon: DEFAULT_POINT.lon,
-  seasons: [
-    { crop_id: 'wheat', sow_month: '', harvest_month: '' },
-    { crop_id: 'fallow', sow_month: '', harvest_month: '' },
-  ],
-  priorities: { save_water: 3, improve_soil: 3, extra_income: 3, reduce_erosion: 3, forage: 3 },
-  allowedCrops: [],
-};
+const BALANCED = { save_water: 3, improve_soil: 3, extra_income: 3, reduce_erosion: 3, forage: 3 };
+
+// One field's answers in the optimisation tab, starting from what is saved on the field.
+const fieldStart = (p, farm) => ({
+  current: p?.current_crop || '',
+  soil: p?.soil_type || farm?.soil_type || 'unknown',
+  crops: p?.crops?.length ? p.crops : (farm?.crops ?? []),
+  priorities: { ...BALANCED },
+});
 
 const VIEWS = ['farm', 'optimise'];
 
 export default function App() {
   const { t, lang, setLang } = useI18n();
-  const [form, setForm] = useState(initial);
+  const [point, setPoint] = useState({ lat: DEFAULT_POINT.lat, lon: DEFAULT_POINT.lon });
+  // Each field keeps its own answers: { [fieldId]: { current, soil, crops, priorities } }.
+  const [answers, setAnswers] = useState({});
   const [features, setFeatures] = useState(null);
   const [started, setStarted] = useState(false);
   const [authed, setAuthed] = useState(isLoggedIn);
@@ -42,14 +43,19 @@ export default function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [status, setStatus] = useState({ state: 'idle' });
   const topRef = useRef(null);
-  const patch = (p) => setForm((f) => ({ ...f, ...p }));
+  const parcel = farm && farm !== 'error' ? farm.parcels.find((p) => p.id === fieldId) : null;
+  const st = answers[fieldId] ?? fieldStart(parcel, farm);
+  const setField = (changes) => setAnswers((all) => ({ ...all, [fieldId]: { ...(all[fieldId] ?? fieldStart(parcel, farm)), ...changes } }));
+  // What the results screen needs to know about the question asked (one season: this year).
+  const form = { lat: point.lat, lon: point.lon, seasons: [{ crop_id: st.current || 'fallow', sow_month: '', harvest_month: '' }], priorities: st.priorities };
   const toTop = () => topRef.current?.scrollIntoView({ block: 'start' });
 
   // Put a loaded or new farm in place: its point, its first field, its crops.
   const applyFarm = (f) => {
     setFarm(f);
     if (!f) return;
-    setForm((cur) => ({ ...cur, lat: f.latitude, lon: f.longitude, allowedCrops: f.crops ?? [] }));
+    setPoint({ lat: f.latitude, lon: f.longitude });
+    setAnswers({});
     setFieldId(f.parcels?.[0]?.id ?? null);
   };
 
@@ -75,19 +81,20 @@ export default function App() {
   }, [farm]);
 
   async function compare() {
+    if (!st.current) { setStatus({ state: 'error', code: 'ui.optab_err_now' }); return; }
     setStatus({ state: 'loading' });
     setSaved('');
     try {
-      const request = buildRequest(form);
+      const request = buildFieldRequest(point, st);
       const data = await getStrategies(request);
       setStatus({ state: 'done', data, features });
       setTimeout(toTop, 0);
-      // Remember the crops the farmer can get, and keep the plan in their account.
-      // A failed save never hides the results.
-      if (JSON.stringify(form.allowedCrops) !== JSON.stringify(farm.crops ?? [])) {
-        updateFarm(farm.id, { crops: form.allowedCrops }).then(() => setFarm((f) => ({ ...f, crops: form.allowedCrops })), () => {});
+      // Keep this field's answers and the plan in the farmer's account. A failed save never hides the results.
+      const changes = { current_crop: st.current, soil_type: st.soil, crops: st.crops };
+      if (fieldId != null) {
+        updateField(fieldId, changes).then(() => setFarm((f) => ({ ...f, parcels: f.parcels.map((p) => (p.id === fieldId ? { ...p, ...changes } : p)) })), () => {});
       }
-      savePlan(form.lat, form.lon, { request, strategies: data }, fieldId)
+      savePlan(point.lat, point.lon, { request, strategies: data }, fieldId)
         .then((r) => setSaved(r ? 'ok' : ''), () => setSaved('fail'));
     } catch (err) {
       setStatus({ state: 'error', code: err instanceof ApiError ? err.code : 'internal_error' });
@@ -152,12 +159,13 @@ export default function App() {
           {view === 'optimise' && allFields && (
             <>
               <button type="button" className="btn-text" onClick={() => setAllFields(false)}>{t('ui.back')}</button>
-              <OptimiserFlow lat={form.lat} lon={form.lon} onLocation={(lat, lon) => patch({ lat, lon })} />
+              <OptimiserFlow lat={point.lat} lon={point.lon} onLocation={(lat, lon) => setPoint({ lat, lon })} />
             </>
           )}
           {view === 'optimise' && !allFields && !showResults && (
             <OptimiseTab
-              farm={farm} form={form} patch={patch} fieldId={fieldId} onField={setFieldId}
+              farm={farm} features={features} fieldId={fieldId} st={st} set={setField}
+              onField={(id) => { setFieldId(id); setStatus({ state: 'idle' }); }}
               loading={status.state === 'loading'} error={status.state === 'error' ? status.code : null}
               onRun={compare} onAllFields={() => setAllFields(true)}
             />
@@ -171,7 +179,7 @@ export default function App() {
                 </button>
               </div>
               {saved && <p className={`notice${saved === 'fail' ? ' notice-error' : ''}`} role="status">{t(saved === 'ok' ? 'ui.auth_saved' : 'ui.auth_save_failed')}</p>}
-              <Results data={status.data} features={status.features} form={form} onPrint={() => window.print()} />
+              <Results data={status.data} features={status.features} form={form} soil={st.soil} onPrint={() => window.print()} />
             </section>
           )}
         </main>

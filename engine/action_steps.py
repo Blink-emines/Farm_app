@@ -67,6 +67,8 @@ def action_steps(seasons, calendar, crops):
         annual = not val(crops, cid, "perennial")
         if annual:
             steps.append((a, 1, _step("sow", [ms[0]], cid, "season_calendar", msg("step_sow_why"))))
+        else:  # the calendar gives a perennial a whole 12-month slot: set up once, then it stays
+            steps.append((a, 1, _step("sow", [ms[0]], cid, "season_calendar", msg("step_perennial_why"))))
         dry = [i for i in range(a, b + 1)
                if any(r["code"] == "stress_water_deficit" for r in months[i]["stress_reasons"])]
         for run in _runs(dry):

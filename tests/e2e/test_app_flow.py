@@ -14,6 +14,7 @@ Run: `backend/.venv/bin/python -m pytest tests/e2e -v`
 """
 
 import json
+import os
 import re
 import urllib.error
 import urllib.request
@@ -22,7 +23,7 @@ import uuid
 import pytest
 from playwright.sync_api import expect, sync_playwright
 
-APP = "http://localhost:3000"
+APP = os.environ.get("E2E_APP", "http://localhost:3000")  # E2E_APP to test another dev server
 TOUR_WAIT_MS = 25000  # the guided tour moves to the next section after a few seconds
 
 # Visible labels per language (copied from the i18n dictionaries).
@@ -82,21 +83,21 @@ L = {
         "nav_label": "Sections of the presentation",
     },
     "ar": {
-        "analyse": "حلّل حقلي",
-        "identifier": "البريد الإلكتروني أو اسم المستخدم",
-        "password": "كلمة المرور",
-        "login": "تسجيل الدخول",
-        "next": "متابعة",
+        "analyse": "حلّل فدّاني",
+        "identifier": "الإيميل ولا السمية",
+        "password": "كلمة السر",
+        "login": "دخل",
+        "next": "زيد",
         "compare": "قارن بين الدورات",
         "lang_button": "العربية",
-        "tour": "جولة مرشدة",
-        "settings_open": "فتح الإعدادات",
+        "tour": "دورة فالصفحة",
+        "settings_open": "حلّ الإعدادات",
         "settings_title": "الإعدادات",
-        "dark": "الوضع الداكن",
-        "close": "إغلاق",
-        "view_optimise": "التحسين",
-        "opt_run": "أرني خطتي",
-        "all_fields": "خطط لكل حقولي معا (متقدم)",
+        "dark": "الوضع الغامق",
+        "close": "سدّ",
+        "view_optimise": "الخطة",
+        "opt_run": "وريني الخطة ديالي",
+        "all_fields": "خطط لكاع الفدادن مرة وحدة (متقدم)",
         "optimiser_title": "",  # filled below from the dictionary when needed
         "add_parcel": "",
         "profile_balanced": "",
@@ -105,7 +106,7 @@ L = {
         "pareto_pick": "",
         "brand": "دورة آمنة",
         "tab_simple": "نصيحة",
-        "results": "نتائجنا لحقلك",
+        "results": "النتائج ديال فدّانك",
         "nav_label": "",
     },
 }
@@ -179,6 +180,7 @@ def _run_wizard(page, lang, account):
     page.get_by_role("button", name=t["analyse"]).first.click()
     _log_in(page, t, account)
     page.get_by_role("tab", name=t["view_optimise"]).click()
+    page.locator(".opt-step").first.get_by_role("radio").first.click()  # what is on the field now
     page.get_by_role("button", name=t["opt_run"]).click()
     expect(page.get_by_role("heading", name=t["results"])).to_be_visible(timeout=60000)
 
@@ -224,7 +226,7 @@ def test_wizard_runs_to_simple_results_in_english(page, account):
     expect(page.get_by_role("img", name=re.compile("Life of your field"))).to_be_visible()
     expect(page.locator(".verdict")).to_have_count(3)
     page.get_by_role("tab", name="Compare").click()
-    assert page.locator(".cmp-row").count() >= 3
+    assert page.locator(".cmp-card").count() >= 3
 
 
 def test_wizard_runs_to_simple_results_in_arabic_with_rtl(page, account):
@@ -332,3 +334,80 @@ def test_farm_setup_wizard_with_gps(browser):
     expect(page.get_by_role("heading", name="Ferme Ait Ali")).to_be_visible(timeout=15000)
     expect(page.get_by_text("33.93").first).to_be_visible()
     ctx.close()
+
+
+# ---------------------------------------------------------------------------
+# Optimisation wizard and action plan (items 1, 2, 4, 8)
+# ---------------------------------------------------------------------------
+
+def _farm_user(soil="unknown", fields=2):
+    creds = _new_user()
+    token = _post("/api/token/", creds)["access"]
+    _post("/api/farms/", {
+        "name": "Ferme Ait Ali", "latitude": 33.96, "longitude": -5.27, "soil_type": soil,
+        "parcels": [{"name": f"Field {i + 1}", "area_ha": 1 + i} for i in range(fields)],
+    }, token)
+    return creds
+
+
+def _open_optimise(page, creds):
+    t = L["en"]
+    _switch_language(page, "en")
+    page.get_by_role("button", name=t["analyse"]).first.click()
+    _log_in(page, t, creds)
+    expect(page.locator(".dash")).to_be_visible()
+    return t
+
+
+def test_unknown_soil_is_shown_from_the_map_not_as_i_dont_know(page):
+    _open_optimise(page, _farm_user(soil="unknown"))
+    soil = page.locator(".dash-soil")
+    expect(soil).to_contain_text("Estimated from the map, not measured on your field")
+    expect(soil).not_to_contain_text("I don't know")
+    expect(soil).to_contain_text(re.compile(r"soil", re.I))
+
+
+def test_each_field_keeps_its_own_answers(page):
+    t = _open_optimise(page, _farm_user())
+    page.get_by_role("tab", name=t["view_optimise"]).click()
+    now = page.locator(".opt-step").nth(0)
+    plant = page.locator(".opt-step").nth(2)
+    now.get_by_role("radio", name="Wheat").click()
+    plant.get_by_role("button", name="Lentil").click()
+    page.get_by_role("radio", name="Field 2 · 2 ha").click()
+    expect(now.get_by_role("radio", name="Wheat")).to_have_attribute("aria-checked", "false")
+    expect(plant.get_by_role("button", name="Lentil")).to_have_attribute("aria-pressed", "false")
+    now.get_by_role("radio", name="Nothing (bare field)").click()
+    plant.get_by_role("button", name="Barley").click()
+    page.get_by_role("radio", name="Field 1 · 1 ha").click()
+    expect(now.get_by_role("radio", name="Wheat")).to_have_attribute("aria-checked", "true")
+    expect(plant.get_by_role("button", name="Lentil")).to_have_attribute("aria-pressed", "true")
+    expect(plant.get_by_role("button", name="Barley")).to_have_attribute("aria-pressed", "false")
+    page.get_by_role("radio", name="Field 2 · 2 ha").click()
+    expect(now.get_by_role("radio", name="Nothing (bare field)")).to_have_attribute("aria-checked", "true")
+    expect(plant.get_by_role("button", name="Barley")).to_have_attribute("aria-pressed", "true")
+
+
+def test_one_chosen_crop_is_in_every_option_and_the_plan_has_steps(page):
+    t = _open_optimise(page, _farm_user(fields=1))
+    page.get_by_role("tab", name=t["view_optimise"]).click()
+    expect(page.get_by_role("button", name="Add a year")).to_have_count(0)  # one year only
+    page.locator(".opt-step").nth(0).get_by_role("radio", name="Wheat").click()
+    page.locator(".opt-step").nth(2).get_by_role("button", name="Lentil").click()
+    page.get_by_role("button", name=t["opt_run"]).click()
+    # Item 8: a month-by-month action plan, each step tied to a named rule, no Play button.
+    steps = page.locator(".act-step")
+    expect(steps.first).to_be_visible(timeout=60000)
+    assert steps.count() >= 3
+    rules = {steps.nth(i).get_attribute("data-rule") for i in range(steps.count())}
+    assert rules <= {"season_calendar", "water_demand_match", "bare_months_penalty", "family_break"}, rules
+    expect(page.get_by_role("button", name="Play")).to_have_count(0)
+    expect(page.get_by_role("button", name="Listen to the plan")).to_be_visible()
+    # Item 4: with one crop chosen, every proposed option contains it.
+    page.get_by_role("tab", name="Compare").click()
+    cards = page.locator(".cmp-card")
+    expect(cards.first).to_be_visible()
+    for i in range(cards.count()):
+        title = cards.nth(i).locator("h3").inner_text()
+        if "Your rotation" not in cards.nth(i).inner_text():
+            assert "lentil" in title.lower(), title

@@ -60,6 +60,7 @@ MESSAGES = {
     "note_required_crop": ([], "Every alternative includes the crop you chose; the engine picked what goes around it."),
     "step_sow_why": ([], "Usual sowing month for this crop in the calendar; confirm the date locally."),
     "step_harvest_why": ([], "Usual harvest month for this crop in the calendar."),
+    "step_perennial_why": ([], "This crop stays in the field all year: it is set up once, not sown every season."),
     "step_water_why": ([], "Rain is usually below what this crop needs in these months."),
     "step_bare_why": ([], "Bare soil is exposed to erosion; a cover crop protects it."),
     "step_fallow_why": ([], "A field left to rest is bare soil; a cover crop would protect it."),

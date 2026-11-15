@@ -33,6 +33,21 @@ export function buildRequest(form) {
   return req;
 }
 
+// StrategyRequest for one field of the optimisation tab: this year's crop (or bare = fallow) as the
+// current situation; 2+ crops chosen = only these; exactly one = it must be in the plan.
+export function buildFieldRequest(point, st) {
+  const all = CROPS.filter((c) => c !== 'fallow');
+  const req = {
+    latitude: point.lat,
+    longitude: point.lon,
+    current_rotation: { seasons: [{ crop_id: st.current || 'fallow' }] },
+    priorities: st.priorities,
+  };
+  if (st.crops.length === 1) req.required_crop = st.crops[0];
+  else if (st.crops.length > 1 && st.crops.length < all.length) req.allowed_crops = st.crops;
+  return req;
+}
+
 // Slider presets, same as engine/weights.yaml (optimiser.profiles).
 export const PROFILES = {
   economic: { save_water: 1, improve_soil: 1, extra_income: 5, reduce_erosion: 0, forage: 1 },

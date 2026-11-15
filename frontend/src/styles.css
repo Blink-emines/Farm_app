@@ -675,13 +675,12 @@ div.chart-key ul { list-style: none; padding: 0; display: flex; flex-wrap: wrap;
 .fl-zero { stroke: var(--line); stroke-dasharray: 3 3; }
 .fl-soil-line { fill: none; stroke: var(--clay); stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
 .fl-year-line { stroke: var(--line); stroke-width: 1.5; stroke-dasharray: 4 4; }
-.fl-cursor { fill: var(--ink); opacity: 0.1; }
 .fl-month { font-size: 11px; fill: var(--muted); }
 .fl-yearlabel { font-size: 12px; font-weight: 600; fill: var(--ink); }
 .is-compact .fl-yearlabel { font-size: 11px; fill: var(--muted); }
 .life { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-l); padding: 16px; }
 .life-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
-.play-btn, .listen-btn { display: inline-flex; align-items: center; gap: 8px; min-block-size: 48px; padding-inline: 20px; }
+.listen-btn { display: inline-flex; align-items: center; gap: 8px; min-block-size: 48px; padding-inline: 20px; }
 .life-caption { min-block-size: 3em; font-size: var(--text-s); }
 .life-caption.is-dry { border-inline-start: 4px solid var(--alert-line); padding-inline-start: 12px; }
 .life-key { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 14px; color: var(--muted); }
@@ -708,11 +707,52 @@ div.chart-key ul { list-style: none; padding: 0; display: flex; flex-wrap: wrap;
 :root[data-theme="dark"] .v-caution { background: #4a3b12; color: #f6d27a; }
 :root[data-theme="dark"] .v-risk { background: #5a2418; color: #ffc2b0; }
 
-/* ---------- Compare: stacked strips ---------- */
-.cmp-row { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-l); padding: 16px; display: grid; gap: 8px; }
-.cmp-row.is-selected { border-color: var(--primary); }
 .cmp-head { display: grid; gap: 2px; }
 .cmp-head h3 { font-size: var(--text-m); }
-.cmp-facts { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; font-size: 14px; color: var(--muted); }
-.cmp-badge { padding: 4px 12px; border-radius: 999px; background: var(--primary-soft); color: var(--primary-dark); font-weight: 600; }
-.cmp-row .btn { justify-self: start; }
+
+/* ---------- action plan (My plan) ---------- */
+.plan-summary { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.plan-crops { display: flex; flex-wrap: wrap; gap: 4px 12px; font-weight: 600; }
+.plan-crops span { display: inline-flex; align-items: center; gap: 4px; }
+.plan-crops span + span::before { content: "→"; color: var(--muted); font-weight: 400; margin-inline-end: 8px; }
+:root[dir="rtl"] .plan-crops span + span::before { content: "←"; }
+.plan-soil { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; }
+.soil-words { display: inline-flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; }
+.soil-note { font-size: 14px; color: var(--muted); }
+.act-steps { list-style: none; padding: 0; display: grid; gap: 8px; }
+.act-step { display: grid; grid-template-columns: 48px 1fr auto; grid-template-areas: "when when when" "pic body listen"; gap: 4px 12px; align-items: center; padding: 12px; border-radius: var(--r-m); background: var(--page); border-inline-start: 4px solid var(--soil-growing); }
+.act-step.is-water { border-inline-start-color: var(--water); }
+.act-step.is-dont { border-inline-start-color: var(--alert-line); }
+.act-year { font-weight: 600; color: var(--muted); font-size: 14px; padding-block-start: 8px; }
+.act-when { grid-area: when; font-weight: 600; font-size: 14px; color: var(--primary-dark); font-variant-numeric: tabular-nums; }
+.act-step.is-dont .act-when { color: var(--bad-text); }
+.act-pic { grid-area: pic; inline-size: 48px; block-size: 48px; display: grid; place-items: center; }
+.act-pic > svg { inline-size: 40px; block-size: 40px; }
+.act-crop { position: relative; display: grid; place-items: center; }
+.act-crop.is-avoid > svg:last-child { position: absolute; inset-block-end: -4px; inset-inline-end: -4px; inline-size: 20px; block-size: 20px; color: var(--alert-line); background: var(--surface); border-radius: 50%; }
+.act-body { grid-area: body; display: grid; gap: 2px; }
+.act-body span { font-size: 14px; color: var(--muted); }
+.act-step .listen { grid-area: listen; }
+.listen { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.listen.is-compact .listen-btn { min-inline-size: 48px; padding-inline: 12px; justify-content: center; }
+.listen-none { font-size: 14px; color: var(--muted); }
+.expert-big { display: flex; align-items: center; gap: 12px; justify-content: space-between; }
+
+/* ---------- optimisation wizard steps ---------- */
+.opt-step-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.step-n { display: inline-grid; place-items: center; inline-size: 28px; block-size: 28px; border-radius: 50%; background: var(--primary-soft); color: var(--primary-dark); font-size: 16px; margin-inline-end: 8px; }
+.opt .crop-card .soil-art { inline-size: 44px; block-size: 30px; border-radius: 6px; }
+.soil-auto { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; }
+
+/* ---------- compare cards ---------- */
+.cmp-cards { display: grid; gap: 12px; }
+@media (min-width: 760px) { .cmp-cards { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); } }
+.cmp-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-l); padding: 16px; display: grid; gap: 12px; align-content: start; }
+.cmp-card.is-selected { border-color: var(--primary); }
+.cmp-rows { display: grid; grid-template-columns: minmax(96px, auto) 1fr; gap: 8px 12px; margin: 0; }
+.cmp-rows dt { font-size: 14px; color: var(--muted); font-weight: 500; }
+.cmp-rows dd { margin: 0; display: grid; gap: 2px; font-variant-numeric: tabular-nums; }
+.cmp-rel { color: var(--muted); font-size: 14px; }
+.cmp-diff { padding: 12px; border-radius: var(--r-s); background: var(--page); color: var(--ink); font-weight: 500; }
+.cmp-actions { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.dash-now { display: inline-flex; align-items: center; gap: 4px; color: var(--muted); font-size: 14px; margin-inline-start: auto; margin-inline-end: 12px; }

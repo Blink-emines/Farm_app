@@ -401,3 +401,19 @@ class FarmTests(APITestCase):
 
     def test_duplicate_crops_are_kept_once(self):
         self.assertEqual(self.farm(crops=['wheat', 'wheat']).data['crops'], ['wheat'])
+
+    def test_each_field_keeps_its_own_answers(self):
+        parcels = self.farm().data['parcels']
+        one, two = parcels[0]['id'], parcels[1]['id']
+        self.client.patch(f'/api/fields/{one}/', {'current_crop': 'wheat', 'soil_type': 'clay', 'crops': ['lentil']}, format='json')
+        self.client.patch(f'/api/fields/{two}/', {'current_crop': 'fallow', 'soil_type': 'unknown', 'crops': ['barley', 'chickpea']}, format='json')
+        by_id = {p['id']: p for p in self.client.get('/api/farms/').data[0]['parcels']}
+        self.assertEqual((by_id[one]['current_crop'], by_id[one]['soil_type'], by_id[one]['crops']), ('wheat', 'clay', ['lentil']))
+        self.assertEqual((by_id[two]['current_crop'], by_id[two]['soil_type'], by_id[two]['crops']), ('fallow', 'unknown', ['barley', 'chickpea']))
+
+    def test_field_answers_are_validated(self):
+        field_id = self.farm().data['parcels'][0]['id']
+        url = f'/api/fields/{field_id}/'
+        self.assertEqual(self.client.patch(url, {'current_crop': 'banana'}, format='json').status_code, 400)
+        self.assertEqual(self.client.patch(url, {'soil_type': 'lava'}, format='json').status_code, 400)
+        self.assertEqual(self.client.patch(url, {'crops': ['fallow']}, format='json').status_code, 400)

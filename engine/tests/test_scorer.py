@@ -257,3 +257,10 @@ def test_required_crop_is_in_every_alternative(features_mock, request_default):
         if not s["is_current"]:
             assert "lentil" in [x["crop_id"] for x in s["seasons"]], s["id"]
     assert "note_required_crop" in [n["code"] for n in out["notes"]]
+
+
+def test_perennial_gets_a_set_up_once_step(features_mock, request_default):
+    body = _with_current(request_default, [{"crop_id": "alfalfa"}])
+    cur = next(s for s in score(features_mock, body)["strategies"] if s["is_current"])
+    assert cur["action_steps"][0]["action"] == "sow"
+    assert cur["action_steps"][0]["message"]["code"] == "step_perennial_why"

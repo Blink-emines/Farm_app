@@ -2,12 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 import { useI18n } from '../i18n/index.jsx';
 import { DEFAULT_POINT, inBox } from '../constants.js';
 import { createFarm } from '../api.js';
+import { soilFromMap } from '../soilText.js';
 import LocationPicker from './LocationPicker.jsx';
 import { PinIcon } from './icons.jsx';
 
 // Crops are chosen later, in the optimisation tab.
 const STEPS = ['name', 'fields', 'soil', 'location'];
-const SOILS = ['clay', 'loam', 'sandy', 'red', 'stony', 'unknown'];
+export const SOILS = ['clay', 'loam', 'sandy', 'red', 'stony', 'unknown'];
 const MAX_FIELDS = 20;
 
 // Small drawings of each soil, so the farmer picks by look rather than by name.
@@ -64,6 +65,27 @@ const SOIL_ART = {
 
 export function SoilArt({ id }) {
   return <svg className="soil-art" viewBox="0 0 120 80" aria-hidden="true" focusable="false">{SOIL_ART[id]}</svg>;
+}
+
+// Picture for a soil: the farmer's answer, or the map estimate when it is "I don't know".
+const MAP_ART = { heavy_clay: 'clay', fairly_heavy: 'clay', medium: 'loam', light: 'sandy', sandy: 'sandy' };
+export function soilArtFor(soil, features) {
+  if (soil && soil !== 'unknown') return soil;
+  return MAP_ART[soilFromMap(features)?.kind] ?? 'unknown';
+}
+
+// Soil in words. "I don't know" is never shown: the map estimate is, with its note.
+export function SoilWords({ soil, features }) {
+  const { t } = useI18n();
+  if (soil && soil !== 'unknown') return <strong>{t(`ui.soil_${soil}`)}</strong>;
+  const m = soilFromMap(features);
+  if (!m) return <span className="help">{t(features ? 'ui.soilmap_none' : 'ui.checking_place')}</span>;
+  return (
+    <span className="soil-words">
+      <strong>{t(`ui.soilmap_${m.kind}`)}</strong>
+      <span className="soil-note">{t(m.regional ? 'ui.soilmap_note_regional' : 'ui.soilmap_note')}</span>
+    </span>
+  );
 }
 
 const toNumber = (text) => Number(String(text).replace(',', '.'));

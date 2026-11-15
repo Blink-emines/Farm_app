@@ -150,8 +150,8 @@ export async function createFarm(farm) {
   return authed('/api/farms/', { method: 'POST', body: farm });
 }
 
-// changes: e.g. { crops: ['wheat', 'lentil'] }
-export async function updateFarm(id, changes) {
+// One field's answers in the optimisation tab: { current_crop, soil_type, crops }.
+export async function updateField(id, changes) {
   if (USE_MOCK) return null;
-  return authed(`/api/farms/${id}/`, { method: 'PATCH', body: changes });
+  return authed(`/api/fields/${id}/`, { method: 'PATCH', body: changes });
 }

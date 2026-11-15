@@ -11,11 +11,23 @@ from .models import Farm, Field, Measurement, Result
 MARKET_CROPS = [c for c in load_crops() if c != 'fallow']
 
 
+CURRENT_CROPS = list(load_crops())  # every engine crop, 'fallow' = bare field
+
+
 class FieldSerializer(serializers.ModelSerializer):
+    current_crop = serializers.ChoiceField(choices=CURRENT_CROPS + [''], required=False)
+    soil_type = serializers.ChoiceField(choices=[c for c, _ in Farm.SOIL_TYPES] + [''], required=False)
+    crops = serializers.ListField(
+        child=serializers.ChoiceField(choices=MARKET_CROPS), required=False, max_length=len(MARKET_CROPS)
+    )
+
     class Meta:
         model = Field
         # No 'owner': the server sets it from the login token, never the client.
-        fields = ['id', 'name', 'latitude', 'longitude']
+        fields = ['id', 'name', 'latitude', 'longitude', 'area_ha', 'current_crop', 'soil_type', 'crops']
+
+    def validate_crops(self, crops):
+        return list(dict.fromkeys(crops))
 
 
 class ParcelSerializer(serializers.ModelSerializer):
@@ -25,7 +37,8 @@ class ParcelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Field
-        fields = ['id', 'name', 'area_ha']
+        fields = ['id', 'name', 'area_ha', 'current_crop', 'soil_type', 'crops']
+        read_only_fields = ['current_crop', 'soil_type', 'crops']
 
 
 class FarmSerializer(serializers.ModelSerializer):

@@ -62,7 +62,7 @@ function useWidth(ref, fallback = 343) {
   return w;
 }
 
-export default function FieldLife({ strategy, climate, compact = false, cursor = null, marked = null, onMark, soilRange }) {
+export default function FieldLife({ strategy, climate, compact = false, marked = null, onMark, soilRange }) {
   const { t, crop, month, lang } = useI18n();
   const box = useRef(null);
   const width = useWidth(box);
@@ -178,10 +178,6 @@ export default function FieldLife({ strategy, climate, compact = false, cursor =
         {Array.from({ length: years - 1 }, (_, y) => (
           <line key={y} x1={xb(12 * (y + 1))} x2={xb(12 * (y + 1))} y1={compact ? 0 : 20} y2={L.axis + 6} className="fl-year-line" />
         ))}
-
-        {cursor != null && cursor < n && (
-          <rect x={x(cursor)} y={compact ? 0 : 18} width={cell} height={L.axis - (compact ? 0 : 12)} className="fl-cursor" />
-        )}
 
         {!compact && months.map((m, i) => (i % labelStep === 0 ? (
           <text key={i} x={x(i) + cell / 2} y={L.axis} textAnchor="middle" className="fl-month">{initial(m.month)}</text>

@@ -43,3 +43,8 @@ Update: Supabase migrated to 0004 with user approval (RLS check: no table withou
 ## 2026-11-15 — results redesign, two tabs, calendar fix (lead, branch farm-setup)
 Done: engine calendar fix + soil_steps + allowed_crops (contract updated); setup wizard 4 steps, map first; My farm / Optimisation tabs; new results (Life of your field, verdicts, Listen, Play, Compare strips, Details); /unslop polish pass (4px grid, plural-safe copy, single highlight in Compare). Found and fixed: allowed_crops with 1-2 crops returned a 500 (fewer than 3 strategies). Tests: engine + cross-layer 171, Django 69, e2e 9 (on Supabase; e2e users deleted). Checked at 375px in EN and AR RTL, no horizontal scroll.
 Open: Listen depends on the phone's voices (Moroccan Arabic is rare; falls back to standard Arabic). Verdict thresholds and soil names need a review by an agronomist/native speaker. Second wizard: waiting for the user's spec.
+
+## 2026-11-15 — fixes round from the user's testing (lead, branch farm-setup)
+Done: items 1-4, 8, 9, 11, 12, 13 (engine action_steps/facts/required_crop, per-field answers, Darija farmer screens, Listen + audio script, compare cards). Tests: engine+cross-layer 178, Django 71, data 89, e2e 12 (on SQLite; see tests/report.md).
+Blocked: Supabase migrate to 0005 was refused by the tool's safety check; the owner must run it. Until then the backend on :8000 (Supabase) cannot load farms.
+Open: native review of docs/darija-review.md; record clips from docs/audio-script.md.

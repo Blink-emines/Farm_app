@@ -6,7 +6,9 @@ import StrategyDetail from './StrategyDetail.jsx';
 import ClimateDashboard from './ClimateDashboard.jsx';
 import SoilProfile from './SoilProfile.jsx';
 import MyPlan from './MyPlan.jsx';
-import FieldLife, { dryMonths, flatMonths, soilEnd, soilLine } from './FieldLife.jsx';
+import { flatMonths } from './FieldLife.jsx';
+import { verdicts } from './MyPlan.jsx';
+import Listen from './Listen.jsx';
 import TimeMachine from './TimeMachine.jsx';
 import SpaceView from './SpaceView.jsx';
 import WhatIf from './WhatIf.jsx';
@@ -73,35 +75,83 @@ function CompactCard({ s, onOpen }) {
   );
 }
 
-// Compare: the options as thin "life of the field" strips on one soil scale. The one that ends with
-// the highest soil line and the one with the fewest dry months are marked.
-function CompareStack({ strategies, climate, selected, onPick }) {
-  const { t, tm } = useI18n();
-  const lines = strategies.map((s) => soilLine(s, flatMonths(s)));
-  const range = [Math.min(0, ...lines.flat()), Math.max(0, ...lines.flat())];
-  const ends = strategies.map(soilEnd);
-  const dry = strategies.map((s) => dryMonths(s) / (s.calendar.length || 1));
-  const bestSoil = ends.indexOf(Math.max(...ends));
-  const fewestDry = dry.indexOf(Math.min(...dry));
+// Compare: one card per option with the same rows (return, water, soil, risk months), then one plain
+// sentence on how it differs from the current rotation. Yields are FAOSTAT national ranges or nothing.
+function CompareCards({ strategies, selected, onPick }) {
+  const { t, tm, crop, month, lang } = useI18n();
+  const name = (c) => (c === 'fallow' ? t('ui.s_fallow') : crop(c));
+  const inSentence = (c) => (lang === 'ar' ? name(c) : name(c).toLowerCase());
+  const cur = strategies.find((s) => s.is_current);
+  const dryList = (s) => [...new Set(flatMonths(s).filter((m) => m.stress_reasons.some((r) => r.code === 'stress_water_deficit')).map((m) => m.month))];
+  const soilKey = (s) => verdicts(s)[1].key;
+
+  const difference = (s) => {
+    if (s.is_current) return t('ui.cmp_this_is_now');
+    const f = s.facts;
+    const c = cur.facts;
+    const good = [];
+    const bad = [];
+    if (f.return.relative_to_current === 'more') good.push(t('ui.cmp_d_more_return'));
+    if (f.return.relative_to_current === 'less') bad.push(t('ui.cmp_d_less_return'));
+    if (f.water_need_mm_per_year != null && c.water_need_mm_per_year != null && c.water_need_mm_per_year > 0) {
+      const r = f.water_need_mm_per_year / c.water_need_mm_per_year;
+      if (r > 1.1) bad.push(t('ui.cmp_d_more_water'));
+      if (r < 0.9) good.push(t('ui.cmp_d_less_water'));
+    }
+    if (f.soil_points - c.soil_points > 0.5) good.push(t('ui.cmp_d_better_soil'));
+    if (f.soil_points - c.soil_points < -0.5) bad.push(t('ui.cmp_d_worse_soil'));
+    if (f.dry_months_per_year - c.dry_months_per_year > 0.5) bad.push(t('ui.cmp_d_more_dry'));
+    if (f.dry_months_per_year - c.dry_months_per_year < -0.5) good.push(t('ui.cmp_d_fewer_dry'));
+    if (!good.length && !bad.length) return t('ui.cmp_d_same');
+    const sep = t('ui.list_sep');
+    const goodText = good.join(sep);
+    const badText = bad.join(sep);
+    return `${t('ui.cmp_d_prefix')} ${goodText}${goodText && badText ? ` ${t('ui.cmp_d_but')} ` : ''}${badText}`;
+  };
+
   return (
-    <div className="stack compare-stack">
+    <div className="stack">
       <p className="help">{t('ui.cmp_help')}</p>
-      {strategies.map((s, i) => (
-        <article key={s.id} className={`cmp-row${s.id === selected ? ' is-selected' : ''}`}>
-          <header className="cmp-head">
-            <span className="tag">{tagOf(t, s)}</span>
-            <h3>{tm(s.name)}</h3>
-          </header>
-          <FieldLife strategy={s} climate={climate} compact soilRange={range} />
-          <ul className="cmp-facts">
-            {i === bestSoil && <li className="cmp-badge">{t('ui.cmp_best_soil')}</li>}
-            {i === fewestDry && <li className="cmp-badge">{t('ui.cmp_fewest_dry')}</li>}
-            <li>{t('ui.cmp_dry', { n: Math.round(dry[i] * 10) / 10 })}</li>
-          </ul>
-          <button type="button" className="btn btn-quiet" onClick={() => onPick(s.id)}>{t('ui.cmp_show')}</button>
-        </article>
-      ))}
-      <p className="muted">{t('ui.life_key_soil')}</p>
+      <div className="cmp-cards">
+        {strategies.map((s) => {
+          const crops = s.seasons.map((x) => x.crop_id);
+          const title = t('ui.cmp_if').replace('{crops}', crops.map(inSentence).join(` ${t('ui.s_then')} `));
+          const f = s.facts;
+          const ret = f.return.crops.map((r) => (r.yield_t_per_ha
+            ? t('ui.cmp_yield', { crop: name(r.crop_id), min: r.yield_t_per_ha.min, max: r.yield_t_per_ha.max })
+            : t('ui.cmp_yield_none', { crop: name(r.crop_id) })));
+          const rel = f.return.relative_to_current === 'current' ? '' : t(`ui.cmp_rel_${f.return.relative_to_current}`);
+          const water = f.water_need_mm_per_year == null ? t('ui.dash_unknown') : t('ui.cmp_water_mm', { mm: f.water_need_mm_per_year });
+          const dry = dryList(s);
+          const risk = dry.length ? t('ui.cmp_risk_months', { n: f.dry_months_per_year, months: dry.map(month).join(t('ui.list_sep')) }) : t('ui.cmp_risk_none');
+          const diff = difference(s);
+          const spoken = [title, t('ui.cmp_row_return'), ...ret, rel, t('ui.cmp_row_water'), water, t('ui.cmp_row_soil'), t(`ui.${soilKey(s)}`), t('ui.cmp_row_risk'), risk, diff].filter(Boolean).join('. ');
+          return (
+            <article key={s.id} className={`cmp-card${s.id === selected ? ' is-selected' : ''}`}>
+              <header className="cmp-head">
+                <span className="tag">{tagOf(t, s)}</span>
+                <h3>{title}</h3>
+              </header>
+              <dl className="cmp-rows">
+                <dt>{t('ui.cmp_row_return')}</dt>
+                <dd>{ret.map((r, i) => <span key={i} className="cmp-line">{r}</span>)}{rel && <span className="cmp-line cmp-rel">{rel}</span>}</dd>
+                <dt>{t('ui.cmp_row_water')}</dt>
+                <dd>{water}</dd>
+                <dt>{t('ui.cmp_row_soil')}</dt>
+                <dd>{t(`ui.${soilKey(s)}`)}</dd>
+                <dt>{t('ui.cmp_row_risk')}</dt>
+                <dd>{risk}</dd>
+              </dl>
+              <p className="cmp-diff">{diff}</p>
+              <div className="cmp-actions">
+                <button type="button" className="btn btn-quiet" onClick={() => onPick(s.id)}>{t('ui.cmp_show')}</button>
+                <Listen compact clips={[]} text={spoken} />
+              </div>
+            </article>
+          );
+        })}
+      </div>
+      <p className="muted">{t('ui.cmp_yield_note')}</p>
     </div>
   );
 }
@@ -109,7 +159,7 @@ function CompareStack({ strategies, climate, selected, onPick }) {
 const TABS = ['plan', 'compare', 'details'];
 const DETAILS = ['options', 'climate', 'history', 'space', 'soil', 'whatif'];
 
-export default function Results({ data, features, form, onPrint }) {
+export default function Results({ data, features, form, soil, onPrint }) {
   const { t, tm } = useI18n();
   const [openId, setOpenId] = useState(null);
   const [tab, setTab] = useState('plan');
@@ -138,9 +188,9 @@ export default function Results({ data, features, form, onPrint }) {
       </div>
 
       <div id="tab-panel" role="tabpanel" aria-labelledby={`tab-${tab}`} className="stack">
-        {tab === 'plan' && <MyPlan strategy={selected} features={features} onCompare={() => setTab('compare')} onPrint={onPrint} />}
+        {tab === 'plan' && <MyPlan strategy={selected} features={features} soil={soil} onCompare={() => setTab('compare')} onPrint={onPrint} />}
         {tab === 'compare' && (
-          <CompareStack strategies={data.strategies} climate={climate} selected={selected.id} onPick={(id) => { setSelId(id); setTab('plan'); window.scrollTo({ top: 0 }); }} />
+          <CompareCards strategies={data.strategies} selected={selected.id} onPick={(id) => { setSelId(id); setTab('plan'); window.scrollTo({ top: 0 }); }} />
         )}
         {tab === 'details' && (
           <>

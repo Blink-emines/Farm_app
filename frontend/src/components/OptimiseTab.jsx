@@ -1,17 +1,21 @@
 import { useI18n } from '../i18n/index.jsx';
 import { CROPS } from '../constants.js';
-import RotationInput from './RotationInput.jsx';
 import Priorities from './Priorities.jsx';
 import { CropIcon } from './icons.jsx';
+import { SOILS, SoilArt, SoilWords } from './FarmSetup.jsx';
 
 const MARKET_CROPS = CROPS.filter((c) => c !== 'fallow');
+const NOW_CHOICES = [...MARKET_CROPS, 'fallow']; // 'fallow' = bare field
 
-// "Optimisation" tab: which field, what grows there now, which crops the farmer can get,
-// what matters to them. Then "Show my plan".
-export default function OptimiseTab({ farm, form, patch, fieldId, onField, loading, error, onRun, onAllFields }) {
+// "Optimisation" tab, per field: (a) what is on the field now, (b) the soil, (c) what the farmer
+// can or wants to plant, then the goal sliders. Each field keeps its own answers (state lives in App).
+export default function OptimiseTab({ farm, features, fieldId, onField, st, set, loading, error, onRun, onAllFields }) {
   const { t, crop } = useI18n();
-  const chosen = form.allowedCrops ?? [];
-  const toggle = (c) => patch({ allowedCrops: chosen.includes(c) ? chosen.filter((x) => x !== c) : [...chosen, c] });
+  const chosen = st.crops;
+  const all = chosen.length === MARKET_CROPS.length;
+  const toggle = (c) => set({ crops: chosen.includes(c) ? chosen.filter((x) => x !== c) : [...chosen, c] });
+  const nowName = (c) => (c === 'fallow' ? t('ui.optab_bare') : crop(c));
+  const planHint = chosen.length === 0 ? 'ui.optab_plant_none' : chosen.length === 1 ? 'ui.optab_plant_one' : all ? 'ui.optab_plant_all' : 'ui.optab_plant_some';
 
   return (
     <div className="wizard opt stack">
@@ -30,14 +34,40 @@ export default function OptimiseTab({ farm, form, patch, fieldId, onField, loadi
         </section>
       )}
 
-      <section className="stack" aria-labelledby="opt-now">
-        <h2 id="opt-now">{t('ui.step_rotation')}</h2>
-        <RotationInput seasons={form.seasons} onChange={(seasons) => patch({ seasons })} />
+      <section className="stack opt-step" aria-labelledby="opt-now">
+        <h2 id="opt-now"><span className="step-n">1</span>{t('ui.optab_now')}</h2>
+        <div className="crop-grid" role="radiogroup" aria-labelledby="opt-now">
+          {NOW_CHOICES.map((c) => (
+            <button key={c} type="button" role="radio" aria-checked={st.current === c} className="crop-card" onClick={() => set({ current: c })}>
+              {c === 'fallow' ? <SoilArt id="loam" /> : <CropIcon id={c} size={44} />}
+              <span>{nowName(c)}</span>
+            </button>
+          ))}
+        </div>
       </section>
 
-      <section className="stack" aria-labelledby="opt-crops">
-        <h2 id="opt-crops">{t('ui.farm_q_crops')}</h2>
-        <p className="help">{t('ui.opt_crops_help')}</p>
+      <section className="stack opt-step" aria-labelledby="opt-soil">
+        <h2 id="opt-soil"><span className="step-n">2</span>{t('ui.optab_soil')}</h2>
+        <div className="soil-grid" role="radiogroup" aria-labelledby="opt-soil">
+          {SOILS.map((s) => (
+            <button key={s} type="button" role="radio" aria-checked={st.soil === s} className="soil-card" onClick={() => set({ soil: s })}>
+              <SoilArt id={s} />
+              <strong>{t(`ui.soil_${s}`)}</strong>
+            </button>
+          ))}
+        </div>
+        {st.soil === 'unknown' && (
+          <p className="notice soil-auto" role="status">{t('ui.optab_soil_auto')} <SoilWords soil="unknown" features={features} /></p>
+        )}
+      </section>
+
+      <section className="stack opt-step" aria-labelledby="opt-plant">
+        <div className="opt-step-head">
+          <h2 id="opt-plant"><span className="step-n">3</span>{t('ui.optab_plant')}</h2>
+          <button type="button" className="btn btn-quiet" onClick={() => set({ crops: all ? [] : [...MARKET_CROPS] })}>
+            {all ? t('ui.optab_clear') : t('ui.optab_select_all')}
+          </button>
+        </div>
         <div className="crop-grid">
           {MARKET_CROPS.map((c) => (
             <button key={c} type="button" aria-pressed={chosen.includes(c)} className="crop-card" onClick={() => toggle(c)}>
@@ -46,15 +76,15 @@ export default function OptimiseTab({ farm, form, patch, fieldId, onField, loadi
             </button>
           ))}
         </div>
-        <p className="help" aria-live="polite">{chosen.length ? t('ui.farm_crops_count', { n: chosen.length }) : t('ui.opt_crops_all')}</p>
+        <p className="help" aria-live="polite">{t(planHint, { crop: chosen[0] ?? '' })}</p>
       </section>
 
-      <section className="stack" aria-labelledby="opt-goals">
-        <h2 id="opt-goals">{t('ui.step_goals')}</h2>
-        <Priorities values={form.priorities} onChange={(priorities) => patch({ priorities })} />
+      <section className="stack opt-step" aria-labelledby="opt-goals">
+        <h2 id="opt-goals"><span className="step-n">4</span>{t('ui.step_goals')}</h2>
+        <Priorities values={st.priorities} onChange={(priorities) => set({ priorities })} />
       </section>
 
-      {error && <p className="notice notice-error" role="alert">{t(`err.${error}`)}</p>}
+      {error && <p className="notice notice-error" role="alert">{t(error.startsWith('ui.') ? error : `err.${error}`)}</p>}
 
       <div className="wizard-nav">
         <button type="button" className="btn btn-primary" disabled={loading} onClick={onRun}>

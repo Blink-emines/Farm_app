@@ -48,6 +48,10 @@ class Field(models.Model):
     area_ha = models.FloatField(
         null=True, blank=True, validators=[MinValueValidator(0.01), MaxValueValidator(10000)]
     )
+    # The farmer's answers in the optimisation tab, kept per field.
+    current_crop = models.CharField(max_length=20, blank=True, default='')  # crop id, 'fallow' = bare
+    soil_type = models.CharField(max_length=10, blank=True, default='')  # Farm.SOIL_TYPES, '' = farm's
+    crops = models.JSONField(default=list, blank=True)  # crops the farmer can or wants to plant
     name = models.CharField(max_length=100)
     latitude = models.FloatField(
         validators=[MinValueValidator(-90), MaxValueValidator(90)]

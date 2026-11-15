@@ -6,7 +6,7 @@ import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 import { useI18n } from '../i18n/index.jsx';
 import { SatelliteTiles } from './tiles.jsx';
 import { CropIcon } from './icons.jsx';
-import { SoilArt } from './FarmSetup.jsx';
+import { SoilArt, SoilWords, soilArtFor } from './FarmSetup.jsx';
 
 const icon = L.icon({ iconUrl: markerIcon, iconRetinaUrl: markerIcon2x, shadowUrl: markerShadow, iconSize: [25, 41], iconAnchor: [12, 41] });
 const total = (xs) => xs.reduce((a, b) => a + b, 0);
@@ -31,6 +31,8 @@ function indicators(features) {
 export default function Dashboard({ farm, features, onOptimise }) {
   const { t, crop } = useI18n();
   const area = Math.round(total(farm.parcels.map((p) => p.area_ha ?? 0)) * 100) / 100;
+  // Crops chosen in the optimisation tab, over all fields (older farms kept them on the farm).
+  const chosen = [...new Set([...farm.parcels.flatMap((p) => p.crops ?? []), ...(farm.crops ?? [])])];
   const period = features?.climate?.period;
 
   return (
@@ -56,22 +58,26 @@ export default function Dashboard({ farm, features, onOptimise }) {
           <h2 id="dash-fields">{t('ui.dash_fields')}</h2>
           <ul className="dash-fields">
             {farm.parcels.map((p) => (
-              <li key={p.id}><span>{p.name}</span><b>{p.area_ha} {t('ui.unit_ha')}</b></li>
+              <li key={p.id}>
+                <span>{p.name}</span>
+                {p.current_crop && <span className="dash-now">{p.current_crop === 'fallow' ? t('ui.optab_bare') : <><CropIcon id={p.current_crop} size={20} />{crop(p.current_crop)}</>}</span>}
+                <b>{p.area_ha} {t('ui.unit_ha')}</b>
+              </li>
             ))}
           </ul>
         </section>
 
         <section className="dash-card dash-soil" aria-labelledby="dash-soil">
           <h2 id="dash-soil">{t('ui.dash_soil')}</h2>
-          <SoilArt id={farm.soil_type} />
-          <p><strong>{t(`ui.soil_${farm.soil_type}`)}</strong></p>
+          <SoilArt id={soilArtFor(farm.soil_type, features)} />
+          <p><SoilWords soil={farm.soil_type} features={features} /></p>
         </section>
 
         <section className="dash-card" aria-labelledby="dash-crops">
           <h2 id="dash-crops">{t('ui.dash_crops')}</h2>
-          {farm.crops?.length ? (
+          {chosen.length ? (
             <ul className="dash-crops">
-              {farm.crops.map((c) => <li key={c}><CropIcon id={c} size={36} /><span>{crop(c)}</span></li>)}
+              {chosen.map((c) => <li key={c}><CropIcon id={c} size={36} /><span>{crop(c)}</span></li>)}
             </ul>
           ) : (
             <p className="help">{t('ui.dash_crops_none')}</p>

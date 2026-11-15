@@ -1,5 +1,38 @@
 # QA report
 
+## Update 2026-11-15 (lead): fixes round (items 1, 2, 4, 8)
+
+| Suite | Command | Result |
+|-------|---------|--------|
+| Engine + cross-layer (contracts, integration, API) | `backend/.venv/bin/python -m pytest engine/tests tests --ignore=tests/e2e` | 178 passed |
+| Django backend | `cd backend && DATABASE_URL= .venv/bin/python manage.py test` | 71 passed (OK) |
+| e2e (Playwright) | `E2E_APP=http://localhost:3001 backend/.venv/bin/python -m pytest tests/e2e` | 12 passed |
+
+e2e ran against a second dev server (Vite on 3001, Django on 8001 with the local SQLite file),
+because Supabase did not yet have migration `farms/0005` (adding it needs the owner's approval
+to run `migrate`). `E2E_APP` defaults to `http://localhost:3000`.
+
+New tests for this round:
+
+| Item | Test | Where |
+|---|---|---|
+| 1. "I don't know" soil shown from the map | `test_unknown_soil_is_shown_from_the_map_not_as_i_dont_know` | `tests/e2e/test_app_flow.py` |
+| 2. Each field keeps its own answers | `test_each_field_keeps_its_own_answers` (switch 1→2→1→2); `test_each_field_keeps_its_own_answers`, `test_field_answers_are_validated` | `tests/e2e/test_app_flow.py`; `backend/farms/tests.py` |
+| 4. One chosen crop is in every option; one year only | `test_one_chosen_crop_is_in_every_option_and_the_plan_has_steps`; `test_required_crop_is_in_every_alternative` | e2e; `engine/tests/test_scorer.py` |
+| 8. Action plan from the timeline and named rules | `test_action_steps_follow_the_timeline`, `test_every_action_step_names_its_source`, `test_same_family_twice_gives_an_avoid_step`, `test_watch_water_steps_match_dry_months`, `test_perennial_gets_a_set_up_once_step`; e2e checks `data-rule` on every step and no Play button | `engine/tests/test_scorer.py`; e2e |
+| 13. Return: FAOSTAT range or "no reliable figure" | `test_facts_use_faostat_ranges_and_say_when_there_is_none` | `engine/tests/test_scorer.py` |
+
+Bugs found and fixed while testing: a CSS class collision (`.step-body`) that made the
+all-fields optimiser's "Add a parcel" button unclickable (renamed the action-plan classes
+to `act-*`); a plan step that read "Do not sow lentil" inside a plan that sows lentil
+(now worded as a warning).
+
+Not verified: Listen with recorded clips (no clips recorded yet; the speech fallback was
+exercised only for "no voice" handling in headless Chromium); Darija wording (needs the
+native-speaker review in `docs/darija-review.md`).
+
+---
+
 Date: 2026-11-14. Results re-run by the lead after the qa-docs final pass.
 
 ## Results
